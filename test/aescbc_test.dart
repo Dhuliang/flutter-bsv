@@ -11,8 +11,7 @@ import './vectors/aescbc.dart';
 void main() {
   group("Aescbc", () {
     group('vectors', () {
-      // for (var i = 0; i < aescbcJson.length; i++) {
-      for (var i = 0; i < 1; i++) {
+      for (var i = 0; i < aescbcJson.length; i++) {
         var vector = aescbcJson[i];
         test('should pass sjcl test vector $i', () {
           final key = hex.decode(vector['key']);
