@@ -1,109 +1,104 @@
 class Constants {
-  static MainnetConstants mainnet = MainnetConstants();
+  static NetworkConstants mainnet = MainnetConstants();
 
-  static TestnetConstants testnet = TestnetConstants();
+  static NetworkConstants testnet = TestnetConstants();
 
-  static RegtestConstants regtest = RegtestConstants();
+  static NetworkConstants regtest = RegtestConstants();
 
-  static STNConstants stn = STNConstants();
+  static NetworkConstants stn = STNConstants();
 }
 
-class MainnetConstants {
-  // MAX_SIZE
-  static const int MaxSize = 0x02000000;
-  static const int Port = 8333;
+abstract class NetworkConstants {
+  // base net is mainnet
+  int maxSize = 0x02000000;
+  int port = 8333;
 
-  static const int AddressPubKeyHash = 0x00;
-  static const int AddressPayToScriptHash = 0x05;
+  int addressPubKeyHash = 0x00;
+  int addressPayToScriptHash = 0x05;
 
-  static const int Bip32PubKey = 0x0488b21e;
-  static const int Bip32PrivKey = 0x0488ade4;
+  int bip32PubKey = 0x0488b21e;
+  int bip32PrivKey = 0x0488ade4;
 
-  static const int BlockMaxNBits = 0x1d00ffff;
-  static const int BlockMagicNum = 0xe3e1f3e8;
+  int blockMaxNBits = 0x1d00ffff;
+  int blockMagicNum = 0xe3e1f3e8;
 
-  static const int MsgMagicNum = 0xe3e1f3e8;
+  int msgMagicNum = 0xe3e1f3e8;
   // as of Bitcoin SV v1.0.5
-  static const int MsgVersionBytesNum = 70015;
+  int msgVersionBytesNum = 70015;
 
-  static const int PrivKeyVersionByteNum = 0x80;
+  int privKeyVersionByteNum = 0x80;
 
   // number of satoshis that an output can't be less than
-  static const int TxBuilderDust = 546;
-  static const double TxBuilderFeePerKbNum = 0.00000500e8;
+  int txBuilderDust = 546;
+  double txBuilderFeePerKbNum = 0.00000500e8;
 }
 
-class TestnetConstants {
-  // MAX_SIZE
-  static const int MaxSize = 0x02000000;
-  static const int Port = 18333;
+class MainnetConstants extends NetworkConstants {}
 
-  static const int AddressPubKeyHash = 0x6f;
-  static const int AddressPayToScriptHash = 0xc4;
+class TestnetConstants extends NetworkConstants {
+  int maxSize = 0x02000000;
+  int port = 18333;
 
-  static const int Bip32PubKey = 0x043587cf;
-  static const int Bip32PrivKey = 0x04358394;
+  int addressPubKeyHash = 0x6f;
+  int addressPayToScriptHash = 0xc4;
 
-  static const int BlockMaxNBits = 0x1d00ffff;
-  static const int BlockMagicNum = 0xf4e5f3f4;
+  int bip32PubKey = 0x043587cf;
+  int bip32PrivKey = 0x04358394;
 
-  static const int MsgMagicNum = 0xf4e5f3f4;
+  int blockMaxNBits = 0x1d00ffff;
+  int blockMagicNum = 0xf4e5f3f4;
+
+  int msgMagicNum = 0xf4e5f3f4;
   // as of Bitcoin SV v1.0.5
-  static const int MsgVersionBytesNum = 70015;
+  int msgVersionBytesNum = 70015;
 
-  static const int PrivKeyVersionByteNum = 0xef;
+  int privKeyVersionByteNum = 0xef;
 
   // number of satoshis that an output can't be less than
-  static const int TxBuilderDust = 546;
-  static const double TxBuilderFeePerKbNum = 0.00000500e8;
+  int txBuilderDust = 546;
+  double txBuilderFeePerKbNum = 0.00000500e8;
 }
 
-class RegtestConstants {
-  // MAX_SIZE
-  static const int MaxSize = 0x02000000;
-  static const int Port = 18444;
+class RegtestConstants extends NetworkConstants {
+  int maxSize = 0x02000000;
+  int port = 18444;
 
-  static const int AddressPubKeyHash = 0x6f;
-  static const int AddressPayToScriptHash = 0xc4;
+  int addressPubKeyHash = 0x6f;
+  int addressPayToScriptHash = 0xc4;
 
-  static const int Bip32PubKey = 0x043587cf;
-  static const int Bip32PrivKey = 0x04358394;
+  int bip32PubKey = 0x043587cf;
+  int bip32PrivKey = 0x04358394;
 
-  static const int BlockMaxNBits = 0x207fffff;
-  static const int BlockMagicNum = 0xdab5bffa;
+  int blockMaxNBits = 0x207fffff;
+  int blockMagicNum = 0xdab5bffa;
 
-  static const int MsgMagicNum = 0xdab5bffa;
-  // as of Bitcoin SV v1.0.5
-  static const int MsgVersionBytesNum = 70015;
+  int msgMagicNum = 0xdab5bffa;
+  int msgVersionBytesNum = 70015;
 
-  static const int PrivKeyVersionByteNum = 0xef;
+  int privKeyVersionByteNum = 0xef;
 
-  // number of satoshis that an output can't be less than
-  static const int TxBuilderDust = 546;
-  static const double TxBuilderFeePerKbNum = 0.00000500e8;
+  int txBuilderDust = 546;
+  double txBuilderFeePerKbNum = 0.00000500e8;
 }
 
-class STNConstants {
-  // MAX_SIZE
-  static const int MaxSize = 0x02000000;
-  static const int Port = 9333;
+class STNConstants extends NetworkConstants {
+  int maxSize = 0x02000000;
+  int port = 9333;
 
-  static const int AddressPubKeyHash = 0x6f;
-  static const int AddressPayToScriptHash = 0xc4;
+  int addressPubKeyHash = 0x6f;
+  int addressPayToScriptHash = 0xc4;
 
-  static const int Bip32PubKey = 0x043587cf;
-  static const int Bip32PrivKey = 0x04358394;
+  int bip32PubKey = 0x043587cf;
+  int bip32PrivKey = 0x04358394;
 
-  static const int BlockMaxNBits = 0x1d00ffff;
-  static const int BlockMagicNum = 0xfbcec4f9;
+  int blockMaxNBits = 0x1d00ffff;
+  int blockMagicNum = 0xfbcec4f9;
 
-  static const int MsgMagicNum = 0xfbcec4f9;
-  // as of Bitcoin SV v1.0.5
-  static const int MsgVersionBytesNum = 70015;
+  int msgMagicNum = 0xfbcec4f9;
+  int msgVersionBytesNum = 70015;
 
-  static const int PrivKeyVersionByteNum = 0xef;
+  int privKeyVersionByteNum = 0xef;
 
-  // number of satoshis that an output can't be less than
-  static const int TxBuilderDust = 546;
-  static const double TxBuilderFeePerKbNum = 0.00000500e8;
+  int txBuilderDust = 546;
+  double txBuilderFeePerKbNum = 0.00000500e8;
 }

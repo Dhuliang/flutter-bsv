@@ -91,6 +91,25 @@ class Shark extends Fish with Swimmer {}
 
 class FlyingFish extends Fish with Swimmer, Flyer {}
 
+abstract class NetworkConstants {
+  int maxSize = 33;
+}
+
+class MainC extends NetworkConstants {
+  @override
+  int get maxSize => 11;
+}
+
+class MainX extends NetworkConstants {
+  int maxSize = 22;
+}
+
+class MainO extends NetworkConstants {}
+
+test11(NetworkConstants n) {
+  print(n.maxSize);
+}
+
 void main() {
   test('adds one to input values', () {
     String result = '';
@@ -103,6 +122,10 @@ void main() {
 
     print(result);
     Client().method();
+    BigInt.one;
+    test11(MainX());
+    test11(MainO());
+    test11(MainC());
 
     // final calculator = Calculator();
     // expect(calculator.addOne(2), 3);

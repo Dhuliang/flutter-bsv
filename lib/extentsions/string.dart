@@ -1,4 +1,4 @@
-extension NumberParsing on String {
+extension StringX on String {
   int parseInt() {
     return int.parse(this);
   }
