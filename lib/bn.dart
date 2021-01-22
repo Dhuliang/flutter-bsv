@@ -231,30 +231,33 @@ class BigIntX {
     if (other is num) {
       return this.bn.compareTo(BigInt.from(other));
     }
+    if (other is BigInt) {
+      return this.bn.compareTo(other);
+    }
     throw Exception("not support yet");
   }
 
-  bool eq(BigIntX other) {
+  bool eq(dynamic other) {
     return this.cmp(other) == 0;
   }
 
-  bool neq(BigIntX other) {
+  bool neq(dynamic other) {
     return this.cmp(other) != 0;
   }
 
-  bool gt(BigIntX other) {
+  bool gt(dynamic other) {
     return this.cmp(other) > 0;
   }
 
-  bool geq(BigIntX other) {
+  bool geq(dynamic other) {
     return this.cmp(other) >= 0;
   }
 
-  bool lt(BigIntX other) {
+  bool lt(dynamic other) {
     return this.cmp(other) < 0;
   }
 
-  bool leq(BigIntX other) {
+  bool leq(dynamic other) {
     return this.cmp(other) <= 0;
   }
 

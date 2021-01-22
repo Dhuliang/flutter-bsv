@@ -40,7 +40,7 @@ class PrivKey {
     do {
       privBuf = RandomBytes.getRandomBuffer(32);
       bn = BigIntX.fromBuffer(privBuf);
-      condition = bn.lt(BigIntX(bn: Point.getN()));
+      condition = bn.lt(Point.getN());
     } while (!condition);
 
     return PrivKey(bn: bn, compressed: true);
