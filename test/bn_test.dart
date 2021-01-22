@@ -29,7 +29,7 @@ void main() {
       expect(bn.toString(), (math.pow(2, 26)).toString());
     });
 
-    //it('should correctly square the number related to a bug in bn.js', function () {
+    //test('should correctly square the number related to a bug in bn.js', function () {
     //   const p = Bn._prime('k256').p
     //   const red = Bn.red('k256')
 
@@ -437,4 +437,185 @@ void main() {
   //       .should.equal(true)
   //   })
   // })
+
+  group('#toSm', () {
+    test('should convert to Sm', () {
+      List<int> buf;
+      buf = BigIntX.zero().toSm();
+      expect(buf.toHex(), '');
+
+      buf = BigIntX.fromNum(5).toSm();
+      expect(buf.toHex(), '05');
+
+      buf = BigIntX.fromNum(-5).toSm();
+      expect(buf.toHex(), '85');
+
+      buf = BigIntX.fromNum(128).toSm();
+      expect(buf.toHex(), '0080');
+
+      buf = BigIntX.fromNum(-128).toSm();
+      expect(buf.toHex(), '8080');
+
+      buf = BigIntX.fromNum(127).toSm();
+      expect(buf.toHex(), '7f');
+
+      buf = BigIntX.fromNum(-127).toSm();
+      expect(buf.toHex(), 'ff');
+
+      buf = BigIntX.fromNum(128).toSm(endian: Endian.little);
+      expect(buf.toHex(), '8000');
+
+      buf = BigIntX.fromNum(-128).toSm(endian: Endian.little);
+      expect(buf.toHex(), '8080');
+    });
+  });
+
+  group('#fromSm', () {
+    test('should convert from Sm', () {
+      var buf;
+      buf = [0];
+      expect(BigIntX.fromSm(buf).cmp(BigIntX.fromNum(0)), 0);
+
+      buf = hex.decode('05');
+      expect(BigIntX.fromSm(buf).cmp(BigIntX.fromNum(5)), 0);
+
+      buf = hex.decode('85');
+      expect(BigIntX.fromSm(buf).cmp(BigIntX.fromNum(-5)), 0);
+
+      buf = hex.decode('0080');
+      expect(BigIntX.fromSm(buf).cmp(BigIntX.fromNum(128)), 0);
+
+      buf = hex.decode('8080');
+      expect(BigIntX.fromSm(buf).cmp(BigIntX.fromNum(-128)), 0);
+
+      buf = hex.decode('8000');
+      expect(
+          BigIntX.fromSm(buf, endian: Endian.little).cmp(BigIntX.fromNum(128)),
+          0);
+
+      buf = hex.decode('8080');
+      expect(
+          BigIntX.fromSm(buf, endian: Endian.little).cmp(BigIntX.fromNum(-128)),
+          0);
+
+      buf = hex.decode('0080');
+      expect(BigIntX.fromSm(buf, endian: Endian.little).cmp(BigIntX.fromNum(0)),
+          0);
+    });
+  });
+
+  group('#toScriptNumBuffer', () {
+    test('should output a little endian Sm number', () {
+      var bn = BigIntX.fromNum(-23434234);
+      // print(bn.toScriptNumBuffer().toHex());
+      expect(
+        bn.toScriptNumBuffer().toHex(),
+        bn.toSm(endian: Endian.little).toHex(),
+      );
+    });
+  });
+
+  group('#fromScriptNumBuffer', () {
+    test('should parse this normal number', () {
+      expect(BigIntX.fromScriptNumBuffer(buf: hex.decode('01')).toInt(), 1);
+
+      expect(BigIntX.fromScriptNumBuffer(buf: hex.decode('0080')).toInt(), 0);
+
+      expect(BigIntX.fromScriptNumBuffer(buf: hex.decode('0180')).toInt(), -1);
+    });
+
+    test('should throw an error for a number over 4 bytes', () {
+      expect(
+        () => BigIntX.fromScriptNumBuffer(buf: hex.decode('8100000000')),
+        throwsException,
+        // throwsA(predicate(
+        //     (e) => e is Exception && e == Exception('script number overflo'))),
+        // throwsA(predicate((e))=>e is String)),
+        // throwsException,
+        // throwsA('script number overflo'
+        //     // allOf((e) {
+        //     //   return e == 'script number overflo';
+        //     // }),
+        //     ),
+      );
+    });
+
+    test(
+        'should throw an error for number that is not a minimal size representation',
+        () {
+      // invalid
+
+      expect(
+        () => BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('80000000'),
+          fRequireMinimal: true,
+        ),
+        throwsException,
+      );
+      expect(
+        () => BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('800000'),
+          fRequireMinimal: true,
+        ),
+        throwsException,
+      );
+      expect(
+        () => BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('00'),
+          fRequireMinimal: true,
+        ),
+        throwsException,
+      );
+
+      // // valid
+      expect(
+        BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('8000'),
+          fRequireMinimal: true,
+        ).toString(),
+        '128',
+      );
+      expect(
+        BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('0081'),
+          fRequireMinimal: true,
+        ).toString(),
+        '-256',
+      );
+      expect(
+        BigIntX.fromScriptNumBuffer(
+          buf: hex.decode(''),
+          fRequireMinimal: true,
+        ).toString(),
+        '0',
+      );
+      expect(
+        BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('01'),
+          fRequireMinimal: true,
+        ).toString(),
+        '1',
+      );
+
+      // // invalid, but flag not set
+      expect(
+        BigIntX.fromScriptNumBuffer(
+          buf: hex.decode('00000000'),
+        ).toString(),
+        '0',
+      );
+    });
+  });
+
+  group('#fromNumber', () {
+    test('should convert from a number', () {
+      expect(BigIntX.fromNum(5).toInt(), 5);
+    });
+  });
+
+  group('#toNumber', () {
+    test('it should convert to a number', () {
+      expect(BigIntX(bn: BigInt.from(5)).toInt(), 5);
+    });
+  });
 }

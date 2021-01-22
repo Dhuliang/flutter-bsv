@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:bsv/extentsions/string.dart';
 import 'package:convert/convert.dart';
 import "package:pointycastle/pointycastle.dart";
 
@@ -19,6 +20,10 @@ class BigIntX {
 
   BigIntX({this.bn});
 
+  BigIntX.zero() {
+    bn = BigInt.zero;
+  }
+
   factory BigIntX.fromNum(num n) {
     return BigIntX(bn: BigInt.from(n));
   }
@@ -27,7 +32,28 @@ class BigIntX {
     return BigIntX(bn: BigInt.parse(source, radix: radix));
   }
 
-  static BigIntX fromBuffer(
+  /// Signed magnitude buffer. Most significant bit represents sign (0 = positive,
+  /// 1 = negative).
+  factory BigIntX.fromSm(List<int> buf, {Endian endian = Endian.big}) {
+    if (buf.isEmpty) {
+      return BigIntX.fromBuffer([0]);
+    }
+
+    if (endian == Endian.little) {
+      buf = reverseBuf(buf);
+    }
+
+    if (buf[0] & 0x80 > 0) {
+      buf[0] = buf[0] & 0x7f;
+      var tmp = BigIntX.fromBuffer(buf);
+      return tmp.neg();
+    } else {
+      return BigIntX.fromBuffer(buf);
+    }
+    // return BigIntX.fromBuffer(buf);
+  }
+
+  factory BigIntX.fromBuffer(
     List<int> list, {
     Endian endian = Endian.big,
   }) {
@@ -38,8 +64,53 @@ class BigIntX {
     return BigIntX(bn: BigInt.tryParse(str, radix: 16));
   }
 
-  static BigIntX fromHex(String hexStr, {Endian endian = Endian.big}) {
+  factory BigIntX.fromHex(String hexStr, {Endian endian = Endian.big}) {
     return BigIntX.fromBuffer(hex.decode(hexStr), endian: endian);
+  }
+
+  // This is analogous to the constructor for CScriptNum in bitcoind. Many ops
+  // in bitcoind's script interpreter use CScriptNum, which is not really a
+  // proper bignum. Instead, an error is thrown if trying to input a number
+  // bigger than 4 bytes. We copy that behavior here. There is one exception -
+  // in CHECKLOCKTIMEVERIFY, the numbers are allowed to be up to 5 bytes long.
+  // We allow for setting that variable here for use in CHECKLOCKTIMEVERIFY.
+  //这类似于bitcoind中CScriptNum的构造函数。 许多行动
+  //在bitcoind的脚本解释器中使用CScriptNum，这实际上不是
+  //正确的bignum。 相反，如果尝试输入数字，则会引发错误
+  //大于4个字节。 我们在此复制该行为。 有一个例外-
+  //在CHECKLOCKTIMEVERIFY中，数字的最大长度为5个字节。
+  //我们允许在此处设置该变量以用于CHECKLOCKTIMEVERIFY。
+  factory BigIntX.fromScriptNumBuffer({
+    List<int> buf,
+    bool fRequireMinimal = false,
+    int nMaxNumSize,
+  }) {
+    if (nMaxNumSize == null) {
+      nMaxNumSize = 4;
+    }
+    if (buf.length > nMaxNumSize) {
+      throw Exception('script number overflow');
+    }
+    if (fRequireMinimal && buf.length > 0) {
+      // Check that the number is encoded with the minimum possible
+      // number of bytes.
+      //
+      // If the most-significant-byte - excluding the sign bit - is zero
+      // then we're not minimal. Note how this test also rejects the
+      // negative-zero encoding, 0x80.
+      if ((buf[buf.length - 1] & 0x7f) == 0) {
+        // One exception: if there's more than one byte and the most
+        // significant bit of the second-most-significant-byte is set
+        // it would conflict with the sign bit. An example of this case
+        // is +-255, which encode to 0xff00 and 0xff80 respectively.
+        // (big-endian).
+        if (buf.length <= 1 || (buf[buf.length - 2] & 0x80) == 0) {
+          throw Exception('non-minimally encoded script number');
+        }
+      }
+    }
+
+    return BigIntX.fromSm(buf, endian: Endian.little);
   }
 
   String toHex({int size, Endian endian = Endian.big}) {
@@ -72,7 +143,8 @@ class BigIntX {
       // buf = hex.decode(this.bn.toRadixString(16).padLeft(size, '0'));
       // return this.bn.toRadixString(16).padLeft(size);
     } else {
-      var hexStr = this.bn.toRadixString(16).padLeft(2, '0');
+      // var hexStr = this.bn.toRadixString(16).padLeft(2, '0');
+      var hexStr = this.bn.toRadixString(16).padLeft0();
       buf = hex.decode(hexStr);
     }
 
@@ -96,28 +168,37 @@ class BigIntX {
   /// not implement
   /// fromBits(){}
 
-  /// not implement
-  /// toSm(){}
+  List<int> toSm({Endian endian = Endian.big}) {
+    List<int> buf;
+    if (this?.cmp(0) == -1) {
+      buf = this.neg().toBuffer();
+      if (buf[0] & 0x80 > 0) {
+        // buf = Buffer.concat([Buffer.from([0x80]), buf])
+        buf = [0x80, ...buf];
+      } else {
+        buf[0] = buf[0] | 0x80;
+      }
+    } else {
+      buf = this.toBuffer();
+      if (buf[0] & 0x80 > 0) {
+        // buf = Buffer.concat([Buffer.from([0x00]), buf])
+        buf = [0x00, ...buf];
+      }
+    }
 
-  /// Signed magnitude buffer. Most significant bit represents sign (0 = positive,
-  /// 1 = negative).
-  BigIntX fromSm(List<int> buf, {Endian endian = Endian.big}) {
-    if (buf.isEmpty) {
-      BigIntX.fromBuffer([0]);
+    if ((buf.length == 1) & (buf[0] == 0)) {
+      buf = [];
     }
 
     if (endian == Endian.little) {
       buf = reverseBuf(buf);
     }
 
-    if (buf[0] & 0x80 == 1) {
-      buf[0] = buf[0] & 0x7f;
-      var tmp = BigIntX.fromBuffer(buf);
-      return tmp.neg();
-    } else {
-      return BigIntX.fromBuffer(buf);
-    }
-    // return BigIntX.fromBuffer(buf);
+    return buf;
+  }
+
+  int toInt() {
+    return this.bn.toInt();
   }
 
   BigIntX neg() => BigIntX(bn: bn * BigInt.from(-1));
@@ -141,7 +222,17 @@ class BigIntX {
 
   BigIntX div(BigIntX other) => BigIntX(bn: bn ~/ other.bn);
 
-  int cmp(BigIntX other) => this.bn.compareTo(other.bn);
+  // TODO should check is num or is bigintx will be better
+  // int cmp(BigIntX other) => this.bn.compareTo(other.bn);
+  int cmp(dynamic other) {
+    if (other is BigIntX) {
+      return this.bn.compareTo(other.bn);
+    }
+    if (other is num) {
+      return this.bn.compareTo(BigInt.from(other));
+    }
+    throw Exception("not support yet");
+  }
 
   bool eq(BigIntX other) {
     return this.cmp(other) == 0;
@@ -169,5 +260,13 @@ class BigIntX {
 
   String toString({int radix = 10}) {
     return this.bn.toRadixString(radix);
+  }
+
+  //上面的推论，除了我们不抛出的明显例外
+  //如果输出大于四个字节，则返回错误。 （如果
+  //执行数值运算，导致溢出超过4
+  //字节）。
+  List<int> toScriptNumBuffer() {
+    return this.toSm(endian: Endian.little);
   }
 }
