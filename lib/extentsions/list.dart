@@ -15,4 +15,10 @@ extension ListX<T> on List<T> {
 
     return List.from(flattened);
   }
+
+  String toHex() {
+    return (this as List<int>)
+        .map((e) => e.toRadixString(16).padLeft(2, '0'))
+        .join();
+  }
 }

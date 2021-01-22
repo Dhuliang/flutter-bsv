@@ -1,7 +1,10 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
+import 'package:bsv/extentsions/list.dart';
 import 'package:convert/convert.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -310,4 +313,128 @@ void main() {
       expect(BigIntX(bn: BigInt.from(5)).toString(), '5');
     });
   });
+
+  group('@fromBuffer', () {
+    test('should work with big endian', () {
+      var bn = BigIntX.fromBuffer(hex.decode('0001'));
+      expect(bn.toString(), '1');
+    });
+
+    test('should work with big endian 256', () {
+      var bn = BigIntX.fromBuffer(hex.decode('0100'));
+      expect(bn.toString(), '256');
+    });
+
+    test('should work with little endian if we specify the size', () {
+      var bn = BigIntX.fromBuffer(hex.decode('0100'), endian: Endian.little);
+      expect(bn.toString(), '1');
+    });
+  });
+
+  group('#fromHex', () {
+    test('should create bn from known hex', () {
+      var bn = BigIntX.fromHex('0100', endian: Endian.little);
+      expect(bn.toString(), '1');
+    });
+  });
+
+  group('#fromBuffer', () {
+    test('should work as a prototype method', () {
+      var bn = BigIntX.fromBuffer(hex.decode('0100'), endian: Endian.little);
+      expect(bn.toString(), '1');
+    });
+  });
+
+  group('#toHex', () {
+    test('should create a hex string of 4 byte buffer', () {
+      var bn = BigIntX.fromNum(1);
+      expect(bn.toHex(size: 4), '00000001');
+    });
+  });
+
+  group('#toBuffer', () {
+    test('should convert zero to empty buffer', () {
+      expect(listEquals(BigIntX.fromNum(0).toBuffer(), [0]), true);
+    });
+
+    test('should create a 4 byte buffer', () {
+      var bn = BigIntX.fromNum(1);
+
+      expect(bn.toBuffer(size: 4).toHex(), '00000001');
+    });
+
+    test('should create a 4 byte buffer in little endian', () {
+      var bn = BigIntX.fromNum(1);
+
+      expect(bn.toBuffer(size: 4, endian: Endian.little).toHex(), '01000000');
+    });
+
+    test('should create a 2 byte buffer even if you ask for a 1 byte', () {
+      var bn = BigIntX.fromString("ff00", radix: 16);
+      expect(bn.toBuffer(size: 1).toHex(), 'ff00');
+    });
+
+    test('should create a 4 byte buffer even if you ask for a 1 byte', () {
+      var bn = BigIntX.fromString("ffffff00", radix: 16);
+      expect(bn.toBuffer(size: 4).toHex(), 'ffffff00');
+    });
+  });
+
+  // group('#toBits', () {
+  //   test('should convert these known Bns to bits', () {
+  //     expect(BigIntX.fromHex('00').toBits(), 0x00000000);
+
+  //     expect(BigIntX.fromHex('01').toBits(), 0x01000001);
+
+  //     expect(BigIntX.fromHex('0101').toBits(), 0x02000101);
+
+  //     expect(BigIntX.fromHex('010101').toBits(), 0x03010101);
+
+  //     expect(BigIntX.fromHex('01010101').toBits(), 0x04010101);
+
+  //     expect(BigIntX.fromHex('0101010101').toBits(), 0x04010101);
+
+  //     expect(BigIntX.fromHex('0101010101').toBits(), 0x05010101);
+
+  //     expect(BigIntX.fromHex('010101010101').toBits(), 0x06010101);
+
+  //     expect(BigIntX.fromNum(-1).toBits(), 0x01800001);
+  //   });
+  // });
+
+  // describe('#fromBits', function () {
+  //   it('should convert these known bits to Bns', function () {
+  //     new Bn()
+  //       .fromBits(0x01003456)
+  //       .toHex()
+  //       .should.equal('')
+  //     new Bn()
+  //       .fromBits(0x02003456)
+  //       .toHex()
+  //       .should.equal('34')
+  //     new Bn()
+  //       .fromBits(0x03003456)
+  //       .toHex()
+  //       .should.equal('3456')
+  //     new Bn()
+  //       .fromBits(0x04003456)
+  //       .toHex()
+  //       .should.equal('345600')
+  //     new Bn()
+  //       .fromBits(0x05003456)
+  //       .toHex()
+  //       .should.equal('34560000')
+  //     new Bn()
+  //       .fromBits(0x05f03456)
+  //       .lt(0)
+  //       .should.equal(true) // sign bit set
+  //     ;(function () {
+  //       new Bn().fromBits(0x05f03456, { strict: true }) // sign bit set
+  //     }.should.throw('negative bit set'))
+  //     new Bn()
+  //       .fromBits(0x04923456)
+  //       .lt(0)
+  //       .should.equal(true)
+  //   })
+  // })
 }
