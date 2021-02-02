@@ -441,7 +441,7 @@ void main() {
   group('#toSm', () {
     test('should convert to Sm', () {
       List<int> buf;
-      buf = BigIntX.zero().toSm();
+      buf = BigIntX.zero.toSm();
       expect(buf.toHex(), '');
 
       buf = BigIntX.fromNum(5).toSm();

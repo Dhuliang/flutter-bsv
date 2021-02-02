@@ -4,17 +4,23 @@ import 'package:bsv/bn.dart';
 import 'package:bsv/constants.dart';
 import 'package:bsv/point.dart';
 import 'package:bsv/random.dart';
+import 'package:bs58check/bs58check.dart' as Base58Check;
 
 class PrivKey {
   BigIntX bn;
   bool compressed;
-  int privKeyVersionByteNum = Constants.mainnet.privKeyVersionByteNum;
+  int privKeyVersionByteNum;
 
   PrivKey({
-    this.bn,
-    this.compressed,
-    this.privKeyVersionByteNum,
-  });
+    BigIntX bn,
+    bool compressed,
+    int privKeyVersionByteNum,
+  }) {
+    this.bn = bn;
+    this.compressed = compressed;
+    this.privKeyVersionByteNum =
+        privKeyVersionByteNum ?? Constants.mainnet.privKeyVersionByteNum;
+  }
 
   factory PrivKey.testnet({BigIntX bn, bool compressed}) {
     return PrivKey(
@@ -32,6 +38,51 @@ class PrivKey {
     );
   }
 
+  factory PrivKey.fromRandom() {
+    return PrivKey().fromRandom();
+  }
+
+  factory PrivKey.fromBuffer(buf) {
+    return PrivKey().fromBuffer(buf);
+  }
+
+  factory PrivKey.fromBn(BigIntX bn) {
+    return PrivKey(bn: bn);
+  }
+
+  factory PrivKey.fromWif(String str) {
+    return PrivKey.fromBuffer(Base58Check.decode(str));
+  }
+
+  factory PrivKey.fromString(String str) {
+    return PrivKey.fromWif(str);
+  }
+
+  factory PrivKey.fromHex(String str) {
+    return PrivKey.fromBn(BigIntX.fromHex(str));
+  }
+
+  factory PrivKey.fromJSON(String str) {
+    return PrivKey.fromHex(str);
+  }
+
+  PrivKey fromBuffer(List<int> buf) {
+    if (buf.length == 1 + 32 + 1 && buf[1 + 32 + 1 - 1] == 1) {
+      this.compressed = true;
+    } else if (buf.length == 1 + 32) {
+      this.compressed = false;
+    } else {
+      throw new Exception(
+          'Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)');
+    }
+
+    if (buf[0] != this.privKeyVersionByteNum) {
+      throw new Exception('Invalid versionByteNum byte');
+    }
+
+    return PrivKey.fromBn(BigIntX.fromBuffer(buf.sublist(1, 1 + 32)));
+  }
+
   PrivKey fromRandom() {
     List<int> privBuf;
     BigIntX bn;
@@ -43,28 +94,48 @@ class PrivKey {
       condition = bn.lt(Point.getN());
     } while (!condition);
 
-    return PrivKey(bn: bn, compressed: true);
+    // return PrivKey(bn: bn, compressed: true);
+    this.bn = bn;
+    this.compressed = true;
+    return this;
   }
 
-  toBuffer() {
+  List<int> toBuffer() {
     var compressed = this.compressed;
 
     if (compressed == null) {
       compressed = true;
     }
-// Endian.big
-    // var privBuf = this.bn.toBuffer({size: 32});
-    // let buf
-    // if (compressed) {
-    //   buf = Buffer.concat([
-    //     Buffer.from([this.privKeyVersionByteNum]),
-    //     privBuf,
-    //     Buffer.from([0x01])
-    //   ])
-    // } else {
-    //   buf = Buffer.concat([Buffer.from([this.Constants.versionByteNum]), privBuf])
-    // }
 
-    // return buf
+    var privBuf = this.bn.toBuffer(size: 32);
+    List<int> buf;
+    if (compressed) {
+      buf = [
+        this.privKeyVersionByteNum,
+        ...privBuf,
+        0x01,
+      ];
+    } else {
+      buf = [this.privKeyVersionByteNum, ...privBuf];
+    }
+
+    return buf;
+  }
+
+  String toWif() {
+    return Base58Check.encode(Uint8List.fromList(this.toBuffer()));
+  }
+
+  String toJSON() {
+    return this.toHex();
+  }
+
+  String toHex() {
+    return this.bn.toHex();
+  }
+
+  @override
+  String toString() {
+    return this.toWif();
   }
 }

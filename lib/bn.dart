@@ -20,9 +20,9 @@ class BigIntX {
 
   BigIntX({this.bn});
 
-  BigIntX.zero() {
-    bn = BigInt.zero;
-  }
+  static BigIntX get zero => BigIntX(bn: BigInt.zero);
+  static BigIntX get one => BigIntX(bn: BigInt.one);
+  static BigIntX get two => BigIntX(bn: BigInt.two);
 
   factory BigIntX.fromNum(num n) {
     return BigIntX(bn: BigInt.from(n));
@@ -47,10 +47,9 @@ class BigIntX {
       buf[0] = buf[0] & 0x7f;
       var tmp = BigIntX.fromBuffer(buf);
       return tmp.neg();
-    } else {
-      return BigIntX.fromBuffer(buf);
     }
-    // return BigIntX.fromBuffer(buf);
+
+    return BigIntX.fromBuffer(buf);
   }
 
   factory BigIntX.fromBuffer(
