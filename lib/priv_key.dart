@@ -5,11 +5,17 @@ import 'package:bsv/constants.dart';
 import 'package:bsv/point.dart';
 import 'package:bsv/random.dart';
 import 'package:bs58check/bs58check.dart' as Base58Check;
+import 'package:convert/convert.dart';
 
 class PrivKey {
   BigIntX bn;
   bool compressed;
   int privKeyVersionByteNum;
+
+  static const INVALID_PRIV_KEY_LENGTH =
+      "Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)";
+
+  static const INVALID_VERSION_BYTE_NUM_BYTE = "Invalid versionByteNum byte";
 
   PrivKey({
     BigIntX bn,
@@ -42,7 +48,7 @@ class PrivKey {
     return PrivKey().fromRandom();
   }
 
-  factory PrivKey.fromBuffer(buf) {
+  factory PrivKey.fromBuffer(List<int> buf) {
     return PrivKey().fromBuffer(buf);
   }
 
@@ -59,7 +65,7 @@ class PrivKey {
   }
 
   factory PrivKey.fromHex(String str) {
-    return PrivKey.fromBn(BigIntX.fromHex(str));
+    return PrivKey.fromBuffer(hex.decode(str));
   }
 
   factory PrivKey.fromJSON(String str) {
@@ -67,20 +73,27 @@ class PrivKey {
   }
 
   PrivKey fromBuffer(List<int> buf) {
+    bool compressed;
     if (buf.length == 1 + 32 + 1 && buf[1 + 32 + 1 - 1] == 1) {
-      this.compressed = true;
+      compressed = true;
     } else if (buf.length == 1 + 32) {
-      this.compressed = false;
+      compressed = false;
     } else {
-      throw new Exception(
-          'Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)');
+      throw INVALID_PRIV_KEY_LENGTH;
+      // throw new Exception(
+      //     'Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)');
+      // throw ('Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)');
     }
 
     if (buf[0] != this.privKeyVersionByteNum) {
-      throw new Exception('Invalid versionByteNum byte');
+      // throw new Exception('Invalid versionByteNum byte');
+      throw INVALID_VERSION_BYTE_NUM_BYTE;
     }
 
-    return PrivKey.fromBn(BigIntX.fromBuffer(buf.sublist(1, 1 + 32)));
+    return PrivKey(
+      bn: BigIntX.fromBuffer(buf.sublist(1, 1 + 32)),
+      compressed: compressed,
+    );
   }
 
   PrivKey fromRandom() {
@@ -131,7 +144,11 @@ class PrivKey {
   }
 
   String toHex() {
-    return this.bn.toHex();
+    return hex.encode(this.toBuffer());
+  }
+
+  BigIntX toBn() {
+    return this.bn;
   }
 
   @override

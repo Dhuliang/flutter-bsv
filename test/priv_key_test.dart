@@ -1,7 +1,9 @@
 import 'package:bsv/bn.dart';
+import 'package:bsv/point.dart';
 import 'package:bsv/priv_key.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bsv/extentsions/list.dart';
 
 void main() {
   group('PrivKey', () {
@@ -59,9 +61,194 @@ void main() {
     group('#fromJSON', () {
       test('should input this address correctly', () {
         var privKey = PrivKey.fromString(encmu);
+        expect(
+          privKey.toHex(),
+          '8096c132224121b509b7d0a16245e957d9192609c5637c6228311287b1be21627a',
+        );
         var privKey2 = PrivKey.fromJSON(privKey.toHex());
         expect(privKey2.toWif(), encmu);
       });
     });
+
+    group('#toString', () {
+      test('should output this address correctly', () {
+        var privKey = new PrivKey.fromString(encmu);
+        expect(privKey.toString(), encmu);
+      });
+    });
+
+    group('#fromRandom', () {
+      test('should set bn gt 0 and lt n, and should be compressed', () {
+        var privKey = PrivKey().fromRandom();
+        expect(privKey.bn.gt(0), true);
+        expect(privKey.bn.lt(Point.getN()), true);
+        expect(privKey.compressed, true);
+      });
+    });
+
+    group('@fromRandom', () {
+      test('should set bn gt 0 and lt n, and should be compressed', () {
+        var privKey = PrivKey.fromRandom();
+        expect(privKey.bn.gt(0), true);
+        expect(privKey.bn.lt(Point.getN()), true);
+        expect(privKey.compressed, true);
+      });
+    });
+
+    group('#toHex', () {
+      test('should return a hex string', () {
+        var privKey = PrivKey.fromBn((BigIntX.fromNum(5)));
+        expect(
+          privKey.toHex(),
+          '80000000000000000000000000000000000000000000000000000000000000000501',
+        );
+      });
+    });
+
+    group('#toBuffer', () {
+      test('should return a buffer', () {
+        var privKey = PrivKey.fromBn((BigIntX.fromNum(5)));
+        expect(
+          privKey.toBuffer().toHex(),
+          '80000000000000000000000000000000000000000000000000000000000000000501',
+        );
+      });
+    });
+
+    group('#fromHex', () {
+      test('should return a hex string', () {
+        var privKey = new PrivKey.fromHex(
+            '80000000000000000000000000000000000000000000000000000000000000000501');
+        expect(
+          privKey.toHex(),
+          '80000000000000000000000000000000000000000000000000000000000000000501',
+        );
+      });
+    });
+
+    group('#fromBuffer', () {
+      test('should return a buffer', () {
+        var privKey = PrivKey.fromBuffer(
+          hex.decode(
+              '80000000000000000000000000000000000000000000000000000000000000000501'),
+        );
+
+        expect(
+          privKey.toHex(),
+          '80000000000000000000000000000000000000000000000000000000000000000501',
+        );
+      });
+
+      test('should throw an error if buffer is wrong length', () {
+        expect(
+          () => PrivKey().fromBuffer(
+            hex.decode(
+              '8000000000000000000000000000000000000000000000000000000000000000050100',
+            ),
+          ),
+          throwsA(PrivKey.INVALID_PRIV_KEY_LENGTH),
+        );
+
+        expect(
+          () => PrivKey().fromBuffer(
+            hex.decode(
+              '8000000000000000000000000000000000000000000000000000000000000005',
+            ),
+          ),
+          throwsA(PrivKey.INVALID_PRIV_KEY_LENGTH),
+        );
+      });
+
+      test('should throw an error if buffer has wrong versionByteNum byte', () {
+        expect(
+          () => PrivKey().fromBuffer(
+            hex.decode(
+              '90000000000000000000000000000000000000000000000000000000000000000501',
+            ),
+          ),
+          throwsA(PrivKey.INVALID_VERSION_BYTE_NUM_BYTE),
+        );
+      });
+    });
+
+    group('#toBn', () {
+      test('should return a bn', () {
+        var privKey = new PrivKey.fromBn(BigIntX.fromNum(5));
+        expect(privKey.toBn().eq(5), true);
+      });
+    });
+
+    // group('#fromBn', () {
+    //   test('should create a privKey from a bignum', () {
+    //     var privKey = new PrivKey().fromBn(new Bn(5))
+    //     privKey.bn.toString().should.equal('5')
+    //   })
+    // })
+
+    // group('@fromBn', () {
+    //   test('should create a privKey from a bignum', () {
+    //     var privKey = PrivKey.fromBn(new Bn(5))
+    //     privKey.bn.toString().should.equal('5')
+    //   })
+    // })
+
+    // group('#validate', () {
+    //   test('should unvalidate these privKeys', () {
+    //     var privKey = new PrivKey()
+    //     privKey.compressed = true
+    //     privKey.bn = Point.getN()
+    //     ;(() {
+    //       privKey.validate()
+    //     }.should.throw('Number must be less than N'))
+    //     privKey.bn = Point.getN().sub(1)
+    //     privKey.compressed = undefined
+    //     ;(() {
+    //       privKey.validate()
+    //     }.should.throw(
+    //       'Must specify whether the corresponding public key is compressed or not (true or false)'
+    //     ))
+    //     privKey.compressed = true
+    //     privKey.validate().should.equal(privKey)
+    //   })
+    // })
+
+    // group('#fromWif', () {
+    //   test('should parse this compressed testnet address correctly', () {
+    //     var privKey = new PrivKey()
+    //     privKey.fromWif(encmainnet)
+    //     privKey.toWif().should.equal(encmainnet)
+    //   })
+    // })
+
+    // group('@fromWif', () {
+    //   test('should parse this compressed testnet address correctly', () {
+    //     var privKey = PrivKey.fromWif(encmainnet)
+    //     privKey.toWif().should.equal(encmainnet)
+    //   })
+    // })
+
+    // group('#toWif', () {
+    //   test('should parse this compressed testnet address correctly', () {
+    //     var privKey = new PrivKey.Testnet()
+    //     privKey.fromWif(enctestnet)
+    //     privKey.toWif().should.equal(enctestnet)
+    //   })
+    // })
+
+    // group('#fromString', () {
+    //   test('should parse this uncompressed testnet address correctly', () {
+    //     var privKey = new PrivKey.Testnet()
+    //     privKey.fromString(enctu)
+    //     privKey.toWif().should.equal(enctu)
+    //   })
+    // })
+
+    // group('#toString', () {
+    //   test('should parse this uncompressed mainnet address correctly', () {
+    //     var privKey = new PrivKey()
+    //     privKey.fromString(encmu)
+    //     privKey.toString().should.equal(encmu)
+    //   })
+    // })
   });
 }
