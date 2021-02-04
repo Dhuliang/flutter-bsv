@@ -178,77 +178,80 @@ void main() {
       });
     });
 
-    // group('#fromBn', () {
-    //   test('should create a privKey from a bignum', () {
-    //     var privKey = new PrivKey().fromBn(new Bn(5))
-    //     privKey.bn.toString().should.equal('5')
-    //   })
-    // })
+    group('#fromBn', () {
+      test('should create a privKey from a bignum', () {
+        var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
+        expect(privKey.toBn().eq(5), true);
+      });
+    });
 
-    // group('@fromBn', () {
-    //   test('should create a privKey from a bignum', () {
-    //     var privKey = PrivKey.fromBn(new Bn(5))
-    //     privKey.bn.toString().should.equal('5')
-    //   })
-    // })
+    group('@fromBn', () {
+      test('should create a privKey from a bignum', () {
+        var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
+        expect(privKey.toBn().eq(5), true);
+      });
+    });
 
-    // group('#validate', () {
-    //   test('should unvalidate these privKeys', () {
-    //     var privKey = new PrivKey()
-    //     privKey.compressed = true
-    //     privKey.bn = Point.getN()
-    //     ;(() {
-    //       privKey.validate()
-    //     }.should.throw('Number must be less than N'))
-    //     privKey.bn = Point.getN().sub(1)
-    //     privKey.compressed = undefined
-    //     ;(() {
-    //       privKey.validate()
-    //     }.should.throw(
-    //       'Must specify whether the corresponding public key is compressed or not (true or false)'
-    //     ))
-    //     privKey.compressed = true
-    //     privKey.validate().should.equal(privKey)
-    //   })
-    // })
+    group('#validate', () {
+      test('should unvalidate these privKeys', () {
+        var privKey = new PrivKey();
+        privKey.compressed = true;
+        privKey.bn = BigIntX(bn: Point.getN());
 
-    // group('#fromWif', () {
-    //   test('should parse this compressed testnet address correctly', () {
-    //     var privKey = new PrivKey()
-    //     privKey.fromWif(encmainnet)
-    //     privKey.toWif().should.equal(encmainnet)
-    //   })
-    // })
+        expect(
+          () => privKey.validate(),
+          throwsA(PrivKey.INVALID_NUMBER_N),
+        );
 
-    // group('@fromWif', () {
-    //   test('should parse this compressed testnet address correctly', () {
-    //     var privKey = PrivKey.fromWif(encmainnet)
-    //     privKey.toWif().should.equal(encmainnet)
-    //   })
-    // })
+        privKey.bn = privKey.bn.sub(BigIntX.one);
+        privKey.compressed = null;
 
-    // group('#toWif', () {
-    //   test('should parse this compressed testnet address correctly', () {
-    //     var privKey = new PrivKey.Testnet()
-    //     privKey.fromWif(enctestnet)
-    //     privKey.toWif().should.equal(enctestnet)
-    //   })
-    // })
+        expect(
+          () => privKey.validate(),
+          throwsA(PrivKey.INVALID_COMPRESSED),
+        );
 
-    // group('#fromString', () {
-    //   test('should parse this uncompressed testnet address correctly', () {
-    //     var privKey = new PrivKey.Testnet()
-    //     privKey.fromString(enctu)
-    //     privKey.toWif().should.equal(enctu)
-    //   })
-    // })
+        privKey.compressed = true;
+        expect(privKey.validate(), privKey);
+      });
+    });
 
-    // group('#toString', () {
-    //   test('should parse this uncompressed mainnet address correctly', () {
-    //     var privKey = new PrivKey()
-    //     privKey.fromString(encmu)
-    //     privKey.toString().should.equal(encmu)
-    //   })
-    // })
+    group('#fromWif', () {
+      test('should parse this compressed testnet address correctly', () {
+        var privKey = new PrivKey().fromWif(encmainnet);
+        expect(privKey.toWif(), encmainnet);
+      });
+    });
+
+    group('@fromWif', () {
+      test('should parse this compressed testnet address correctly', () {
+        var privKey = new PrivKey.fromWif(encmainnet);
+        expect(privKey.toWif(), encmainnet);
+      });
+    });
+
+    group('#toWif', () {
+      test('should parse this compressed testnet address correctly', () {
+        var privKey = new PrivKey.testnet();
+        privKey.fromWif(enctestnet);
+        expect(privKey.toWif(), enctestnet);
+      });
+    });
+
+    group('#fromString', () {
+      test('should parse this uncompressed testnet address correctly', () {
+        var privKey = new PrivKey.testnet();
+        privKey.fromString(enctu);
+        expect(privKey.toWif(), enctu);
+      });
+    });
+
+    group('#toString', () {
+      test('should parse this uncompressed mainnet address correctly', () {
+        var privKey = new PrivKey();
+        privKey.fromString(encmu);
+        expect(privKey.toString(), encmu);
+      });
+    });
   });
 }

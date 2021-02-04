@@ -17,6 +17,11 @@ class PrivKey {
 
   static const INVALID_VERSION_BYTE_NUM_BYTE = "Invalid versionByteNum byte";
 
+  static const INVALID_NUMBER_N = "Number must be less than N";
+
+  static const INVALID_COMPRESSED =
+      "Must specify whether the corresponding public key is compressed or not (true or false)";
+
   PrivKey({
     BigIntX bn,
     bool compressed,
@@ -73,11 +78,11 @@ class PrivKey {
   }
 
   PrivKey fromBuffer(List<int> buf) {
-    bool compressed;
+    // bool compressed;
     if (buf.length == 1 + 32 + 1 && buf[1 + 32 + 1 - 1] == 1) {
-      compressed = true;
+      this.compressed = true;
     } else if (buf.length == 1 + 32) {
-      compressed = false;
+      this.compressed = false;
     } else {
       throw INVALID_PRIV_KEY_LENGTH;
       // throw new Exception(
@@ -90,10 +95,26 @@ class PrivKey {
       throw INVALID_VERSION_BYTE_NUM_BYTE;
     }
 
-    return PrivKey(
-      bn: BigIntX.fromBuffer(buf.sublist(1, 1 + 32)),
-      compressed: compressed,
-    );
+    // return PrivKey(
+    //   bn: BigIntX.fromBuffer(buf.sublist(1, 1 + 32)),
+    //   compressed: compressed,
+    // );
+
+    return this.fromBn(BigIntX.fromBuffer(buf.sublist(1, 1 + 32)));
+  }
+
+  PrivKey fromBn(BigIntX bn) {
+    this.bn = bn;
+    return this;
+  }
+
+  PrivKey fromString(String str) {
+    this.bn = bn;
+    return this.fromWif(str);
+  }
+
+  PrivKey fromWif(String str) {
+    return this.fromBuffer(Base58Check.decode(str));
   }
 
   PrivKey fromRandom() {
@@ -149,6 +170,16 @@ class PrivKey {
 
   BigIntX toBn() {
     return this.bn;
+  }
+
+  PrivKey validate() {
+    if (!this.bn.lt(Point.getN())) {
+      throw INVALID_NUMBER_N;
+    }
+    if (this.compressed == null) {
+      throw INVALID_COMPRESSED;
+    }
+    return this;
   }
 
   @override
