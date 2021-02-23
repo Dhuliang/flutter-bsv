@@ -173,14 +173,14 @@ void main() {
 
     group('#toBn', () {
       test('should return a bn', () {
-        var privKey = new PrivKey.fromBn(BigIntX.fromNum(5));
+        var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
         expect(privKey.toBn().eq(5), true);
       });
     });
 
     group('#fromBn', () {
       test('should create a privKey from a bignum', () {
-        var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
+        var privKey = new PrivKey.fromBn(BigIntX.fromNum(5));
         expect(privKey.toBn().eq(5), true);
       });
     });

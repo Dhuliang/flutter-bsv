@@ -1,3 +1,5 @@
+import 'package:convert/convert.dart';
+
 extension StringX on String {
   int parseInt() {
     return int.parse(this);
@@ -9,5 +11,9 @@ extension StringX on String {
 
   String padLeft0() {
     return this.length.isEven ? this : this.padLeft(this.length + 1, '0');
+  }
+
+  List<int> toBuffer() {
+    return hex.decode(this);
   }
 }
