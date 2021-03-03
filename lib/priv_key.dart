@@ -12,16 +12,6 @@ class PrivKey {
   bool compressed;
   int privKeyVersionByteNum;
 
-  static const INVALID_PRIV_KEY_LENGTH =
-      "Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)";
-
-  static const INVALID_VERSION_BYTE_NUM_BYTE = "Invalid versionByteNum byte";
-
-  static const INVALID_NUMBER_N = "Number must be less than N";
-
-  static const INVALID_COMPRESSED =
-      "Must specify whether the corresponding public key is compressed or not (true or false)";
-
   PrivKey({
     BigIntX bn,
     bool compressed,
@@ -32,6 +22,16 @@ class PrivKey {
     this.privKeyVersionByteNum =
         privKeyVersionByteNum ?? Constants.mainnet.privKeyVersionByteNum;
   }
+
+  static const INVALID_PRIV_KEY_LENGTH =
+      "Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)";
+
+  static const INVALID_VERSION_BYTE_NUM_BYTE = "Invalid versionByteNum byte";
+
+  static const INVALID_NUMBER_N = "Number must be less than N";
+
+  static const INVALID_COMPRESSED =
+      "Must specify whether the corresponding public key is compressed or not (true or false)";
 
   factory PrivKey.testnet({BigIntX bn, bool compressed}) {
     return PrivKey(
@@ -125,7 +125,7 @@ class PrivKey {
     do {
       privBuf = RandomBytes.getRandomBuffer(32);
       bn = BigIntX.fromBuffer(privBuf);
-      condition = bn.lt(Point.getN());
+      condition = bn.lt(PointWrapper.getN());
     } while (!condition);
 
     // return PrivKey(bn: bn, compressed: true);
@@ -173,7 +173,7 @@ class PrivKey {
   }
 
   PrivKey validate() {
-    if (!this.bn.lt(Point.getN())) {
+    if (!this.bn.lt(PointWrapper.getN())) {
       throw INVALID_NUMBER_N;
     }
     if (this.compressed == null) {

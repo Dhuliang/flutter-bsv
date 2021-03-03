@@ -14,7 +14,7 @@ void main() {
     // });
 
     test('should create a public key with a point', () {
-      var p = new Point();
+      var p = new PointWrapper();
       var pk = new PubKey(point: p);
       // should.exist(pk.point)
     });

@@ -81,7 +81,7 @@ void main() {
       test('should set bn gt 0 and lt n, and should be compressed', () {
         var privKey = PrivKey().fromRandom();
         expect(privKey.bn.gt(0), true);
-        expect(privKey.bn.lt(Point.getN()), true);
+        expect(privKey.bn.lt(PointWrapper.getN()), true);
         expect(privKey.compressed, true);
       });
     });
@@ -90,7 +90,7 @@ void main() {
       test('should set bn gt 0 and lt n, and should be compressed', () {
         var privKey = PrivKey.fromRandom();
         expect(privKey.bn.gt(0), true);
-        expect(privKey.bn.lt(Point.getN()), true);
+        expect(privKey.bn.lt(PointWrapper.getN()), true);
         expect(privKey.compressed, true);
       });
     });
@@ -196,7 +196,7 @@ void main() {
       test('should unvalidate these privKeys', () {
         var privKey = new PrivKey();
         privKey.compressed = true;
-        privKey.bn = BigIntX(bn: Point.getN());
+        privKey.bn = PointWrapper.getN();
 
         expect(
           () => privKey.validate(),

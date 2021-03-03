@@ -8,7 +8,7 @@ import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:convert/convert.dart';
 
 class PubKey {
-  Point point;
+  PointWrapper point;
   bool compressed;
 
   static const INVALID_BUF_LENGTH = "Length of x and y must be 32 bytes";
@@ -27,7 +27,7 @@ class PubKey {
   static const INVALID_POINT_ZERO = "point: Point cannot be equal to 0, 0";
 
   PubKey({
-    Point point,
+    PointWrapper point,
     bool compressed,
   }) {
     this.point = point;
