@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
-import 'package:bsv/constants.dart';
 import 'package:bsv/point.dart';
-import 'package:bsv/random.dart';
-import 'package:bs58check/bs58check.dart' as Base58Check;
+import 'package:bsv/priv_key.dart';
+// import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:convert/convert.dart';
+import 'package:flutter/foundation.dart';
 
 class PubKey {
   PointWrapper point;
@@ -34,157 +34,204 @@ class PubKey {
     this.compressed = compressed;
   }
 
-  // factory PrivKey.testnet({BigIntX bn, bool compressed}) {
-  //   return PrivKey(
-  //     bn: bn,
-  //     compressed: compressed,
-  //     privKeyVersionByteNum: Constants.testnet.privKeyVersionByteNum,
-  //   );
-  // }
+  factory PubKey.fromPrivKey(PrivKey privKey) {
+    return PubKey().fromPrivKey(privKey);
+  }
 
-  // factory PrivKey.mainnet({BigIntX bn, bool compressed}) {
-  //   return PrivKey(
-  //     bn: bn,
-  //     compressed: compressed,
-  //     privKeyVersionByteNum: Constants.mainnet.privKeyVersionByteNum,
-  //   );
-  // }
+  factory PubKey.fromDer(List<int> buf, [bool strict]) {
+    return PubKey().fromDer(buf, strict);
+  }
 
-  // factory PrivKey.fromRandom() {
-  //   return PrivKey().fromRandom();
-  // }
+  PubKey fromJSON(String json) {
+    this.fromFastBuffer(hex.decode(json));
+    return this;
+  }
 
-  // factory PrivKey.fromBuffer(List<int> buf) {
-  //   return PrivKey().fromBuffer(buf);
-  // }
+  PubKey fromString(String str) {
+    this.fromDer(BigIntX.fromHex(str).toBuffer(), false);
+    return this;
+  }
 
-  // factory PrivKey.fromBn(BigIntX bn) {
-  //   return PrivKey(bn: bn);
-  // }
+  PubKey fromFastBuffer(List<int> buf) {
+    if (buf.isEmpty) {
+      return this;
+    }
 
-  // factory PrivKey.fromWif(String str) {
-  //   return PrivKey.fromBuffer(Base58Check.decode(str));
-  // }
+    var compressed = buf[0] == 1;
+    buf = buf.sublist(1);
+    this.fromDer(buf);
+    this.compressed = compressed;
+    return this;
+  }
 
-  // factory PrivKey.fromString(String str) {
-  //   return PrivKey.fromWif(str);
-  // }
+  // ignore: slash_for_doc_comments
+  /**
+     * In order to mimic the non-strict style of OpenSSL, set strict = false. For
+     * information and what prefixes 0x06 and 0x07 mean, in addition to the normal
+     * compressed and uncompressed public keys, see the message by Peter Wuille
+     * where he discovered these "hybrid pubKeys" on the mailing list:
+     * http://sourceforge.net/p/bitcoin/mailman/message/29416133/
+     */
+  PubKey fromDer(List<int> buf, [bool strict]) {
+    if (strict == null) {
+      strict = true;
+    } else {
+      strict = false;
+    }
 
-  // factory PrivKey.fromHex(String str) {
-  //   return PrivKey.fromBuffer(hex.decode(str));
-  // }
+    if (buf[0] == 0x04 || (!strict && (buf[0] == 0x06 || buf[0] == 0x07))) {
+      var xbuf = buf.sublist(1, 33);
+      var ybuf = buf.sublist(33, 65);
+      if (xbuf.length != 32 || ybuf.length != 32 || buf.length != 65) {
+        throw INVALID_BUF_LENGTH;
+      }
+      var x = BigIntX.fromBuffer(xbuf).bn;
+      var y = BigIntX.fromBuffer(ybuf).bn;
 
-  // factory PrivKey.fromJSON(String str) {
-  //   return PrivKey.fromHex(str);
-  // }
+      this.point = new PointWrapper(x: x, y: y);
+      this.compressed = false;
+    } else if (buf[0] == 0x03) {
+      var xbuf = buf.sublist(1);
+      var x = new BigIntX.fromBuffer(xbuf).bn;
+      this.fromX(isOdd: true, x: x);
+      this.compressed = true;
+    } else if (buf[0] == 0x02) {
+      var xbuf = buf.sublist(1);
+      var x = new BigIntX.fromBuffer(xbuf).bn;
+      this.fromX(isOdd: false, x: x);
+      this.compressed = true;
+    } else {
+      throw INVALID_DER_FORMAT;
+    }
+    return this;
+  }
 
-  // PrivKey fromBuffer(List<int> buf) {
-  //   // bool compressed;
-  //   if (buf.length == 1 + 32 + 1 && buf[1 + 32 + 1 - 1] == 1) {
-  //     this.compressed = true;
-  //   } else if (buf.length == 1 + 32) {
-  //     this.compressed = false;
-  //   } else {
-  //     throw INVALID_PRIV_KEY_LENGTH;
-  //     // throw new Exception(
-  //     //     'Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)');
-  //     // throw ('Length of privKey buffer must be 33 (uncompressed pubKey) or 34 (compressed pubKey)');
-  //   }
+  PubKey fromX({bool isOdd, BigInt x}) {
+    if (isOdd == null) {
+      throw INVALID_ODD;
+    }
 
-  //   if (buf[0] != this.privKeyVersionByteNum) {
-  //     // throw new Exception('Invalid versionByteNum byte');
-  //     throw INVALID_VERSION_BYTE_NUM_BYTE;
-  //   }
+    this.point = PointWrapper.fromX(isOdd: isOdd, x: x);
+    return this;
+  }
 
-  //   // return PrivKey(
-  //   //   bn: BigIntX.fromBuffer(buf.sublist(1, 1 + 32)),
-  //   //   compressed: compressed,
-  //   // );
+  PubKey fromBuffer(List<int> buf, [bool strict]) {
+    return this.fromDer(buf, strict);
+  }
 
-  //   return this.fromBn(BigIntX.fromBuffer(buf.sublist(1, 1 + 32)));
-  // }
+  List<int> toBuffer() {
+    var compressed = this.compressed;
 
-  // PrivKey fromBn(BigIntX bn) {
-  //   this.bn = bn;
-  //   return this;
-  // }
+    if (compressed == null) {
+      compressed = true;
+    }
 
-  // PrivKey fromString(String str) {
-  //   this.bn = bn;
-  //   return this.fromWif(str);
-  // }
+    return this.toDer(compressed);
+  }
 
-  // PrivKey fromWif(String str) {
-  //   return this.fromBuffer(Base58Check.decode(str));
-  // }
+  List<int> toDer(bool compressed) {
+    compressed = compressed == null ? this.compressed : compressed;
+    if (compressed == null) {
+      throw INVALID_COMPRESSED;
+    }
 
-  // PrivKey fromRandom() {
-  //   List<int> privBuf;
-  //   BigIntX bn;
-  //   bool condition;
+    var x = this.point.getX();
+    var y = this.point.getY();
 
-  //   do {
-  //     privBuf = RandomBytes.getRandomBuffer(32);
-  //     bn = BigIntX.fromBuffer(privBuf);
-  //     condition = bn.lt(Point.getN());
-  //   } while (!condition);
+    var xbuf = x.toBuffer(size: 32);
+    var ybuf = y.toBuffer(size: 32);
 
-  //   // return PrivKey(bn: bn, compressed: true);
-  //   this.bn = bn;
-  //   this.compressed = true;
-  //   return this;
-  // }
+    List<int> prefix;
 
-  // List<int> toBuffer() {
-  //   var compressed = this.compressed;
-
-  //   if (compressed == null) {
-  //     compressed = true;
-  //   }
-
-  //   var privBuf = this.bn.toBuffer(size: 32);
-  //   List<int> buf;
-  //   if (compressed) {
-  //     buf = [
-  //       this.privKeyVersionByteNum,
-  //       ...privBuf,
-  //       0x01,
-  //     ];
-  //   } else {
-  //     buf = [this.privKeyVersionByteNum, ...privBuf];
-  //   }
-
-  //   return buf;
-  // }
+    if (!compressed) {
+      prefix = List<int>.from([0x04]);
+      // return List<int>.from([prefix, xbuf, ybuf]);
+      return prefix + xbuf + ybuf;
+    } else {
+      var odd = ybuf[ybuf.length - 1] % 2;
+      if (odd != 0) {
+        prefix = List<int>.from([0x03]);
+      } else {
+        prefix = List<int>.from([0x02]);
+      }
+      // return List<int>.from([prefix, xbuf]);
+      return prefix + xbuf;
+    }
+  }
 
   // String toWif() {
   //   return Base58Check.encode(Uint8List.fromList(this.toBuffer()));
   // }
 
-  // String toJSON() {
-  //   return this.toHex();
-  // }
+  String toJSON() {
+    return hex.encode(this.toFastBuffer());
+  }
 
-  // String toHex() {
-  //   return hex.encode(this.toBuffer());
-  // }
+  List<int> toFastBuffer() {
+    if (this.point == null) {
+      return [0];
+    }
 
-  // BigIntX toBn() {
-  //   return this.bn;
-  // }
+    List<int> buffer = [];
+    buffer.add((this.compressed ?? true) ? 1 : 0);
+    buffer.addAll(this.toDer(false));
+    // var bw = WriteBuffer();
+    // Buffer
+    // const bw = new Bw()
 
-  // PrivKey validate() {
-  //   if (!this.bn.lt(Point.getN())) {
-  //     throw INVALID_NUMBER_N;
-  //   }
-  //   if (this.compressed == null) {
-  //     throw INVALID_COMPRESSED;
-  //   }
-  //   return this;
-  // }
+    // bw.putUint8(this.compressed ? 1 : 0);
+    // bw.putInt64List(this.toDer(false));
+    // return bw.toBuffer()
+    // return bw.done().buffer.asInt8List();
+    return buffer;
+  }
 
-  // @override
-  // String toString() {
-  //   return this.toWif();
-  // }
+  String toHex() {
+    return hex.encode(this.toBuffer());
+  }
+
+  String toString() {
+    var compressed = this.compressed == null ? true : this.compressed;
+    return hex.encode(this.toDer(compressed));
+  }
+
+  static bool isCompressedOrUncompressed(List<int> buf) {
+    if (buf.length < 33) {
+      //  Non-canonical public key: too short
+      return false;
+    }
+    if (buf[0] == 0x04) {
+      if (buf.length != 65) {
+        //  Non-canonical public key: invalid length for uncompressed key
+        return false;
+      }
+    } else if (buf[0] == 0x02 || buf[0] == 0x03) {
+      if (buf.length != 33) {
+        //  Non-canonical public key: invalid length for compressed key
+        return false;
+      }
+    } else {
+      //  Non-canonical public key: neither compressed nor uncompressed
+      return false;
+    }
+    return true;
+  }
+
+  PubKey validate() {
+    if (this.point.isInfinity) {
+      throw INVALID_POINT_INFINITY;
+    }
+    var other = PointWrapper(x: BigInt.zero, y: BigInt.zero);
+    if (this.point == other) {
+      throw INVALID_POINT_ZERO;
+    }
+    this.point.validate();
+    return this;
+  }
+
+  PubKey fromPrivKey(PrivKey privKey) {
+    this.point = PointWrapper.getG().mul(privKey.bn);
+    this.compressed = privKey.compressed;
+    return this;
+  }
 }

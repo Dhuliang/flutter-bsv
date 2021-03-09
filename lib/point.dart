@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:bsv/bn.dart';
 import 'package:convert/convert.dart';
@@ -7,24 +6,11 @@ import "package:pointycastle/pointycastle.dart";
 
 var ec = new ECDomainParameters("secp256k1");
 
-BigInt sqrt(BigInt val) {
-  BigInt half = BigInt.from(val.bitLength / 2);
-  BigInt cur = half;
-
-  while (true) {
-    BigInt tmp = half + BigInt.from(val / half) >> (1);
-
-    if (tmp == half || tmp == cur) return tmp;
-
-    cur = half;
-    half = tmp;
-  }
-}
-
 class PointWrapper {
   ECPoint point;
 
   PointWrapper({BigInt x, BigInt y}) {
+    super.toString();
     this.point = ec.curve.createPoint(x ?? BigInt.zero, y ?? BigInt.zero);
   }
 
@@ -87,6 +73,10 @@ class PointWrapper {
   static BigIntX getN() {
     return BigIntX(bn: ec.n);
   }
+
+  bool get isCompressed => this.point.isCompressed;
+
+  bool get isInfinity => this.point.isInfinity;
 
   PointWrapper copyFrom(PointWrapper other) {
     if (!(other is PointWrapper)) {
@@ -200,4 +190,15 @@ class PointWrapper {
 
     return isOnCurve;
   }
+
+  @override
+  bool operator ==(other) {
+    if (other is PointWrapper) {
+      return this.point == other.point;
+    }
+    return this == other;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }
