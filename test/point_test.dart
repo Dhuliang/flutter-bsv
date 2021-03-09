@@ -245,97 +245,78 @@ void main() {
         }
       });
 
-      // group('#mulAdd',  () {
-      //   test('should get back a point',  () {
-      //     var p1 = PointWrapper.getG()
-      //     var bn1 = new Bn(5)
-      //     var p2 = PointWrapper.getG().add(p1)
-      //     var bn2 = new Bn(6)
-      //     p1
-      //       .mulAdd(bn1, p2, bn2)
-      //       .getX()
-      //       .toString()
-      //       .should.equal(
-      //         p1
-      //           .mul(bn1)
-      //           .add(p2.mul(bn2))
-      //           .getX()
-      //           .toString()
-      //       )
-      //     p1
-      //       .mulAdd(bn1, p2, bn2)
-      //       .getY()
-      //       .toString()
-      //       .should.equal(
-      //         p1
-      //           .mul(bn1)
-      //           .add(p2.mul(bn2))
-      //           .getY()
-      //           .toString()
-      //       )
-      //   })
-      // })
+      group('#mulAdd', () {
+        test('should get back a point', () {
+          var p1 = PointWrapper.getG();
+          var bn1 = BigIntX.fromNum(5);
+          var p2 = PointWrapper.getG().add(p1);
+          var bn2 = BigIntX.fromNum(6);
 
-      // group('@getN',  () {
-      //   test('should return n',  () {
-      //     var bn = PointWrapper.getN()
-      //     ;(bn instanceof Bn).should.equal(true)
-      //   })
-      // })
+          expect(
+            p1.mulAdd(bn1, p2, bn2).getX().toString(),
+            p1.mul(bn1).add(p2.mul(bn2)).getX().toString(),
+          );
 
-      // group('@fromX',  () {
-      //   test('should return g',  () {
-      //     var g = PointWrapper.getG()
-      //     var p = PointWrapper.fromX(false, g.getX())
-      //     g.eq(p).should.equal(true)
-      //   })
-      // })
+          expect(
+            p1.mulAdd(bn1, p2, bn2).getY().toString(),
+            p1.mul(bn1).add(p2.mul(bn2)).getY().toString(),
+          );
+        });
+      });
 
-      // group('#fromX',  () {
-      //   test('should return g',  () {
-      //     var g = PointWrapper.getG()
-      //     var p = new PointWrapper.fromX(false, g.getX())
-      //     g.eq(p).should.equal(true)
-      //   })
-      // })
+      group('@getN', () {
+        test('should return n', () {
+          var bn = PointWrapper.getN();
+          expect(bn is BigIntX, true);
+        });
+      });
 
-      // group('#validate',  () {
-      //   test('should validate this valid point',  () {
-      //     var x = new Bn().fromBuffer(
-      //       Buffer.from(
-      //         'ac242d242d23be966085a2b2b893d989f824e06c9ad0395a8a52f055ba39abb2',
-      //         'hex'
-      //       )
-      //     )
-      //     var y = new Bn().fromBuffer(
-      //       Buffer.from(
-      //         '4836ab292c105a711ed10fcfd30999c31ff7c02456147747e03e739ad527c380',
-      //         'hex'
-      //       )
-      //     )
-      //     var p = new Point(x, y)
-      //     should.exist(p.validate())
-      //   })
+      group('@fromX', () {
+        test('should return g', () {
+          var g = PointWrapper.getG();
+          var p = PointWrapper.fromX(isOdd: false, x: g.getX().bn);
+          expect(g.point == p.point, true);
+        });
+      });
 
-      //   test('should invalidate this invalid point',  () {
-      //     var x = new Bn().fromBuffer(
-      //       Buffer.from(
-      //         'ac242d242d23be966085a2b2b893d989f824e06c9ad0395a8a52f055ba39abb2',
-      //         'hex'
-      //       )
-      //     )
-      //     var y = new Bn().fromBuffer(
-      //       Buffer.from(
-      //         '0000000000000000000000000000000000000000000000000000000000000000',
-      //         'hex'
-      //       )
-      //     )
-      //     var p = new Point(x, y)
-      //     ;( () {
-      //       p.validate()
-      //     }.should.throw('Invalid y value of public key'))
-      //   })
-      // })
+      group('#fromX', () {
+        test('should return g', () {
+          var g = PointWrapper.getG();
+          var p = new PointWrapper.fromX(isOdd: false, x: g.getX().bn);
+          expect(g.point == p.point, true);
+        });
+      });
+
+      group('#validate', () {
+        test('should validate this valid point', () {
+          var x = BigIntX.fromHex(
+            'ac242d242d23be966085a2b2b893d989f824e06c9ad0395a8a52f055ba39abb2',
+          );
+
+          var y = BigIntX.fromHex(
+            '4836ab292c105a711ed10fcfd30999c31ff7c02456147747e03e739ad527c380',
+          );
+
+          var p = new PointWrapper(x: x.bn, y: y.bn);
+          expect(p.validate() is PointWrapper, true);
+        });
+
+        test('should invalidate this invalid point', () {
+          var x = BigIntX.fromHex(
+            'ac242d242d23be966085a2b2b893d989f824e06c9ad0395a8a52f055ba39abb2',
+          );
+          var y = BigIntX.fromHex(
+            '0000000000000000000000000000000000000000000000000000000000000000',
+          );
+
+          var p = new PointWrapper(x: x.bn, y: y.bn);
+
+          expect(
+            () => p.validate(),
+            throwsA(PointWrapper.INVALID_Y_VALUE_OF_PUBLIC_KEY),
+          );
+        });
+      });
     });
   });
 }

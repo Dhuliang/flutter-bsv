@@ -72,34 +72,6 @@ class PointWrapper {
     PointWrapper.checkIfOnCurve(point);
 
     return PointWrapper.fromECPoint(point);
-    // var t = ec.curve.fromBigInteger(x);
-    // var alpha = (t * ((t * t) + ec.curve.a)) + ec.curve.b;
-    // ECFieldElement beta = alpha.sqrt();
-
-    // ec.curve.decodePoint(x)
-    // x = BigInt.from(16);
-    // var ecf = ec.curve.fromBigInteger(x);
-    // ecf.sqrt();
-    // ec.curve.fromBigInteger(x);
-    // // x.modPow(exponent, modulus)
-    // var n = BigInt.from(10);
-    // var exp = BigInt.from(3);
-    // var mod = BigInt.from(30);
-    // var t = n.modPow(exp, mod);
-
-    // var field = ec.curve.fromBigInteger(x);
-
-    // var a = ec.curve.fromBigInteger(BigInt.zero);
-    // var b = ec.curve.fromBigInteger(BigInt.from(7));
-
-    // var y2 = (field * field) * (field) + (field * a) + b;
-    // var tmp = sqrt(y2);
-    // x.
-    // sqrt(y2);
-    // x.
-    // x.modPow(exponent, modulus)
-
-    // return PointWrapper(x: x);
   }
 
   factory PointWrapper.fromECPoint(ECPoint point) {
@@ -133,6 +105,12 @@ class PointWrapper {
   PointWrapper mul(BigIntX other) {
     var result = PointWrapper.fromECPoint(this.point * other.bn);
     return result;
+  }
+
+  PointWrapper mulAdd(BigIntX b1, PointWrapper p, BigIntX b2) {
+    // var result = PointWrapper.fromECPoint(this.point * other.bn);
+    // return result;
+    return this.mul(b1).add(p.mul(b2));
   }
 
   // mulAdd (bn1, point, bn2) {
@@ -179,7 +157,10 @@ class PointWrapper {
   // }
 
   PointWrapper validate() {
-    var p2 = PointWrapper.fromX(x: this.getX().bn);
+    var p2 = PointWrapper.fromX(
+      isOdd: this.point.isCompressed,
+      x: this.getX().bn,
+    );
 
     if (!(p2.getY().cmp(this.getY()) == 0)) {
       throw INVALID_Y_VALUE_OF_PUBLIC_KEY;
@@ -196,7 +177,7 @@ class PointWrapper {
     return hex.encode(point.getEncoded(true));
   }
 
-  static checkIfOnCurve(ECPoint point) {
+  static bool checkIfOnCurve(ECPoint point) {
     //a bit of math copied from PointyCastle. ecc/ecc_fp.dart -> decompressPoint()
     var x = ec.curve.fromBigInteger(point.x.toBigInteger());
     var alpha = (x * ((x * x) + ec.curve.a)) + ec.curve.b;
