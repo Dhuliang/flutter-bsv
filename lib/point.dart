@@ -1,9 +1,25 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bsv/bn.dart';
+import 'package:convert/convert.dart';
 import "package:pointycastle/pointycastle.dart";
 
 var ec = new ECDomainParameters("secp256k1");
+
+BigInt sqrt(BigInt val) {
+  BigInt half = BigInt.from(val.bitLength / 2);
+  BigInt cur = half;
+
+  while (true) {
+    BigInt tmp = half + BigInt.from(val / half) >> (1);
+
+    if (tmp == half || tmp == cur) return tmp;
+
+    cur = half;
+    half = tmp;
+  }
+}
 
 class PointWrapper {
   ECPoint point;
@@ -18,10 +34,72 @@ class PointWrapper {
 
   static const INVALID_POINT_CONSTRUCTOR = "Point should be an external point";
 
+//  ShortCurve.prototype.pointFromX = function pointFromX(x, odd) {
+//   x = new BN(x, 16);
+//   if (!x.red)
+//     x = x.toRed(this.red);
+
+//   var y2 = x.redSqr().redMul(x).redIAdd(x.redMul(this.a)).redIAdd(this.b);
+//   var y = y2.redSqrt();
+//   if (y.redSqr().redSub(y2).cmp(this.zero) !== 0)
+//     throw new Error('invalid point');
+
+//   // XXX Is there any way to tell if the number is odd without converting it
+//   // to non-red form?
+//   var isOdd = y.fromRed().isOdd();
+//   if (odd && !isOdd || !odd && isOdd)
+//     y = y.redNeg();
+
+//   return this.point(x, y);
+// };
+
   factory PointWrapper.fromX({bool isOdd, BigInt x}) {
-    ec.curve.fromBigInteger(x);
-    ec.curve.fromBigInteger(x);
-    return PointWrapper(x: x);
+    var prefixByte;
+    if (isOdd) {
+      prefixByte = 0x03;
+    } else {
+      prefixByte = 0x02;
+    }
+
+    var encoded = BigIntX(bn: x).toBuffer();
+
+    var addressBytes = List<int>(1 + encoded.length);
+    addressBytes[0] = prefixByte;
+    addressBytes.setRange(1, addressBytes.length, encoded);
+
+    var point = ec.curve.decodePoint(addressBytes);
+
+    PointWrapper.checkIfOnCurve(point);
+
+    return PointWrapper.fromECPoint(point);
+    // var t = ec.curve.fromBigInteger(x);
+    // var alpha = (t * ((t * t) + ec.curve.a)) + ec.curve.b;
+    // ECFieldElement beta = alpha.sqrt();
+
+    // ec.curve.decodePoint(x)
+    // x = BigInt.from(16);
+    // var ecf = ec.curve.fromBigInteger(x);
+    // ecf.sqrt();
+    // ec.curve.fromBigInteger(x);
+    // // x.modPow(exponent, modulus)
+    // var n = BigInt.from(10);
+    // var exp = BigInt.from(3);
+    // var mod = BigInt.from(30);
+    // var t = n.modPow(exp, mod);
+
+    // var field = ec.curve.fromBigInteger(x);
+
+    // var a = ec.curve.fromBigInteger(BigInt.zero);
+    // var b = ec.curve.fromBigInteger(BigInt.from(7));
+
+    // var y2 = (field * field) * (field) + (field * a) + b;
+    // var tmp = sqrt(y2);
+    // x.
+    // sqrt(y2);
+    // x.
+    // x.modPow(exponent, modulus)
+
+    // return PointWrapper(x: x);
   }
 
   factory PointWrapper.fromECPoint(ECPoint point) {
@@ -112,5 +190,33 @@ class PointWrapper {
       throw INVALID_POINT_ON_CURVE;
     }
     return this;
+  }
+
+  static String compressPoint(ECPoint point) {
+    return hex.encode(point.getEncoded(true));
+  }
+
+  static checkIfOnCurve(ECPoint point) {
+    //a bit of math copied from PointyCastle. ecc/ecc_fp.dart -> decompressPoint()
+    var x = ec.curve.fromBigInteger(point.x.toBigInteger());
+    var alpha = (x * ((x * x) + ec.curve.a)) + ec.curve.b;
+    ECFieldElement beta = alpha.sqrt();
+
+    if (beta == null) {
+      throw ('This point is not on the curve');
+    }
+
+    //slight-of-hand. Create compressed point, reconstruct and check Y value.
+    var compressedPoint = compressPoint(point);
+    var checkPoint = ec.curve.decodePoint(hex.decode(compressedPoint));
+
+    if (checkPoint.y.toBigInteger() != point.y.toBigInteger()) {
+      throw ('This point is not on the curve');
+    }
+
+    var isOnCurve = (point.x.toBigInteger() == BigInt.zero) &&
+        (point.y.toBigInteger() == BigInt.zero);
+
+    return isOnCurve;
   }
 }

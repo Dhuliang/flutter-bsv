@@ -195,7 +195,7 @@ void main() {
 
           var n = BigIntX.fromString(nhex, radix: 16);
           var g1 = PointWrapper.getG(); // precomputed g
-          var g2 = new PointWrapper.fromX(
+          var g2 = PointWrapper.fromX(
             isOdd: false,
             x: BigIntX.fromString(
               "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
