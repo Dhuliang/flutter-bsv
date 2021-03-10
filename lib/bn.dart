@@ -271,4 +271,8 @@ class BigIntX {
   List<int> toScriptNumBuffer() {
     return this.toSm(endian: Endian.little);
   }
+
+  int toNumber() {
+    return this.bn.toInt();
+  }
 }
