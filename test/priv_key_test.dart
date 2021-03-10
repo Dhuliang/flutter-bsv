@@ -26,8 +26,8 @@ void main() {
       //   new PrivKey.Testnet().constructor
       // )
 
-      print(PrivKey.testnet().privKeyVersionByteNum);
-      expect(PrivKey.testnet().fromRandom().toString()[0], 'c');
+      print(PrivKey.Testnet().privKeyVersionByteNum);
+      expect(PrivKey.Testnet().fromRandom().toString()[0], 'c');
     });
 
     test('should create a 0 private key with this convenience method', () {
@@ -43,7 +43,7 @@ void main() {
 
     test('should create an uncompressed testnet private key', () {
       var privKey =
-          PrivKey.testnet(bn: BigIntX.fromBuffer(buf), compressed: false);
+          PrivKey.Testnet(bn: BigIntX.fromBuffer(buf), compressed: false);
       expect(privKey.toString(), enctu);
     });
 
@@ -232,7 +232,7 @@ void main() {
 
     group('#toWif', () {
       test('should parse this compressed testnet address correctly', () {
-        var privKey = new PrivKey.testnet();
+        var privKey = new PrivKey.Testnet();
         privKey.fromWif(enctestnet);
         expect(privKey.toWif(), enctestnet);
       });
@@ -240,7 +240,7 @@ void main() {
 
     group('#fromString', () {
       test('should parse this uncompressed testnet address correctly', () {
-        var privKey = new PrivKey.testnet();
+        var privKey = new PrivKey.Testnet();
         privKey.fromString(enctu);
         expect(privKey.toWif(), enctu);
       });

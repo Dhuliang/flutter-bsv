@@ -1,11 +1,15 @@
 class Constants {
-  static NetworkConstants mainnet = MainnetConstants();
+  // ignore: non_constant_identifier_names
+  static NetworkConstants Mainnet = MainnetConstants();
 
-  static NetworkConstants testnet = TestnetConstants();
+  // ignore: non_constant_identifier_names
+  static NetworkConstants Testnet = TestnetConstants();
 
-  static NetworkConstants regtest = RegtestConstants();
+  // ignore: non_constant_identifier_names
+  static NetworkConstants Regtest = RegtestConstants();
 
-  static NetworkConstants stn = STNConstants();
+  // ignore: non_constant_identifier_names
+  static NetworkConstants STN = STNConstants();
 }
 
 abstract class NetworkConstants {

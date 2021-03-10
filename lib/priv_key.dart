@@ -20,7 +20,7 @@ class PrivKey {
     this.bn = bn;
     this.compressed = compressed;
     this.privKeyVersionByteNum =
-        privKeyVersionByteNum ?? Constants.mainnet.privKeyVersionByteNum;
+        privKeyVersionByteNum ?? Constants.Mainnet.privKeyVersionByteNum;
   }
 
   static const INVALID_PRIV_KEY_LENGTH =
@@ -33,19 +33,21 @@ class PrivKey {
   static const INVALID_COMPRESSED =
       "Must specify whether the corresponding public key is compressed or not (true or false)";
 
-  factory PrivKey.testnet({BigIntX bn, bool compressed}) {
+  // ignore: non_constant_identifier_names
+  factory PrivKey.Testnet({BigIntX bn, bool compressed}) {
     return PrivKey(
       bn: bn,
       compressed: compressed,
-      privKeyVersionByteNum: Constants.testnet.privKeyVersionByteNum,
+      privKeyVersionByteNum: Constants.Testnet.privKeyVersionByteNum,
     );
   }
 
-  factory PrivKey.mainnet({BigIntX bn, bool compressed}) {
+  // ignore: non_constant_identifier_names
+  factory PrivKey.Mainnet({BigIntX bn, bool compressed}) {
     return PrivKey(
       bn: bn,
       compressed: compressed,
-      privKeyVersionByteNum: Constants.mainnet.privKeyVersionByteNum,
+      privKeyVersionByteNum: Constants.Mainnet.privKeyVersionByteNum,
     );
   }
 
