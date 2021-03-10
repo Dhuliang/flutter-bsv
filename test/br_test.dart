@@ -254,6 +254,7 @@ void main() {
         expect(br.readVarIntBuf().length, 5);
       });
 
+      // TODO
       test('should read a 9 byte varInt', () {
         // var buf = new Bw()
         //   .writeVarIntBn(new Bn(Math.pow(2, 54).toString()))
@@ -265,24 +266,25 @@ void main() {
 
     group('#readVarIntNum', () {
       test('should read a 1 byte varInt', () {
-        var view = ByteData.view(Uint8List(50).buffer);
+        var view = ByteData.view(Uint8List.fromList([50]).buffer);
         var br = new Br.fromByteData(view);
         expect(br.readVarIntNum(), 50);
       });
 
-      // test('should read a 3 byte varInt',  () {
-      //   var buf = Buffer.from([253, 253, 0])
-      //   var br = new Br(buf)
-      //   br.readVarIntNum().should.equal(253)
-      // })
+      test('should read a 3 byte varInt', () {
+        var view = ByteData.view(Uint8List.fromList([253, 253, 0]).buffer);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntNum(), 253);
+      });
 
-      // test('should read a 5 byte varInt',  () {
-      //   var buf = Buffer.from([254, 0, 0, 0, 0])
-      //   buf.writeUInt32LE(50000, 1)
-      //   var br = new Br(buf)
-      //   br.readVarIntNum().should.equal(50000)
-      // })
+      test('should read a 5 byte varInt', () {
+        var view = ByteData.view(Uint8List.fromList([254, 0, 0, 0, 0]).buffer);
+        view.setUint32(1, 50000, Endian.little);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntNum(), 50000);
+      });
 
+      // TODO
       // test('should throw an error on a 9 byte varInt over the javascript uint precision limit',  () {
       //   var buf = new Bw()
       //     .writeVarIntBn(new Bn(Math.pow(2, 54).toString()))
@@ -291,8 +293,9 @@ void main() {
       //   ;( () {
       //     br.readVarIntNum()
       //   }.should.throw('number too large to retain precision - use readVarIntBn'))
-      // })
+      // });
 
+      // TODO
       // test('should not throw an error on a 9 byte varInt not over the javascript uint precision limit',  () {
       //   var buf = new Bw()
       //     .writeVarIntBn(new Bn(Math.pow(2, 53).toString()))
@@ -306,46 +309,34 @@ void main() {
       // })
     });
 
-    // group('#readVarIntBn',  () {
-    //   test('should read a 1 byte varInt',  () {
-    //     var buf = Buffer.from([50])
-    //     var br = new Br(buf)
-    //     br
-    //       .readVarIntBn()
-    //       .toNumber()
-    //       .should.equal(50)
-    //   })
+    group('#readVarIntBn', () {
+      test('should read a 1 byte varInt', () {
+        var view = ByteData.view(Uint8List.fromList([50]).buffer);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntBn().toNumber(), 50);
+      });
 
-    //   test('should read a 3 byte varInt',  () {
-    //     var buf = Buffer.from([253, 253, 0])
-    //     var br = new Br(buf)
-    //     br
-    //       .readVarIntBn()
-    //       .toNumber()
-    //       .should.equal(253)
-    //   })
+      test('should read a 3 byte varInt', () {
+        var view = ByteData.view(Uint8List.fromList([253, 253, 0]).buffer);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntBn().toNumber(), 253);
+      });
 
-    //   test('should read a 5 byte varInt',  () {
-    //     var buf = Buffer.from([254, 0, 0, 0, 0])
-    //     buf.writeUInt32LE(50000, 1)
-    //     var br = new Br(buf)
-    //     br
-    //       .readVarIntBn()
-    //       .toNumber()
-    //       .should.equal(50000)
-    //   })
+      test('should read a 5 byte varInt', () {
+        var view = ByteData.view(Uint8List.fromList([254, 0, 0, 0, 0]).buffer);
+        view.setUint32(1, 50000, Endian.little);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntBn().toNumber(), 50000);
+      });
 
-    //   test('should read a 9 byte varInt',  () {
-    //     var buf = Buffer.concat([
-    //       Buffer.from([255]),
-    //       Buffer.from('ffffffffffffffff', 'hex')
-    //     ])
-    //     var br = new Br(buf)
-    //     br
-    //       .readVarIntBn()
-    //       .toNumber()
-    //       .should.equal(Math.pow(2, 64))
-    //   })
-    // })
+      test('should read a 9 byte varInt', () {
+        var view = ByteData.view(Uint8List.fromList([
+          ...Uint8List.fromList([255]),
+          ...hex.decode('ffffffffffffffff'),
+        ]).buffer);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntBn().bn, BigInt.parse('18446744073709551615'));
+      });
+    });
   });
 }
