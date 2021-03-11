@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
+import 'package:convert/convert.dart';
 
 /// Buffer Writer
 /// =============
@@ -11,19 +12,14 @@ import 'package:bsv/bn.dart';
 
 class Bw {
   List<Uint8List> bufs;
-  int pos;
 
-  Bw({
-    Uint8List bufs,
-    int pos,
-  }) {
-    bufs = bufs ?? Uint8List(0);
-    this.pos = pos ?? 0;
+  Bw({List<Uint8List> bufs}) {
+    this.bufs = bufs ?? List<Uint8List>(0);
   }
 
-  factory Bw.fromByteData(ByteData data) {
-    return new Bw(bufs: data.buffer.asUint8List());
-  }
+  // factory Bw.fromByteData(ByteData data) {
+  //   return new Bw(bufs: data.buffer.asUint8List());
+  // }
 
   int getLength() {
     var len = 0;
@@ -31,15 +27,20 @@ class Bw {
       var buf = item;
       len = len + buf.length;
     }
-    return bufs.length;
+    return len;
   }
 
   List<int> toBuffer() {
     return this.bufs.expand((element) => element).toList();
   }
 
+  String toHex() {
+    return hex.encode(this.toBuffer());
+  }
+
   Bw write(Uint8List buf) {
-    this.bufs.add(buf);
+    List<Uint8List> temp = []..addAll(this.bufs)..addAll([buf]);
+    this.bufs = temp;
     return this;
   }
 
@@ -48,7 +49,8 @@ class Bw {
     for (var i = 0; i < buf2.length; i++) {
       buf2[i] = buf[buf.length - 1 - i];
     }
-    this.bufs.add(buf2);
+    List<Uint8List> temp = []..addAll(this.bufs)..addAll([buf2]);
+    this.bufs = temp;
     return this;
   }
 
@@ -205,9 +207,9 @@ class Bw {
       view.setUint8(0, 254);
       view.setUint32(1, n, Endian.little);
     } else {
+      buf = Uint8List(1 + 8);
       var bw = new Bw();
-      view = ByteData.view(buf.buffer);
-      view.setUint8(0, 255);
+      bw.writeUInt8(255);
       bw.writeUInt64LEBn(bn);
       buf = Uint8List.fromList(bw.toBuffer());
     }

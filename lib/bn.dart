@@ -121,7 +121,7 @@ class BigIntX {
     List<int> buf;
 
     if (size != null) {
-      var hexStr = this.bn.toRadixString(16).padLeft(2, '0');
+      var hexStr = this.bn.toRadixString(16).padLeft0();
       var natlen = hexStr.length ~/ 2;
       buf = hex.decode(hexStr);
 

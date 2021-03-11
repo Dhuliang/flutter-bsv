@@ -20,10 +20,7 @@ class Br {
   static const ERROR_NUMBER_TOO_LARGE =
       'number too large to retain precision - use readVarIntBn';
 
-  Br({
-    Uint8List buf,
-    int pos,
-  }) {
+  Br({Uint8List buf, int pos}) {
     this.buf = buf ?? Uint8List(0);
     this.pos = pos ?? 0;
   }
