@@ -3,15 +3,18 @@ import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
 
-/// Buffer Reader
-/// =============
-///
-/// This is a convenience class for reading VarInts and other basic types from a
-/// buffer. This class is most useful for reading VarInts, and also for signed
-/// or unsigned integers of various types. It can also read a buffer in reverse
-/// order, which is useful in bitcoin which uses little endian numbers a lot so
-/// you find that you must reverse things. You probably want to use it like:
-/// varInt = new Br(buf).readnew VarInt()
+// ignore: slash_for_doc_comments
+/**
+ * Buffer Reader
+ * =============
+ *
+ * This is a convenience class for reading VarInts and other basic types from a
+ * buffer. This class is most useful for reading VarInts, and also for signed
+ * or unsigned integers of various types. It can also read a buffer in reverse
+ * order, which is useful in bitcoin which uses little endian numbers a lot so
+ * you find that you must reverse things. You probably want to use it like:
+ * varInt = new Br(buf).readnew VarInt()
+ */
 
 class Br {
   Uint8List buf;

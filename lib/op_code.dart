@@ -1,3 +1,13 @@
+/*
+ * OpCode
+ * ======
+ *
+ * An opCode is one of the operations in the bitcoin scripting language. Each
+ * operation is just a number from 0-255, and it has a corresponding string,
+ * e.g. "OP_RETURN", which comes from the name of that constant in the bitcoind
+ * source code. The way you probably want to use this is with
+ * new OpCode(str).toNumber() or new OpCode(num).toString()
+ */
 class OpCode {
   int number;
 

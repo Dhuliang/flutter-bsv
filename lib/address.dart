@@ -1,21 +1,24 @@
 import 'package:flutter/services.dart';
 
-/// Bitcoin Address
-/// ===============
-///
-/// A bitcoin address. Normal use cases:
-/// var address = new Address().fromPubKey(pubKey)
-/// var address = new Address().fromString(string)
-/// var string = address.toString()
-/// var script = address.toTxOutScript()
-/// var isValid = Address.isValid(string)
-///
-/// Can also do testnet:
-/// var address = Address.Testnet()
-///
-/// Note that an Address and an Addr are two completely different things. An
-/// Address is what you send bitcoin to. An Addr is an ip address and port that
-/// you connect to over the internet.
+// ignore: slash_for_doc_comments
+/**
+ * Bitcoin Address
+ * ===============
+ *
+ * A bitcoin address. Normal use cases:
+ * var address = new Address().fromPubKey(pubKey)
+ * var address = new Address().fromString(string)
+ * var string = address.toString()
+ * var script = address.toTxOutScript()
+ * var isValid = Address.isValid(string)
+ *
+ * Can also do testnet:
+ * var address = Address.Testnet()
+ *
+ * Note that an Address and an Addr are two completely different things. An
+ * Address is what you send bitcoin to. An Addr is an ip address and port that
+ * you connect to over the internet.
+ */
 
 class Address {
   int pubKeyHash;

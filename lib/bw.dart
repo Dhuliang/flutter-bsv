@@ -3,12 +3,15 @@ import 'dart:typed_data';
 import 'package:bsv/bn.dart';
 import 'package:convert/convert.dart';
 
-/// Buffer Writer
-/// =============
-///
-/// This is the writing complement of the Bw. You can easily write
-/// VarInts and other basic number types. The way to use it is: buf =
-/// new Bw().write(buf1).write(buf2).toBuffer()
+// ignore: slash_for_doc_comments
+/**
+ * Buffer Writer
+ * =============
+ *
+ * This is the writing complement of the Bw. You can easily write
+ * VarInts and other basic number types. The way to use it is: buf =
+ * new Bw().write(buf1).write(buf2).toBuffer()
+ */
 
 class Bw {
   List<Uint8List> bufs;
