@@ -38,11 +38,15 @@ class Br {
 
   // buffer =>
 
-  List<int> read([int len]) {
-    len = len ?? this.buf.length;
-    var buf = this.buf.sublist(this.pos, this.pos + len);
-    this.pos = this.pos + len;
-    return buf;
+  Uint8List read([int len]) {
+    try {
+      len = len ?? this.buf.length;
+      var buf = this.buf.sublist(this.pos, this.pos + len);
+      this.pos = this.pos + len;
+      return buf;
+    } catch (e) {
+      return Uint8List(0);
+    }
   }
 
   List<int> readReverse([int len]) {

@@ -110,12 +110,21 @@ class Script {
     return new Script().writeBuffer(buf);
   }
 
+  factory Script.fromHex(String hexStr) {
+    return new Script().fromhex(hexStr);
+  }
+
   Script fromJSON(json) {
     return this.fromString(json);
   }
 
   String toJSON() {
     return this.toString();
+  }
+
+  Script fromhex(String hexStr) {
+    this.fromBuffer(Uint8List.fromList(hex.decode(hexStr)));
+    return this;
   }
 
   Script fromBuffer(Uint8List buf) {
@@ -214,7 +223,7 @@ class Script {
     return this;
   }
 
-  fromString(String str) {
+  Script fromString(String str) {
     this.chunks = List<ScriptChunk>.from([]);
     if (str == '' || str == null) {
       return this;
@@ -295,7 +304,7 @@ class Script {
       }
     }
 
-    return str.substring(1);
+    return str.isEmpty ? str : str.substring(1);
   }
 
   // ignore: slash_for_doc_comments
@@ -742,9 +751,9 @@ class Script {
 
   Script writeString(String str) {
     var script = new Script().fromString(str);
-    this.chunks = this.chunks = [
+    this.chunks = [
       ...this.chunks,
-      script,
+      ...script.chunks,
     ];
     return this;
   }
