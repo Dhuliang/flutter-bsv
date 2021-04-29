@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
+import 'package:bsv/bw.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -254,13 +256,11 @@ void main() {
         expect(br.readVarIntBuf().length, 5);
       });
 
-      // TODO
       test('should read a 9 byte varInt', () {
-        // var buf = new Bw()
-        //   .writeVarIntBn(new Bn(Math.pow(2, 54).toString()))
-        //   .toBuffer()
-        // var br = new Br(buf)
-        // br.readVarIntBuf().length.should.equal(9)
+        var buf = Bw().writeVarIntBn(BigIntX.fromNum(pow(2, 54))).toBuffer();
+        var view = ByteData.view(Uint8List.fromList(buf).buffer);
+        var br = new Br.fromByteData(view);
+        expect(br.readVarIntBuf().length, 9);
       });
     });
 
@@ -284,29 +284,29 @@ void main() {
         expect(br.readVarIntNum(), 50000);
       });
 
-      // TODO
-      // test('should throw an error on a 9 byte varInt over the javascript uint precision limit',  () {
-      //   var buf = new Bw()
-      //     .writeVarIntBn(new Bn(Math.pow(2, 54).toString()))
-      //     .toBuffer()
-      //   var br = new Br(buf)
-      //   ;( () {
-      //     br.readVarIntNum()
-      //   }.should.throw('number too large to retain precision - use readVarIntBn'))
-      // });
+      test(
+          'should throw an error on a 9 byte varInt over the javascript uint precision limit',
+          () {
+        var buf = Bw().writeVarIntBn(BigIntX.fromNum(pow(2, 54))).toBuffer();
+        var view = ByteData.view(Uint8List.fromList(buf).buffer);
+        var br = new Br.fromByteData(view);
+        expect(
+          () => br.readVarIntNum(),
+          throwsA(Br.ERROR_NUMBER_TOO_LARGE),
+        );
+      });
 
-      // TODO
-      // test('should not throw an error on a 9 byte varInt not over the javascript uint precision limit',  () {
-      //   var buf = new Bw()
-      //     .writeVarIntBn(new Bn(Math.pow(2, 53).toString()))
-      //     .toBuffer()
-      //   var br = new Br(buf)
-      //   ;( () {
-      //     br.readVarIntNum()
-      //   }.should.not.throw(
-      //     'number too large to retain precision - use readVarIntBn'
-      //   ))
-      // })
+      // test(
+      //     'should not throw an error on a 9 byte varInt not over the javascript uint precision limit',
+      //     () {
+      //   var buf = Bw().writeVarIntBn(BigIntX.fromNum(pow(2, 53))).toBuffer();
+      //   var view = ByteData.view(Uint8List.fromList(buf).buffer);
+      //   var br = new Br.fromByteData(view);
+      //   expect(
+      //     () => br.readVarIntNum(),
+      //     throwsA(Br.ERROR_NUMBER_TOO_LARGE),
+      //   );
+      // });
     });
 
     group('#readVarIntBn', () {

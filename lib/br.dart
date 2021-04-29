@@ -36,16 +36,17 @@ class Br {
     return this.pos >= this.buf.length;
   }
 
-  // buffer =>
-
   Uint8List read([int len]) {
+    len = len ?? this.buf.length;
+    var start = this.pos;
+    var end = this.pos + len;
+
     try {
-      len = len ?? this.buf.length;
-      var buf = this.buf.sublist(this.pos, this.pos + len);
       this.pos = this.pos + len;
+      var buf = this.buf.sublist(start, end);
       return buf;
     } catch (e) {
-      return Uint8List(0);
+      return Uint8List.fromList([]);
     }
   }
 

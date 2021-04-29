@@ -10,6 +10,8 @@ import 'package:bsv/op_code.dart';
 import 'package:bsv/pub_key.dart';
 import 'package:convert/convert.dart';
 
+import 'package:bsv/extentsions/list.dart';
+
 // ignore: slash_for_doc_comments
 /**
  * Script
@@ -111,7 +113,7 @@ class Script {
   }
 
   factory Script.fromHex(String hexStr) {
-    return new Script().fromhex(hexStr);
+    return new Script().fromHex(hexStr);
   }
 
   Script fromJSON(json) {
@@ -122,7 +124,7 @@ class Script {
     return this.toString();
   }
 
-  Script fromhex(String hexStr) {
+  Script fromHex(String hexStr) {
     this.fromBuffer(Uint8List.fromList(hex.decode(hexStr)));
     return this;
   }
@@ -135,11 +137,12 @@ class Script {
       var opCodeNum = br.readUInt8();
 
       var len = 0;
-      var buf = Uint8List(0);
+      var buf = Uint8List.fromList([]);
       if (opCodeNum > 0 && opCodeNum < OpCode.OP_PUSHDATA1) {
         len = opCodeNum;
+        buf = br.read(len);
         this.add(ScriptChunk(
-          buf: br.read(len),
+          buf: buf,
           len: len,
           opCodeNum: opCodeNum,
         ));
@@ -168,6 +171,7 @@ class Script {
           opCodeNum: opCodeNum,
         ));
       } else if (opCodeNum == OpCode.OP_PUSHDATA4) {
+        print('OP_PUSHDATA4');
         try {
           len = br.readUInt32LE();
           buf = br.read(len);
@@ -180,6 +184,7 @@ class Script {
           opCodeNum: opCodeNum,
         ));
       } else {
+        print('add 0');
         this.add(ScriptChunk(
           opCodeNum: opCodeNum,
         ));
@@ -213,6 +218,10 @@ class Script {
     }
 
     return bw.toBuffer();
+  }
+
+  String toHex() {
+    return this.toBuffer().toHex();
   }
 
   Script add(ScriptChunk chunk) {
