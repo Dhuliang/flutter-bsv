@@ -21,4 +21,28 @@ extension ListX<T> on List<T> {
         .map((e) => e.toRadixString(16).padLeft(2, '0'))
         .join();
   }
+
+  List<T> slice(int begin, [int end]) {
+    var i, cloned = <T>[], size, len = this.length;
+
+    var start = begin ?? 0;
+    end = end ?? len;
+
+    var upTo = end ?? len;
+
+    if (end < 0) {
+      upTo = len + end;
+    }
+
+    size = upTo - start;
+
+    if (size > 0) {
+      cloned = List<T>(size);
+      for (i = 0; i < size; i++) {
+        cloned[i] = this[start + i];
+      }
+    }
+
+    return cloned;
+  }
 }
