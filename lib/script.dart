@@ -1,4 +1,5 @@
 // ignore: slash_for_doc_comments
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -84,7 +85,7 @@ class Script {
     return new Script().fromSafeDataArray(dataBuf);
   }
 
-  factory Script.fromPubKeyHash(List<Uint8List> dataBuf) {
+  factory Script.fromPubKeyHash(Uint8List dataBuf) {
     return new Script().fromPubKeyHash(dataBuf);
   }
 
@@ -296,7 +297,7 @@ class Script {
     for (var i = 0; i < this.chunks.length; i++) {
       var chunk = this.chunks[i];
       var opCodeNum = chunk.opCodeNum;
-      if (chunk.buf != null) {
+      if (chunk.buf == null) {
         if (OpCode.str[opCodeNum] != null) {
           str = str + ' ' + new OpCode(number: opCodeNum).toString();
         } else {
@@ -320,7 +321,7 @@ class Script {
   /**
    * Input the script from the script string format used in bitcoind data tests
    */
-  fromBitcoindString(str) {
+  Script fromBitcoindString(str) {
     var bw = new Bw();
     var tokens = str.split(' ');
     var i;
@@ -329,13 +330,17 @@ class Script {
       if (token == '') {
         continue;
       }
-      if (token[0] == '0' && token[1] == 'x') {
+
+      if (token[0] == '0' && token.length >= 2 && token[1] == 'x') {
         var hexStr = token.substring(2);
         bw.write(Uint8List.fromList(hex.decode(hexStr)));
       } else if (token[0] == "'") {
         var tstr = token.substring(1, token.length - 1);
-        var cbuf = Uint8List.fromList(hex.decode(tstr));
-        var tbuf = new Script().writeBuffer(cbuf).toBuffer();
+        // var t = utf8.encode(tstr);
+        // var cbuf = Uint8List.fromList(hex.decode(tstr));
+        var cbuf = Uint8List.fromList(utf8.encode(tstr));
+        var tbuf =
+            Uint8List.fromList(new Script().writeBuffer(cbuf).toBuffer());
         bw.write(tbuf);
       } else if (OpCode.map['OP_' + token] != null) {
         var opstr = 'OP_' + token;
@@ -355,7 +360,7 @@ class Script {
       }
     }
     var buf = bw.toBuffer();
-    return this.fromBuffer(buf);
+    return this.fromBuffer(Uint8List.fromList(buf));
   }
 
   // ignore: slash_for_doc_comments
@@ -458,7 +463,7 @@ class Script {
   String _chunkToString(ScriptChunk chunk) {
     var opCodeNum = chunk.opCodeNum;
     var str = '';
-    if (chunk.buf != null) {
+    if (chunk.buf == null) {
       // no data chunk
       if (OpCode.str[opCodeNum] != null) {
         // A few cases where the opcode name differs from reverseMap
@@ -481,7 +486,7 @@ class Script {
       }
     } else {
       // data chunk
-      if (chunk.len > 0) {
+      if (chunk.len != null && chunk.len > 0) {
         str = str + ' ' + hex.encode(chunk.buf);
       }
     }
@@ -529,7 +534,7 @@ class Script {
   /**
    * Turn script into a standard pubKeyHash output script
    */
-  Script fromPubKeyHash(hashBuf) {
+  Script fromPubKeyHash(Uint8List hashBuf) {
     if (hashBuf.length != 20) {
       throw ERROR_HASHBUF_MUST_BE_20;
     }
@@ -542,15 +547,15 @@ class Script {
   }
 
   static List<PubKey> sortPubKeys(List<PubKey> pubKeys) {
-    pubKeys.sublist(0).sort((pubKey1, pubKey2) {
+    pubKeys.sort((pubKey1, pubKey2) {
       var buf1 = pubKey1.toBuffer();
       var buf2 = pubKey2.toBuffer();
       var len = max(buf1.length, buf2.length);
       for (var i = 0; i <= len; i++) {
-        if (buf1[i] == null) {
+        if (i >= buf1.length) {
           return -1; // shorter strings come first
         }
-        if (buf2[i] == null) {
+        if (i >= buf2.length) {
           return 1;
         }
         if (buf1[i] < buf2[i]) {
@@ -579,7 +584,7 @@ class Script {
     }
     this.writeOpCode(m + OpCode.OP_1 - 1);
     for (var i in pubKeys) {
-      this.writeBuffer(i.toBuffer());
+      this.writeBuffer(Uint8List.fromList(i.toBuffer()));
     }
     this.writeOpCode(pubKeys.length + OpCode.OP_1 - 1);
     this.writeOpCode(OpCode.OP_CHECKMULTISIG);
@@ -767,7 +772,7 @@ class Script {
     return this;
   }
 
-  Script writeOpCode(opCodeNum) {
+  Script writeOpCode(int opCodeNum) {
     this.add(ScriptChunk(opCodeNum: opCodeNum));
     return this;
   }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 extension ListX<T> on List<T> {
   int get doubleLength => length * 2;
   List<T> operator -() => reversed.toList();
@@ -28,7 +30,7 @@ extension ListX<T> on List<T> {
     var start = begin ?? 0;
     end = end ?? len;
 
-    var upTo = end ?? len;
+    var upTo = end != null ? min(end, len) : len;
 
     if (end < 0) {
       upTo = len + end;

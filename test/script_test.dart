@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:bsv/bn.dart';
 import 'package:bsv/op_code.dart';
+import 'package:bsv/priv_key.dart';
+import 'package:bsv/pub_key.dart';
 import 'package:bsv/script.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -230,9 +235,8 @@ void main() {
         buf[buf.length - 1] = new OpCode().fromString('OP_0').toNumber();
         var script = new Script().fromBuffer(buf);
 
-        //TODO NET STEP
         expect(script.chunks.length, 3);
-        expect(script.chunks[0].buf.toHex(), '010203');
+        expect(script.chunks[0].opCodeNum, buf[0]);
         expect(script.chunks[0].opCodeNum, buf[0]);
         expect(script.chunks[1].buf.toHex(), '010203');
         expect(script.chunks[2].opCodeNum, buf[buf.length - 1]);
@@ -240,353 +244,386 @@ void main() {
       });
     });
 
-    // group('#fromString',  () {
-    //   test('should parse these known scripts',  () {
-    //     new Script()
-    //       .fromString('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //       .toString()
-    //       .should.equal('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //     new Script()
-    //       .fromString('OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG')
-    //       .toString()
-    //       .should.equal('OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG')
-    //     new Script()
-    //       .fromString('OP_SHA256 32 0x8cc17e2a2b10e1da145488458a6edec4a1fdb1921c2d5ccbc96aa0ed31b4d5f8 OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIGVERIFY OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG')
-    //       .toString()
-    //       .should.equal('OP_SHA256 32 0x8cc17e2a2b10e1da145488458a6edec4a1fdb1921c2d5ccbc96aa0ed31b4d5f8 OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIGVERIFY OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG')
-    //     new Script()
-    //       .fromString('OP_0 OP_PUSHDATA2 3 0x010203 OP_0')
-    //       .toString()
-    //       .should.equal('OP_0 OP_PUSHDATA2 3 0x010203 OP_0')
-    //     new Script()
-    //       .fromString('OP_0 OP_PUSHDATA1 3 0x010203 OP_0')
-    //       .toString()
-    //       .should.equal('OP_0 OP_PUSHDATA1 3 0x010203 OP_0')
-    //     new Script()
-    //       .fromString('OP_0 3 0x010203 OP_0')
-    //       .toString()
-    //       .should.equal('OP_0 3 0x010203 OP_0')
-    //     new Script()
-    //       .fromString('')
-    //       .toString()
-    //       .should.equal('')
-    //     new Script()
-    //       .fromString()
-    //       .toString()
-    //       .should.equal('')
-    //   })
-    // })
+    group('#fromString', () {
+      test('should parse these known scripts', () {
+        expect(
+          new Script()
+              .fromString('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
+              .toString(),
+          'OP_0 OP_PUSHDATA4 3 0x010203 OP_0',
+        );
 
-    // group('#toString',  () {
-    //   test('should output this buffer an OP code, data, and another OP code',  () {
-    //     var buf = Uint8List.fromList([0, 0, 0, 0, 0, 0, 1, 2, 3, 0])
-    //     buf[0] = new OpCode().fromString('OP_0').toNumber()
-    //     buf[1] = new OpCode().fromString('OP_PUSHDATA4').toNumber()
-    //     buf.writeUInt16LE(3, 2)
-    //     buf[buf.length - 1] = new OpCode().fromString('OP_0').toNumber()
-    //     var script = new Script().fromBuffer(buf)
-    //     script.chunks.length.should.equal(3)
-    //     script.chunks[0].opCodeNum.should.equal(buf[0])
-    //     script.chunks[1].buf.toString('hex').should.equal('010203')
-    //     script.chunks[2].opCodeNum.should.equal(buf[buf.length - 1])
-    //     script
-    //       .toString()
-    //       .toString('hex')
-    //       .should.equal('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //   })
-    // })
+        expect(
+          new Script()
+              .fromString(
+                  'OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG')
+              .toString(),
+          'OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG',
+        );
 
-    // group('#fromBitcoindString',  () {
-    //   test('should convert from this known string',  () {
-    //     new Script()
-    //       .fromBitcoindString('DEPTH 0 EQUAL')
-    //       .toBitcoindString()
-    //       .should.equal('DEPTH 0 EQUAL')
-    //     new Script()
-    //       .fromBitcoindString(
-    //         "'Azzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' EQUAL"
-    //       )
-    //       .toBitcoindString()
-    //       .should.equal(
-    //         '0x4b417a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a EQUAL'
-    //       )
+        expect(
+          new Script()
+              .fromString(
+                  'OP_SHA256 32 0x8cc17e2a2b10e1da145488458a6edec4a1fdb1921c2d5ccbc96aa0ed31b4d5f8 OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIGVERIFY OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG')
+              .toString(),
+          'OP_SHA256 32 0x8cc17e2a2b10e1da145488458a6edec4a1fdb1921c2d5ccbc96aa0ed31b4d5f8 OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIGVERIFY OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG',
+        );
 
-    //     var str =
-    //       '0x4c47304402203acf75dd59bbef171aeeedae4f1020b824195820db82575c2b323b8899f95de9022067df297d3a5fad049ba0bb81255d0e495643cbcf9abae9e396988618bc0c6dfe01 0x47304402205f8b859230c1cab7d4e8de38ff244d2ebe046b64e8d3f4219b01e483c203490a022071bdc488e31b557f7d9e5c8a8bec90dc92289ca70fa317685f4f140e38b30c4601'
-    //     new Script()
-    //       .fromBitcoindString(str)
-    //       .toBitcoindString()
-    //       .should.equal(str)
-    //   })
+        expect(
+          new Script()
+              .fromString('OP_0 OP_PUSHDATA2 3 0x010203 OP_0')
+              .toString(),
+          'OP_0 OP_PUSHDATA2 3 0x010203 OP_0',
+        );
 
-    //   test('should convert to this known string',  () {
-    //     new Script()
-    //       .fromBitcoindString('DEPTH 0 EQUAL')
-    //       .toBitcoindString()
-    //       .should.equal('DEPTH 0 EQUAL')
-    //   })
-    // })
+        expect(
+          new Script()
+              .fromString('OP_0 OP_PUSHDATA1 3 0x010203 OP_0')
+              .toString(),
+          'OP_0 OP_PUSHDATA1 3 0x010203 OP_0',
+        );
 
-    // group('@fromBitcoindString',  () {
-    //   test('should convert from this known string',  () {
-    //     Script.fromBitcoindString('DEPTH 0 EQUAL')
-    //       .toBitcoindString()
-    //       .should.equal('DEPTH 0 EQUAL')
-    //     Script.fromBitcoindString(
-    //       "'Azzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' EQUAL"
-    //     )
-    //       .toBitcoindString()
-    //       .should.equal(
-    //         '0x4b417a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a EQUAL'
-    //       )
+        expect(
+          new Script().fromString('OP_0 3 0x010203 OP_0').toString(),
+          'OP_0 3 0x010203 OP_0',
+        );
 
-    //     var str =
-    //       '0x4c47304402203acf75dd59bbef171aeeedae4f1020b824195820db82575c2b323b8899f95de9022067df297d3a5fad049ba0bb81255d0e495643cbcf9abae9e396988618bc0c6dfe01 0x47304402205f8b859230c1cab7d4e8de38ff244d2ebe046b64e8d3f4219b01e483c203490a022071bdc488e31b557f7d9e5c8a8bec90dc92289ca70fa317685f4f140e38b30c4601'
-    //     Script.fromBitcoindString(str)
-    //       .toBitcoindString()
-    //       .should.equal(str)
-    //   })
+        expect(
+          new Script().fromString('').toString(),
+          '',
+        );
+      });
+    });
 
-    //   test('should convert to this known string',  () {
-    //     Script.fromBitcoindString('DEPTH 0 EQUAL')
-    //       .toBitcoindString()
-    //       .should.equal('DEPTH 0 EQUAL')
-    //   })
+    group('#toString', () {
+      test('should output this buffer an OP code, data, and another OP code',
+          () {
+        var buf = Uint8List.fromList([0, 0, 0, 0, 0, 0, 1, 2, 3, 0]);
+        buf[0] = new OpCode().fromString('OP_0').toNumber();
+        buf[1] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        ByteData.view(buf.buffer).setUint16(2, 3, Endian.little);
+        buf[buf.length - 1] = new OpCode().fromString('OP_0').toNumber();
+        var script = new Script().fromBuffer(buf);
+        expect(script.chunks.length, 3);
+        expect(script.chunks[0].opCodeNum, buf[0]);
+        expect(script.chunks[1].buf.toHex(), '010203');
+        expect(script.chunks[2].opCodeNum, buf[buf.length - 1]);
+        expect(script.toString(), 'OP_0 OP_PUSHDATA4 3 0x010203 OP_0');
+      });
+    });
 
-    //   test('should convert to this known string',  () {
-    //     Script.fromAsmString('OP_DUP OP_HASH160 6fa5502ea094d59576898b490d866b32a61b89f6 OP_EQUALVERIFY OP_CHECKSIG')
-    //       .toAsmString()
-    //       .should.equal('OP_DUP OP_HASH160 6fa5502ea094d59576898b490d866b32a61b89f6 OP_EQUALVERIFY OP_CHECKSIG')
-    //   })
-    // })
+    group('#fromBitcoindString', () {
+      test('should convert from this known string', () {
+        expect(
+          new Script().fromBitcoindString('DEPTH 0 EQUAL').toBitcoindString(),
+          'DEPTH 0 EQUAL',
+        );
 
-    // group('@fromAsmString',  () {
-    //   test('should parse this known script in ASM',  () {
-    //     var asm = 'OP_DUP OP_HASH160 f4c03610e60ad15100929cc23da2f3a799af1725 OP_EQUALVERIFY OP_CHECKSIG'
-    //     var script = Script.fromAsmString(asm)
-    //     script.chunks[0].opCodeNum.should.equal(OpCode.OP_DUP)
-    //     script.chunks[1].opCodeNum.should.equal(OpCode.OP_HASH160)
-    //     script.chunks[2].opCodeNum.should.equal(20)
-    //     script.chunks[2].buf.toString('hex').should.equal('f4c03610e60ad15100929cc23da2f3a799af1725')
-    //     script.chunks[3].opCodeNum.should.equal(OpCode.OP_EQUALVERIFY)
-    //     script.chunks[4].opCodeNum.should.equal(OpCode.OP_CHECKSIG)
-    //   })
+        expect(
+          new Script()
+              .fromBitcoindString(
+                  "'Azzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' EQUAL")
+              .toBitcoindString(),
+          '0x4b417a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a EQUAL',
+        );
 
-    //   test('should parse this known problematic script in ASM',  () {
-    //     var asm = 'OP_RETURN 026d02 0568656c6c6f'
-    //     var script = Script.fromAsmString(asm)
-    //     script.toAsmString().should.equal(asm)
-    //   })
+        var str =
+            '0x4c47304402203acf75dd59bbef171aeeedae4f1020b824195820db82575c2b323b8899f95de9022067df297d3a5fad049ba0bb81255d0e495643cbcf9abae9e396988618bc0c6dfe01 0x47304402205f8b859230c1cab7d4e8de38ff244d2ebe046b64e8d3f4219b01e483c203490a022071bdc488e31b557f7d9e5c8a8bec90dc92289ca70fa317685f4f140e38b30c4601';
 
-    //   test('should know this is invalid hex',  () {
-    //     var asm = 'OP_RETURN 026d02 0568656c6c6fzz'
-    //     let errors = 0
-    //     try {
-    //       errors++
-    //       var script = Script.fromAsmString(asm)
-    //       script.toAsmString().should.equal(asm)
-    //     } catch (err) {
-    //       err.message.should.equal('invalid hex string in script')
-    //     }
-    //     errors.should.equal(1)
-    //   })
+        expect(
+          new Script().fromBitcoindString(str).toBitcoindString(),
+          str,
+        );
+      });
 
-    //   test('should parse this long PUSHDATA1 script in ASM',  () {
-    //     var buf = Buffer.alloc(220, 0)
-    //     var asm = 'OP_RETURN ' + buf.toString('hex')
-    //     var script = Script.fromAsmString(asm)
-    //     script.chunks[1].opCodeNum.should.equal(OpCode.OP_PUSHDATA1)
-    //     script.toAsmString().should.equal(asm)
-    //   })
+      test('should convert to this known string', () {
+        expect(
+          new Script().fromBitcoindString('DEPTH 0 EQUAL').toBitcoindString(),
+          'DEPTH 0 EQUAL',
+        );
+      });
+    });
 
-    //   test('should parse this long PUSHDATA2 script in ASM',  () {
-    //     var buf = Buffer.alloc(1024, 0)
-    //     var asm = 'OP_RETURN ' + buf.toString('hex')
-    //     var script = Script.fromAsmString(asm)
-    //     script.chunks[1].opCodeNum.should.equal(OpCode.OP_PUSHDATA2)
-    //     script.toAsmString().should.equal(asm)
-    //   })
+    group('@fromBitcoindString', () {
+      test('should convert from this known string', () {
+        expect(
+          Script.fromBitcoindString('DEPTH 0 EQUAL').toBitcoindString(),
+          'DEPTH 0 EQUAL',
+        );
 
-    //   test('should parse this long PUSHDATA4 script in ASM',  () {
-    //     var buf = Buffer.alloc(Math.pow(2, 17), 0)
-    //     var asm = 'OP_RETURN ' + buf.toString('hex')
-    //     var script = Script.fromAsmString(asm)
-    //     script.chunks[1].opCodeNum.should.equal(OpCode.OP_PUSHDATA4)
-    //     script.toAsmString().should.equal(asm)
-    //   })
+        expect(
+            Script.fromBitcoindString(
+                    "'Azzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz' EQUAL")
+                .toBitcoindString(),
+            '0x4b417a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a7a EQUAL');
 
-    //   test('should return this script correctly',  () {
-    //     var asm1 = 'OP_FALSE'
-    //     var asm2 = 'OP_0'
-    //     var asm3 = '0'
-    //     Script.fromAsmString(asm1).toAsmString().should.equal(asm3)
-    //     Script.fromAsmString(asm2).toAsmString().should.equal(asm3)
-    //     Script.fromAsmString(asm3).toAsmString().should.equal(asm3)
-    //   })
+        var str =
+            '0x4c47304402203acf75dd59bbef171aeeedae4f1020b824195820db82575c2b323b8899f95de9022067df297d3a5fad049ba0bb81255d0e495643cbcf9abae9e396988618bc0c6dfe01 0x47304402205f8b859230c1cab7d4e8de38ff244d2ebe046b64e8d3f4219b01e483c203490a022071bdc488e31b557f7d9e5c8a8bec90dc92289ca70fa317685f4f140e38b30c4601';
 
-    //   test('should return this script correctly',  () {
-    //     var asm1 = 'OP_1NEGATE'
-    //     var asm2 = '-1'
-    //     Script.fromAsmString(asm1).toAsmString().should.equal(asm2)
-    //     Script.fromAsmString(asm2).toAsmString().should.equal(asm2)
-    //   })
-    // })
+        expect(Script.fromBitcoindString(str).toBitcoindString(), (str));
+      });
 
-    // group('#fromJSON',  () {
-    //   test('should parse this known script',  () {
-    //     new Script()
-    //       .fromJSON('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //       .toString()
-    //       .should.equal('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //   })
-    // })
+      test('should convert to this known string', () {
+        expect(
+          Script.fromBitcoindString('DEPTH 0 EQUAL').toBitcoindString(),
+          'DEPTH 0 EQUAL',
+        );
+      });
 
-    // group('#toJSON',  () {
-    //   test('should output this known script',  () {
-    //     new Script()
-    //       .fromString('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //       .toJSON()
-    //       .should.equal('OP_0 OP_PUSHDATA4 3 0x010203 OP_0')
-    //   })
-    // })
+      test('should convert to this known string', () {
+        expect(
+            Script.fromAsmString(
+                    'OP_DUP OP_HASH160 6fa5502ea094d59576898b490d866b32a61b89f6 OP_EQUALVERIFY OP_CHECKSIG')
+                .toAsmString(),
+            ('OP_DUP OP_HASH160 6fa5502ea094d59576898b490d866b32a61b89f6 OP_EQUALVERIFY OP_CHECKSIG'));
+      });
+    });
 
-    // group('@fromOpReturnData',  () {
-    //   test('should create valid op return output',  () {
-    //     var script = Script.fromOpReturnData(Uint8List.fromList('yours bitcoin'))
-    //     script.isOpReturn().should.equal(true)
-    //   })
-    // })
+    group('@fromAsmString', () {
+      test('should parse this known script in ASM', () {
+        var asm =
+            'OP_DUP OP_HASH160 f4c03610e60ad15100929cc23da2f3a799af1725 OP_EQUALVERIFY OP_CHECKSIG';
+        var script = Script.fromAsmString(asm);
 
-    // group('@fromSafeData',  () {
-    //   test('should create valid op return output',  () {
-    //     var script = Script.fromSafeData(Uint8List.fromList('yours bitcoin'))
-    //     script.isSafeDataOut().should.equal(true)
-    //   })
+        expect(script.chunks[0].opCodeNum, (OpCode.OP_DUP));
+        expect(script.chunks[1].opCodeNum, (OpCode.OP_HASH160));
+        expect(script.chunks[2].opCodeNum, (20));
+        expect(script.chunks[2].buf.toHex(),
+            ('f4c03610e60ad15100929cc23da2f3a799af1725'));
+        expect(script.chunks[3].opCodeNum, (OpCode.OP_EQUALVERIFY));
+        expect(script.chunks[4].opCodeNum, (OpCode.OP_CHECKSIG));
+      });
 
-    //   test('should create valid op return output',  () {
-    //     Script.fromSafeDataArray([Uint8List.fromList('ff', 'hex'), Uint8List.fromList('aa', 'hex')]).toAsmString().should.equal('0 OP_RETURN ff aa')
-    //     Script.fromSafeDataArray([Uint8List.fromList('ff', 'hex'), Uint8List.fromList('aa', 'hex')]).toString().should.equal('OP_0 OP_RETURN 1 0xff 1 0xaa')
-    //   })
-    // })
+      test('should parse this known problematic script in ASM', () {
+        var asm = 'OP_RETURN 026d02 0568656c6c6f';
+        var script = Script.fromAsmString(asm);
+        expect(script.toAsmString(), asm);
+      });
 
-    // group('@fromSafeDataArray',  () {
-    //   test('should create valid op return output',  () {
-    //     var script = Script.fromSafeDataArray([Uint8List.fromList('yours bitcoin'), Uint8List.fromList('bsv')])
-    //     script.isSafeDataOut().should.equal(true)
-    //   })
-    // })
+      test('should know this is invalid hex', () {
+        var asm = 'OP_RETURN 026d02 0568656c6c6fzz';
+        var errors = 0;
+        try {
+          errors++;
+          var script = Script.fromAsmString(asm);
+          expect(script.toAsmString(), (asm));
+        } catch (err) {
+          expect(err.message.toString().toLowerCase().contains('invalid hex'),
+              true);
+        }
+        expect(errors, 1);
+      });
 
-    // group('#getData',  () {
-    //   test('should create valid op return output',  () {
-    //     var script = Script.fromSafeDataArray([Uint8List.fromList('yours bitcoin'), Uint8List.fromList('bsv')])
-    //     script.isSafeDataOut().should.equal(true)
-    //     var bufs = script.getData()
-    //     bufs[0].toString().should.equal('yours bitcoin')
-    //     bufs[1].toString().should.equal('bsv')
-    //   })
-    // })
+      test('should parse this long PUSHDATA1 script in ASM', () {
+        var buf = Uint8List(220);
+        var asm = 'OP_RETURN ' + buf.toHex();
+        var script = Script.fromAsmString(asm);
+        expect(script.chunks[1].opCodeNum, OpCode.OP_PUSHDATA1);
+        expect(script.toAsmString(), asm);
+      });
 
-    // group('#fromPubKeyHash',  () {
-    //   test('should create pubKeyHash output script',  () {
-    //     var hashBuf = Buffer.alloc(20)
-    //     hashBuf.fill(0)
-    //     new Script()
-    //       .fromPubKeyHash(hashBuf)
-    //       .toString()
-    //       .should.equal(
-    //         'OP_DUP OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG'
-    //       )
-    //   })
-    // })
+      test('should parse this long PUSHDATA2 script in ASM', () {
+        var buf = Uint8List(1024);
+        var asm = 'OP_RETURN ' + buf.toHex();
+        var script = Script.fromAsmString(asm);
+        expect(script.chunks[1].opCodeNum, (OpCode.OP_PUSHDATA2));
+        expect(script.toAsmString(), (asm));
+      });
 
-    // group('@fromPubKeyHash',  () {
-    //   test('should create pubKeyHash output script',  () {
-    //     var hashBuf = Buffer.alloc(20)
-    //     hashBuf.fill(0)
-    //     Script.fromPubKeyHash(hashBuf)
-    //       .toString()
-    //       .should.equal(
-    //         'OP_DUP OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG'
-    //       )
-    //   })
-    // })
+      test('should parse this long PUSHDATA4 script in ASM', () {
+        var buf = Uint8List(pow(2, 17));
+        var asm = 'OP_RETURN ' + buf.toHex();
+        var script = Script.fromAsmString(asm);
+        expect(script.chunks[1].opCodeNum, (OpCode.OP_PUSHDATA4));
+        expect(script.toAsmString(), (asm));
+      });
 
-    // group('@sortPubKeys',  () {
-    //   test('should sort these pubKeys in a known order',  () {
-    //     var testPubKeysHex = [
-    //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0',
-    //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758',
-    //       '0266dd7664e65958f3cc67bf92ad6243bc495df5ab56691719263977104b635bea',
-    //       '02ee91377073b04d1d9d19597b81a7be3db6554bd7d16151cb5599a6107a589e70',
-    //       '02c8f63ad4822ef360b5c300f08488fa0fa24af2b2bebb6d6b602ca938ee5af793'
-    //     ]
-    //     var pubKeys = testPubKeysHex.map(hex => new PubKey().fromHex(hex))
-    //     var pubKeysSorted = Script.sortPubKeys(pubKeys)
-    //     pubKeysSorted[0].toString('hex').should.equal(testPubKeysHex[2])
-    //     pubKeysSorted[1].toString('hex').should.equal(testPubKeysHex[1])
-    //     pubKeysSorted[2].toString('hex').should.equal(testPubKeysHex[0])
-    //     pubKeysSorted[3].toString('hex').should.equal(testPubKeysHex[4])
-    //     pubKeysSorted[4].toString('hex').should.equal(testPubKeysHex[3])
-    //   })
-    // })
+      test('should return this script correctly', () {
+        var asm1 = 'OP_FALSE';
+        var asm2 = 'OP_0';
+        var asm3 = '0';
+        expect(Script.fromAsmString(asm1).toAsmString(), (asm3));
+        expect(Script.fromAsmString(asm2).toAsmString(), (asm3));
+        expect(Script.fromAsmString(asm3).toAsmString(), (asm3));
+      });
 
-    // group('#fromPubKeys',  () {
-    //   test('should generate this known script from a list of public keys',  () {
-    //     var privKey = new PrivKey().fromBn(new Bn(5))
-    //     var pubKey = new PubKey().fromPrivKey(privKey)
-    //     var script = new Script().fromPubKeys(2, [pubKey, pubKey, pubKey])
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 OP_3 OP_CHECKMULTISIG'
-    //       )
-    //   })
+      test('should return this script correctly', () {
+        var asm1 = 'OP_1NEGATE';
+        var asm2 = '-1';
+        expect(Script.fromAsmString(asm1).toAsmString(), (asm2));
+        expect(Script.fromAsmString(asm2).toAsmString(), (asm2));
+      });
+    });
 
-    //   test('should generate this known script from a list of public keys, sorted',  () {
-    //     var pubKey1 = new PubKey().fromHex(
-    //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-    //     )
-    //     var pubKey2 = new PubKey().fromHex(
-    //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-    //     )
-    //     var script = new Script().fromPubKeys(2, [pubKey1, pubKey2])
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //   })
+    group('#fromJSON', () {
+      test('should parse this known script', () {
+        expect(
+          new Script().fromJSON('OP_0 OP_PUSHDATA4 3 0x010203 OP_0').toString(),
+          ('OP_0 OP_PUSHDATA4 3 0x010203 OP_0'),
+        );
+      });
+    });
 
-    //   test('should generate this known script from a list of public keys, sorted explicitly',  () {
-    //     var pubKey1 = new PubKey().fromHex(
-    //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-    //     )
-    //     var pubKey2 = new PubKey().fromHex(
-    //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-    //     )
-    //     var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], true)
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //   })
+    group('#toJSON', () {
+      test('should output this known script', () {
+        expect(
+          new Script().fromString('OP_0 OP_PUSHDATA4 3 0x010203 OP_0').toJSON(),
+          ('OP_0 OP_PUSHDATA4 3 0x010203 OP_0'),
+        );
+      });
+    });
 
-    //   test('should generate this known script from a list of public keys, unsorted',  () {
-    //     var pubKey1 = new PubKey().fromHex(
-    //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-    //     )
-    //     var pubKey2 = new PubKey().fromHex(
-    //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-    //     )
-    //     var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], false)
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //   })
-    // })
+    group('@fromOpReturnData', () {
+      test('should create valid op return output', () {
+        var script = Script.fromOpReturnData(
+            Uint8List.fromList(utf8.encode('yours bitcoin')));
+        expect(script.isOpReturn(), (true));
+      });
+    });
+
+    group('@fromSafeData', () {
+      test('should create valid op return output', () {
+        var script = Script.fromSafeData(
+            Uint8List.fromList(utf8.encode('yours bitcoin')));
+        expect(script.isSafeDataOut(), (true));
+      });
+
+      test('should create valid op return output', () {
+        expect(
+            Script.fromSafeDataArray([
+              Uint8List.fromList(hex.decode('ff')),
+              Uint8List.fromList(hex.decode('aa'))
+            ]).toAsmString(),
+            ('0 OP_RETURN ff aa'));
+        expect(
+            Script.fromSafeDataArray([
+              Uint8List.fromList(hex.decode('ff')),
+              Uint8List.fromList(hex.decode('aa'))
+            ]).toString(),
+            ('OP_0 OP_RETURN 1 0xff 1 0xaa'));
+      });
+    });
+
+    group('@fromSafeDataArray', () {
+      test('should create valid op return output', () {
+        var script = Script.fromSafeDataArray([
+          Uint8List.fromList(utf8.encode('yours bitcoin')),
+          Uint8List.fromList(utf8.encode('bsv'))
+        ]);
+        expect(script.isSafeDataOut(), (true));
+      });
+    });
+
+    group('#getData', () {
+      test('should create valid op return output', () {
+        var script = Script.fromSafeDataArray([
+          Uint8List.fromList(utf8.encode('yours bitcoin')),
+          Uint8List.fromList(utf8.encode('bsv'))
+        ]);
+
+        expect(script.isSafeDataOut(), (true));
+        var bufs = script.getData();
+        expect(utf8.decode(bufs[0]), ('yours bitcoin'));
+        expect(utf8.decode(bufs[1]), ('bsv'));
+      });
+    });
+
+    group('#fromPubKeyHash', () {
+      test('should create pubKeyHash output script', () {
+        var hashBuf = Uint8List(20);
+        expect(
+          new Script().fromPubKeyHash(hashBuf).toString(),
+          ('OP_DUP OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG'),
+        );
+      });
+    });
+
+    group('@fromPubKeyHash', () {
+      test('should create pubKeyHash output script', () {
+        var hashBuf = Uint8List(20);
+        expect(
+          Script.fromPubKeyHash(hashBuf).toString(),
+          ('OP_DUP OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG'),
+        );
+      });
+    });
+
+    group('@sortPubKeys', () {
+      test('should sort these pubKeys in a known order', () {
+        var testPubKeysHex = [
+          '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0',
+          '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758',
+          '0266dd7664e65958f3cc67bf92ad6243bc495df5ab56691719263977104b635bea',
+          '02ee91377073b04d1d9d19597b81a7be3db6554bd7d16151cb5599a6107a589e70',
+          '02c8f63ad4822ef360b5c300f08488fa0fa24af2b2bebb6d6b602ca938ee5af793'
+        ];
+
+        var pubKeys = testPubKeysHex.map((hex) => PubKey.fromHex(hex)).toList();
+        var pubKeysSorted = Script.sortPubKeys(pubKeys);
+        expect(pubKeysSorted[0].toHex(), (testPubKeysHex[2]));
+        expect(pubKeysSorted[1].toHex(), (testPubKeysHex[1]));
+        expect(pubKeysSorted[2].toHex(), (testPubKeysHex[0]));
+        expect(pubKeysSorted[3].toHex(), (testPubKeysHex[4]));
+        expect(pubKeysSorted[4].toHex(), (testPubKeysHex[3]));
+      });
+    });
+
+    group('#fromPubKeys', () {
+      test('should generate this known script from a list of public keys', () {
+        var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
+        var pubKey = new PubKey().fromPrivKey(privKey);
+        var script = new Script().fromPubKeys(2, [pubKey, pubKey, pubKey]);
+        expect(
+          script.toString(),
+          ('OP_2 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 OP_3 OP_CHECKMULTISIG'),
+        );
+      });
+
+      // test('should generate this known script from a list of public keys, sorted',  () {
+      //   var pubKey1 = new PubKey().fromHex(
+      //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
+      //   )
+      //   var pubKey2 = new PubKey().fromHex(
+      //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
+      //   )
+      //   var script = new Script().fromPubKeys(2, [pubKey1, pubKey2])
+      //   script
+      //     .toString()
+      //     .should.equal(
+      //       'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
+      //     )
+      // })
+
+      // test('should generate this known script from a list of public keys, sorted explicitly',  () {
+      //   var pubKey1 = new PubKey().fromHex(
+      //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
+      //   )
+      //   var pubKey2 = new PubKey().fromHex(
+      //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
+      //   )
+      //   var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], true)
+      //   script
+      //     .toString()
+      //     .should.equal(
+      //       'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
+      //     )
+      // })
+
+      // test('should generate this known script from a list of public keys, unsorted',  () {
+      //   var pubKey1 = new PubKey().fromHex(
+      //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
+      //   )
+      //   var pubKey2 = new PubKey().fromHex(
+      //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
+      //   )
+      //   var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], false)
+      //   script
+      //     .toString()
+      //     .should.equal(
+      //       'OP_2 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 OP_2 OP_CHECKMULTISIG'
+      //     )
+      // })
+    });
 
     // group('@fromPubKeys',  () {
     //   test('should generate this known script from a list of public keys',  () {

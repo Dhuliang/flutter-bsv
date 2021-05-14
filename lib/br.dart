@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
+import 'package:bsv/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**
@@ -41,13 +42,9 @@ class Br {
     var start = this.pos;
     var end = this.pos + len;
 
-    try {
-      this.pos = this.pos + len;
-      var buf = this.buf.sublist(start, end);
-      return buf;
-    } catch (e) {
-      return Uint8List.fromList([]);
-    }
+    var newBuf = Uint8List.fromList(this.buf.slice(start, end));
+    this.pos = end;
+    return newBuf;
   }
 
   List<int> readReverse([int len]) {
