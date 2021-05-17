@@ -148,7 +148,7 @@ class PointWrapper {
 
   PointWrapper validate() {
     var p2 = PointWrapper.fromX(
-      isOdd: this.point.isCompressed,
+      isOdd: this.point.isInfinity,
       x: this.getX().bn,
     );
 

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'dart:typed_data';
+
 extension ListX<T> on List<T> {
   int get doubleLength => length * 2;
   List<T> operator -() => reversed.toList();
@@ -22,6 +24,13 @@ extension ListX<T> on List<T> {
     return (this as List<int>)
         .map((e) => e.toRadixString(16).padLeft(2, '0'))
         .join();
+  }
+
+  Uint8List toBuffer() {
+    if (this is List<int>) {
+      return Uint8List.fromList(this as List<int>);
+    }
+    throw 'not List<int>';
   }
 
   List<T> slice(int begin, [int end]) {

@@ -93,7 +93,7 @@ class Script {
     return new Script().fromPubKeys(m, pubKeys, sort);
   }
 
-  factory Script.writeScript(ScriptChunk script) {
+  factory Script.writeScript(Script script) {
     return new Script().writeScript(script);
   }
 
@@ -115,6 +115,14 @@ class Script {
 
   factory Script.fromHex(String hexStr) {
     return new Script().fromHex(hexStr);
+  }
+
+  factory Script.fromString(String str) {
+    return new Script().fromString(str);
+  }
+
+  factory Script.writeOpCode(int opCodeNum) {
+    return new Script().writeOpCode(opCodeNum);
   }
 
   Script fromJSON(json) {
@@ -185,7 +193,7 @@ class Script {
           opCodeNum: opCodeNum,
         ));
       } else {
-        print('add 0');
+        // print('add 0');
         this.add(ScriptChunk(
           opCodeNum: opCodeNum,
         ));
@@ -353,7 +361,7 @@ class Script {
       } else if (int.tryParse(token, radix: 10) is int) {
         var bn = new BigIntX.fromNum(int.tryParse(token));
         var script = new Script().writeBn(bn);
-        var tbuf = script.toBuffer();
+        var tbuf = Uint8List.fromList(script.toBuffer());
         bw.write(tbuf);
       } else {
         throw ERROR_INVALID_SCRIPT_TYPE;
@@ -382,7 +390,7 @@ class Script {
         str = str + ' ' + '0x' + chunk.opCodeNum.toRadixString(16);
       }
     }
-    return str.substring(1);
+    return str.isNotEmpty ? str.substring(1) : str;
   }
 
   // ignore: slash_for_doc_comments
@@ -592,7 +600,7 @@ class Script {
   }
 
   Script removeCodeseparators() {
-    var chunks = [];
+    List<ScriptChunk> chunks = [];
     for (var i = 0; i < this.chunks.length; i++) {
       if (this.chunks[i].opCodeNum != OpCode.OP_CODESEPARATOR) {
         chunks.add(this.chunks[i]);
@@ -636,13 +644,18 @@ class Script {
   }
 
   bool isPubKeyHashOut() {
-    if (this.chunks[0] != null &&
+    if (this.chunks.length > 0 &&
+        this.chunks[0] != null &&
         this.chunks[0].opCodeNum == OpCode.OP_DUP &&
+        this.chunks.length > 1 &&
         this.chunks[1] != null &&
         this.chunks[1].opCodeNum == OpCode.OP_HASH160 &&
+        this.chunks.length > 2 &&
         this.chunks[2].buf != null &&
+        this.chunks.length > 3 &&
         this.chunks[3] != null &&
         this.chunks[3].opCodeNum == OpCode.OP_EQUALVERIFY &&
+        this.chunks.length > 4 &&
         this.chunks[4] != null &&
         this.chunks[4].opCodeNum == OpCode.OP_CHECKSIG) {
       return true;
@@ -698,7 +711,7 @@ class Script {
     if (!(m >= 1 && m <= 16)) {
       return false;
     }
-    var pubKeychunks = this.chunks.sublist(1, this.chunks.length - 2);
+    var pubKeychunks = this.chunks.slice(1, this.chunks.length - 2);
     if (!pubKeychunks.every((chunk) {
       try {
         var buf = chunk.buf;
@@ -736,29 +749,30 @@ class Script {
 
   // ignore: slash_for_doc_comments
   /**
-     * Analagous to bitcoind's FindAndDevare Find and devare equivalent chunks,
+     * Analagous to bitcoind's findAndDelete Find and devare equivalent chunks,
      * typically used with push data chunks.  Note that this will find and devare
      * not just the same data, but the same data with the same push data op as
      * produced by default. i.e., if a pushdata in a tx does not use the minimal
      * pushdata op, then when you try to remove the data it is pushing, it will not
      * be removed, because they do not use the same pushdata op.
      */
-  Script findAndDevare(script) {
-    var buf = script.toBuffer();
+  Script findAndDelete(Script script) {
+    var buf = Uint8List.fromList(script.toBuffer());
     for (var i = 0; i < this.chunks.length; i++) {
       var script2 = new Script(chunks: [this.chunks[i]]);
-      var buf2 = script2.toBuffer();
+      var buf2 = Uint8List.fromList(script2.toBuffer());
       if (cmp(buf, buf2)) {
-        this.chunks.sublist(i, 1);
+        // this.chunks.slice(i, 1);
+        this.chunks.removeAt(i);
       }
     }
     return this;
   }
 
-  Script writeScript(ScriptChunk script) {
+  Script writeScript(Script script) {
     this.chunks = [
       ...this.chunks,
-      script,
+      ...script.chunks,
     ];
     return this;
   }
@@ -792,7 +806,7 @@ class Script {
       // see OP_1 - OP_16
       this.add(ScriptChunk(opCodeNum: bn.toNumber() + OpCode.OP_1 - 1));
     } else {
-      var buf = bn.toSm(endian: Endian.little);
+      var buf = bn.toSm(endian: Endian.little).toBuffer();
       this.writeBuffer(buf);
     }
     return this;
@@ -845,7 +859,7 @@ class Script {
     var chunk = this.chunks[i];
     var buf = chunk.buf;
     var opCodeNum = chunk.opCodeNum;
-    if (buf != null) {
+    if (buf == null) {
       return true;
     }
     if (buf.length == 0) {

@@ -10,9 +10,10 @@ import 'package:bsv/script.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/bsv.dart';
-
 import 'package:bsv/extentsions/list.dart';
+
+import 'vectors/bitcoind/script_invalid.dart';
+import 'vectors/bitcoind/script_valid.dart';
 
 void main() {
   group('Script', () {
@@ -579,686 +580,565 @@ void main() {
         );
       });
 
-      // test('should generate this known script from a list of public keys, sorted',  () {
-      //   var pubKey1 = new PubKey().fromHex(
-      //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-      //   )
-      //   var pubKey2 = new PubKey().fromHex(
-      //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-      //   )
-      //   var script = new Script().fromPubKeys(2, [pubKey1, pubKey2])
-      //   script
-      //     .toString()
-      //     .should.equal(
-      //       'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
-      //     )
-      // })
+      test(
+          'should generate this known script from a list of public keys, sorted',
+          () {
+        var pubKey1 = PubKey.fromHex(
+            '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0');
+        var pubKey2 = PubKey.fromHex(
+            '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758');
+        var script = Script().fromPubKeys(2, [pubKey1, pubKey2]);
+        expect(script.toString(),
+            ('OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'));
+      });
 
-      // test('should generate this known script from a list of public keys, sorted explicitly',  () {
-      //   var pubKey1 = new PubKey().fromHex(
-      //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-      //   )
-      //   var pubKey2 = new PubKey().fromHex(
-      //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-      //   )
-      //   var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], true)
-      //   script
-      //     .toString()
-      //     .should.equal(
-      //       'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
-      //     )
-      // })
+      test(
+          'should generate this known script from a list of public keys, sorted explicitly',
+          () {
+        var pubKey1 = PubKey.fromHex(
+            '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0');
+        var pubKey2 = PubKey.fromHex(
+            '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758');
+        var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], true);
+        expect(script.toString(),
+            ('OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'));
+      });
 
-      // test('should generate this known script from a list of public keys, unsorted',  () {
-      //   var pubKey1 = new PubKey().fromHex(
-      //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-      //   )
-      //   var pubKey2 = new PubKey().fromHex(
-      //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-      //   )
-      //   var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], false)
-      //   script
-      //     .toString()
-      //     .should.equal(
-      //       'OP_2 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 OP_2 OP_CHECKMULTISIG'
-      //     )
-      // })
+      test(
+          'should generate this known script from a list of public keys, unsorted',
+          () {
+        var pubKey1 = PubKey.fromHex(
+            '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0');
+        var pubKey2 = PubKey.fromHex(
+            '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758');
+        var script = new Script().fromPubKeys(2, [pubKey1, pubKey2], false);
+        expect(script.toString(),
+            ('OP_2 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 OP_2 OP_CHECKMULTISIG'));
+      });
     });
 
-    // group('@fromPubKeys',  () {
-    //   test('should generate this known script from a list of public keys',  () {
-    //     var privKey = PrivKey.fromBn(new Bn(5))
-    //     var pubKey = PubKey.fromPrivKey(privKey)
-    //     var script = Script.fromPubKeys(2, [pubKey, pubKey, pubKey])
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 OP_3 OP_CHECKMULTISIG'
-    //       )
-    //   })
+    // TODO: NOT IMPLEMENT
+    // group('@fromPubKeys', () {
+    //   test('should generate this known script from a list of public keys', () {
+    //     var privKey = PrivKey.fromBn(BigIntX.fromNum(5));
+    //     var pubKey = PubKey.fromPrivKey(privKey);
+    //     var script = Script.fromPubKeys(2, [pubKey, pubKey, pubKey]);
+    //     expect(script.toString(),
+    //         ('OP_2 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 33 0x022f8bde4d1a07209355b4a7250a5c5128e88b84bddc619ab7cba8d569b240efe4 OP_3 OP_CHECKMULTISIG'));
+    //   });
 
     //   test('should generate this known script from a list of public keys, sorted',  () {
     //     var pubKey1 = PubKey.fromHex(
     //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-    //     )
+    //     );
     //     var pubKey2 = PubKey.fromHex(
     //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-    //     )
+    //     );
     //     var script = Script.fromPubKeys(2, [pubKey1, pubKey2])
     //     script
     //       .toString()
     //       .should.equal(
     //         'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //   })
+    //       );
+    //   });
 
-    //   test('should generate this known script from a list of public keys, sorted explicitly',  () {
-    //     var pubKey1 = PubKey.fromHex(
-    //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
+    // test('should generate this known script from a list of public keys, sorted explicitly',  () {
+    //   var pubKey1 = PubKey.fromHex(
+    //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
+    //   )
+    //   var pubKey2 = PubKey.fromHex(
+    //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
+    //   )
+    //   var script = Script.fromPubKeys(2, [pubKey1, pubKey2], true)
+    //   script
+    //     .toString()
+    //     .should.equal(
+    //       'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
     //     )
-    //     var pubKey2 = PubKey.fromHex(
-    //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
+    // })
+
+    // test('should generate this known script from a list of public keys, unsorted',  () {
+    //   var pubKey1 = PubKey.fromHex(
+    //     '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
+    //   )
+    //   var pubKey2 = PubKey.fromHex(
+    //     '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
+    //   )
+    //   var script = Script.fromPubKeys(2, [pubKey1, pubKey2], false)
+    //   script
+    //     .toString()
+    //     .should.equal(
+    //       'OP_2 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 OP_2 OP_CHECKMULTISIG'
     //     )
-    //     var script = Script.fromPubKeys(2, [pubKey1, pubKey2], true)
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //   })
+    // });
+    // });
 
-    //   test('should generate this known script from a list of public keys, unsorted',  () {
-    //     var pubKey1 = PubKey.fromHex(
-    //       '02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0'
-    //     )
-    //     var pubKey2 = PubKey.fromHex(
-    //       '02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758'
-    //     )
-    //     var script = Script.fromPubKeys(2, [pubKey1, pubKey2], false)
-    //     script
-    //       .toString()
-    //       .should.equal(
-    //         'OP_2 33 0x02c525d65d18be8fb36ab50a21bee02ac9fdc2c176fa18791ac664ea4b95572ae0 33 0x02b937d54b550a3afdc2819772822d25869495f9e588b56a0205617d80514f0758 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //   })
-    // })
+    group('#removeCodeseparators', () {
+      test('should remove any OP_CODESEPARATORs', () {
+        expect(
+            new Script()
+                .writeString('OP_CODESEPARATOR OP_0 OP_CODESEPARATOR')
+                .removeCodeseparators()
+                .toString(),
+            'OP_0');
+      });
+    });
 
-    // group('#removeCodeseparators',  () {
-    //   test('should remove any OP_CODESEPARATORs',  () {
-    //     new Script()
-    //       .writeString('OP_CODESEPARATOR OP_0 OP_CODESEPARATOR')
-    //       .removeCodeseparators()
-    //       .toString()
-    //       .should.equal('OP_0')
-    //   })
-    // })
+    group('#isPushOnly', () {
+      test("should know these scripts are or aren't push only", () {
+        expect(new Script().writeString('OP_0').isPushOnly(), (true));
+        expect(
+            new Script().writeString('OP_0 OP_RETURN').isPushOnly(), (false));
+        expect(
+            new Script()
+                .writeString('OP_PUSHDATA1 5 0x1010101010')
+                .isPushOnly(),
+            (true));
 
-    // group('#isPushOnly',  () {
-    //   test("should know these scripts are or aren't push only",  () {
-    //     new Script()
-    //       .writeString('OP_0')
-    //       .isPushOnly()
-    //       .should.equal(true)
-    //     new Script()
-    //       .writeString('OP_0 OP_RETURN')
-    //       .isPushOnly()
-    //       .should.equal(false)
-    //     new Script()
-    //       .writeString('OP_PUSHDATA1 5 0x1010101010')
-    //       .isPushOnly()
-    //       .should.equal(true)
+        // like bitcoind, we regard OP_RESERVED as being "push only"
+        expect(new Script().writeString('OP_RESERVED').isPushOnly(), (true));
+      });
+    });
 
-    //     // like bitcoind, we regard OP_RESERVED as being "push only"
-    //     new Script()
-    //       .writeString('OP_RESERVED')
-    //       .isPushOnly()
-    //       .should.equal(true)
-    //   })
-    // })
+    group('#isOpReturn', () {
+      test('should know this is a (blank) OP_RETURN script', () {
+        expect(new Script().writeString('OP_RETURN').isOpReturn(), (true));
+      });
 
-    // group('#isOpReturn',  () {
-    //   test('should know this is a (blank) OP_RETURN script',  () {
-    //     new Script()
-    //       .writeString('OP_RETURN')
-    //       .isOpReturn()
-    //       .should.equal(true)
-    //   })
+      test('should know this is an OP_RETURN script', () {
+        var buf = Uint8List(40);
+        expect(
+            new Script()
+                .writeString('OP_RETURN 40 0x' + buf.toHex())
+                .isOpReturn(),
+            (true));
+      });
 
-    //   test('should know this is an OP_RETURN script',  () {
-    //     var buf = Buffer.alloc(40)
-    //     buf.fill(0)
-    //     new Script()
-    //       .writeString('OP_RETURN 40 0x' + buf.toString('hex'))
-    //       .isOpReturn()
-    //       .should.equal(true)
-    //   })
+      test('should know this is not an OP_RETURN script', () {
+        var buf = Uint8List(40);
+        expect(
+            new Script()
+                .writeString('OP_CHECKMULTISIG 40 0x' + buf.toHex())
+                .isOpReturn(),
+            (false));
+      });
+    });
 
-    //   test('should know this is not an OP_RETURN script',  () {
-    //     var buf = Buffer.alloc(40)
-    //     buf.fill(0)
-    //     new Script()
-    //       .writeString('OP_CHECKMULTISIG 40 0x' + buf.toString('hex'))
-    //       .isOpReturn()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#isPubKeyHashIn', () {
+      test('should classify this known pubKeyHashin', () {
+        expect(
+            new Script()
+                .writeString(
+                    '73 0x3046022100bb3c194a30e460d81d34be0a230179c043a656f67e3c5c8bf47eceae7c4042ee0221008bf54ca11b2985285be0fd7a212873d243e6e73f5fad57e8eb14c4f39728b8c601 65 0x04e365859b3c78a8b7c202412b949ebca58e147dba297be29eee53cd3e1d300a6419bc780cc9aec0dc94ed194e91c8f6433f1b781ee00eac0ead2aae1e8e0712c6')
+                .isPubKeyHashIn(),
+            (true));
+      });
 
-    // group('#isPubKeyHashIn',  () {
-    //   test('should classify this known pubKeyHashin',  () {
-    //     new Script()
-    //       .writeString(
-    //         '73 0x3046022100bb3c194a30e460d81d34be0a230179c043a656f67e3c5c8bf47eceae7c4042ee0221008bf54ca11b2985285be0fd7a212873d243e6e73f5fad57e8eb14c4f39728b8c601 65 0x04e365859b3c78a8b7c202412b949ebca58e147dba297be29eee53cd3e1d300a6419bc780cc9aec0dc94ed194e91c8f6433f1b781ee00eac0ead2aae1e8e0712c6'
-    //       )
-    //       .isPubKeyHashIn()
-    //       .should.equal(true)
-    //   })
+      test('should classify this known non-pubKeyHashin', () {
+        expect(
+            new Script()
+                .writeString(
+                    '73 0x3046022100bb3c194a30e460d81d34be0a230179c043a656f67e3c5c8bf47eceae7c4042ee0221008bf54ca11b2985285be0fd7a212873d243e6e73f5fad57e8eb14c4f39728b8c601 65 0x04e365859b3c78a8b7c202412b949ebca58e147dba297be29eee53cd3e1d300a6419bc780cc9aec0dc94ed194e91c8f6433f1b781ee00eac0ead2aae1e8e0712c6 OP_CHECKSIG')
+                .isPubKeyHashIn(),
+            (false));
+      });
+    });
 
-    //   test('should classify this known non-pubKeyHashin',  () {
-    //     new Script()
-    //       .writeString(
-    //         '73 0x3046022100bb3c194a30e460d81d34be0a230179c043a656f67e3c5c8bf47eceae7c4042ee0221008bf54ca11b2985285be0fd7a212873d243e6e73f5fad57e8eb14c4f39728b8c601 65 0x04e365859b3c78a8b7c202412b949ebca58e147dba297be29eee53cd3e1d300a6419bc780cc9aec0dc94ed194e91c8f6433f1b781ee00eac0ead2aae1e8e0712c6 OP_CHECKSIG'
-    //       )
-    //       .isPubKeyHashIn()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#isPubKeyHashOut', () {
+      test('should classify this known pubKeyHashout as pubKeyHashout', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_DUP OP_HASH160 20 0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG')
+                .isPubKeyHashOut(),
+            (true));
+      });
 
-    // group('#isPubKeyHashOut',  () {
-    //   test('should classify this known pubKeyHashout as pubKeyHashout',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_DUP OP_HASH160 20 0000000000000000000000000000000000000000 OP_EQUALVERIFY OP_CHECKSIG'
-    //       )
-    //       .isPubKeyHashOut()
-    //       .should.equal(true)
-    //   })
+      test('should classify this known non-pubKeyHashout as not pubKeyHashout',
+          () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_DUP OP_HASH160 20 0000000000000000000000000000000000000000')
+                .isPubKeyHashOut(),
+            (false));
+      });
+    });
 
-    //   test('should classify this known non-pubKeyHashout as not pubKeyHashout',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_DUP OP_HASH160 20 0000000000000000000000000000000000000000'
-    //       )
-    //       .isPubKeyHashOut()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#isScriptHashIn', () {
+      test('should classify this known scriptHashin', () {
+        expect(
+            new Script()
+                .writeString('20 0000000000000000000000000000000000000000')
+                .isScriptHashIn(),
+            (true));
+      });
 
-    // group('#isScriptHashIn',  () {
-    //   test('should classify this known scriptHashin',  () {
-    //     new Script()
-    //       .writeString('20 0000000000000000000000000000000000000000')
-    //       .isScriptHashIn()
-    //       .should.equal(true)
-    //   })
+      test('should classify this known non-scriptHashin', () {
+        expect(
+            new Script()
+                .writeString(
+                    '20 0000000000000000000000000000000000000000 OP_CHECKSIG')
+                .isScriptHashIn(),
+            (false));
+      });
+    });
 
-    //   test('should classify this known non-scriptHashin',  () {
-    //     new Script()
-    //       .writeString('20 0000000000000000000000000000000000000000 OP_CHECKSIG')
-    //       .isScriptHashIn()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#isScriptHashOut', () {
+      test('should classify this known pubKeyHashout as pubKeyHashout', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUAL')
+                .isScriptHashOut(),
+            (true));
+      });
 
-    // group('#isScriptHashOut',  () {
-    //   test('should classify this known pubKeyHashout as pubKeyHashout',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUAL'
-    //       )
-    //       .isScriptHashOut()
-    //       .should.equal(true)
-    //   })
+      test('should classify these known non-pubKeyHashout as not pubKeyHashout',
+          () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUAL OP_EQUAL')
+                .isScriptHashOut(),
+            (false));
+        expect(
+            new Script()
+                .writeString(
+                    'OP_HASH160 21 0x000000000000000000000000000000000000000000 OP_EQUAL')
+                .isScriptHashOut(),
+            (false));
+      });
+    });
 
-    //   test('should classify these known non-pubKeyHashout as not pubKeyHashout',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_HASH160 20 0x0000000000000000000000000000000000000000 OP_EQUAL OP_EQUAL'
-    //       )
-    //       .isScriptHashOut()
-    //       .should.equal(false)
-    //     new Script()
-    //       .writeString(
-    //         'OP_HASH160 21 0x000000000000000000000000000000000000000000 OP_EQUAL'
-    //       )
-    //       .isScriptHashOut()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#isMultiSigIn', () {
+      test('should know this is a valid multisig input', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_0 71 0x3044022053cacd1a0720e3497b3e78dedfc3ac144b3ff8fb0e231a4121bf4c18a05e606702205d4c69f2611cbca41c8a392b4c274cb07477bae78efef45c65517e4fdea5c0d801 71 0x3044022017dda0d737a9a65b262a1a8da97e73c23550351d6337ca13a8a1dbdbeae2775d02202fe4c031050d9d4ee0a2b1d5302869e1432577129f842c952462fca92a7b012901')
+                .isMultiSigIn(),
+            (true));
+      });
 
-    // group('#isMultiSigIn',  () {
-    //   test('should know this is a valid multisig input',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_0 71 0x3044022053cacd1a0720e3497b3e78dedfc3ac144b3ff8fb0e231a4121bf4c18a05e606702205d4c69f2611cbca41c8a392b4c274cb07477bae78efef45c65517e4fdea5c0d801 71 0x3044022017dda0d737a9a65b262a1a8da97e73c23550351d6337ca13a8a1dbdbeae2775d02202fe4c031050d9d4ee0a2b1d5302869e1432577129f842c952462fca92a7b012901'
-    //       )
-    //       .isMultiSigIn()
-    //       .should.equal(true)
-    //   })
+      test('should know this is not a valid multisig input', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_1 71 0x3044022053cacd1a0720e3497b3e78dedfc3ac144b3ff8fb0e231a4121bf4c18a05e606702205d4c69f2611cbca41c8a392b4c274cb07477bae78efef45c65517e4fdea5c0d801 71 0x3044022017dda0d737a9a65b262a1a8da97e73c23550351d6337ca13a8a1dbdbeae2775d02202fe4c031050d9d4ee0a2b1d5302869e1432577129f842c952462fca92a7b012901')
+                .isMultiSigIn(),
+            (false));
+      });
 
-    //   test('should know this is not a valid multisig input',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_1 71 0x3044022053cacd1a0720e3497b3e78dedfc3ac144b3ff8fb0e231a4121bf4c18a05e606702205d4c69f2611cbca41c8a392b4c274cb07477bae78efef45c65517e4fdea5c0d801 71 0x3044022017dda0d737a9a65b262a1a8da97e73c23550351d6337ca13a8a1dbdbeae2775d02202fe4c031050d9d4ee0a2b1d5302869e1432577129f842c952462fca92a7b012901'
-    //       )
-    //       .isMultiSigIn()
-    //       .should.equal(false)
-    //   })
+      test('should know this is not a valid multisig input', () {
+        expect(new Script().writeString('OP_0').isMultiSigIn(), (false));
+      });
+    });
 
-    //   test('should know this is not a valid multisig input',  () {
-    //     new Script()
-    //       .writeString('OP_0')
-    //       .isMultiSigIn()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#isMultiSigOut', () {
+      test('should know this is a valid multisig output', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_1 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_CHECKMULTISIG')
+                .isMultiSigOut(),
+            (true));
+      });
 
-    // group('#isMultiSigOut',  () {
-    //   test('should know this is a valid multisig output',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_1 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //       .isMultiSigOut()
-    //       .should.equal(true)
-    //   })
+      test('should know this is a valid multisig output', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_CHECKMULTISIG')
+                .isMultiSigOut(),
+            (true));
+      });
 
-    //   test('should know this is a valid multisig output',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //       .isMultiSigOut()
-    //       .should.equal(true)
-    //   })
+      test('should know this is not a valid multisig output', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_1 OP_CHECKMULTISIG')
+                .isMultiSigOut(),
+            (false));
+      });
 
-    //   test('should know this is not a valid multisig output',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_1 OP_CHECKMULTISIG'
-    //       )
-    //       .isMultiSigOut()
-    //       .should.equal(false)
-    //   })
+      test('should know this is not a valid multisig output', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_RETURN')
+                .isMultiSigOut(),
+            (false));
+      });
 
-    //   test('should know this is not a valid multisig output',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 33 0x02f23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_RETURN'
-    //       )
-    //       .isMultiSigOut()
-    //       .should.equal(false)
-    //   })
+      test('should know this is not a valid multisig output', () {
+        expect(
+            new Script()
+                .writeString(
+                    'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 32 0xf23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_CHECKMULTISIG')
+                .isMultiSigOut(),
+            (false));
+      });
+    });
 
-    //   test('should know this is not a valid multisig output',  () {
-    //     new Script()
-    //       .writeString(
-    //         'OP_2 33 0x029cf97e1052008852da9d107411b2d47aad387612558fa864b723c484f8931176 32 0xf23ab919b3a4795c75552b3985982f54c4164a26948b9fe87625705f694e7aa9 OP_2 OP_CHECKMULTISIG'
-    //       )
-    //       .isMultiSigOut()
-    //       .should.equal(false)
-    //   })
-    // })
+    group('#findAndDelete', () {
+      test('should find and deconste this buffer', () {
+        expect(
+            new Script()
+                .writeString('OP_RETURN 2 0xf0f0')
+                .findAndDelete(new Script().writeString('2 0xf0f0'))
+                .toString(),
+            ('OP_RETURN'));
+      });
+    });
 
-    // group('#findAndDelete',  () {
-    //   test('should find and devare this buffer',  () {
-    //     new Script()
-    //       .writeString('OP_RETURN 2 0xf0f0')
-    //       .findAndDelete(new Script().writeString('2 0xf0f0'))
-    //       .toString()
-    //       .should.equal('OP_RETURN')
-    //   })
-    // })
+    group('#writeScript', () {
+      test('should write these scripts', () {
+        var script1 = new Script().fromString('OP_CHECKMULTISIG');
+        var script2 = new Script().fromString('OP_CHECKMULTISIG');
+        var script = script1.writeScript(script2);
+        expect(script.toString(), ('OP_CHECKMULTISIG OP_CHECKMULTISIG'));
+      });
+    });
 
-    // group('#writeScript',  () {
-    //   test('should write these scripts',  () {
-    //     var script1 = new Script().fromString('OP_CHECKMULTISIG')
-    //     var script2 = new Script().fromString('OP_CHECKMULTISIG')
-    //     var script = script1.writeScript(script2)
-    //     script.toString().should.equal('OP_CHECKMULTISIG OP_CHECKMULTISIG')
-    //   })
-    // })
+    group('@writeScript', () {
+      test('should write these scripts', () {
+        var script1 = Script.fromString('OP_CHECKMULTISIG');
+        var script2 = Script.fromString('OP_CHECKMULTISIG');
+        var script = script1.writeScript(script2);
+        expect(script.toString(), ('OP_CHECKMULTISIG OP_CHECKMULTISIG'));
+      });
+    });
 
-    // group('@writeScript',  () {
-    //   test('should write these scripts',  () {
-    //     var script1 = Script.fromString('OP_CHECKMULTISIG')
-    //     var script2 = Script.fromString('OP_CHECKMULTISIG')
-    //     var script = script1.writeScript(script2)
-    //     script.toString().should.equal('OP_CHECKMULTISIG OP_CHECKMULTISIG')
-    //   })
-    // })
+    group('#writeOpCode', () {
+      test('should write this op', () {
+        expect(new Script().writeOpCode(OpCode.OP_CHECKMULTISIG).toString(),
+            ('OP_CHECKMULTISIG'));
+      });
+    });
 
-    // group('#writeOpCode',  () {
-    //   test('should write this op',  () {
-    //     new Script()
-    //       .writeOpCode(OpCode.OP_CHECKMULTISIG)
-    //       .toString()
-    //       .should.equal('OP_CHECKMULTISIG')
-    //   })
-    // })
+    group('@writeOpCode', () {
+      test('should write this op', () {
+        expect(Script.writeOpCode(OpCode.OP_CHECKMULTISIG).toString(),
+            ('OP_CHECKMULTISIG'));
+      });
+    });
 
-    // group('@writeOpCode',  () {
-    //   test('should write this op',  () {
-    //     Script.writeOpCode(OpCode.OP_CHECKMULTISIG)
-    //       .toString()
-    //       .should.equal('OP_CHECKMULTISIG')
-    //   })
-    // })
+    group('#setChunkOpCode', () {
+      test('should set this op', () {
+        var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG);
+        script.setChunkOpCode(0, OpCode.OP_CHECKSEQUENCEVERIFY);
+        expect(script.chunks[0].opCodeNum, (OpCode.OP_CHECKSEQUENCEVERIFY));
+      });
+    });
 
-    // group('#setChunkOpCode',  () {
-    //   test('should set this op',  () {
-    //     var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG)
-    //     script.setChunkOpCode(0, OpCode.OP_CHECKSEQUENCEVERIFY)
-    //     script.chunks[0].opCodeNum.should.equal(OpCode.OP_CHECKSEQUENCEVERIFY)
-    //   })
-    // })
+    group('#writeBn', () {
+      test('should write these numbers', () {
+        expect(new Script().writeBn(BigIntX.fromNum(0)).toBuffer().toHex(),
+            ('00'));
+        expect(new Script().writeBn(BigIntX.fromNum(1)).toBuffer().toHex(),
+            ('51'));
+        expect(new Script().writeBn(BigIntX.fromNum(16)).toBuffer().toHex(),
+            ('60'));
+        expect(new Script().writeBn(BigIntX.fromNum(-1)).toBuffer().toHex(),
+            ('4f'));
+        expect(new Script().writeBn(BigIntX.fromNum(-2)).toBuffer().toHex(),
+            ('0182'));
+      });
+    });
 
-    // group('#writeBn',  () {
-    //   test('should write these numbers',  () {
-    //     new Script()
-    //       .writeBn(new Bn(0))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('00')
-    //     new Script()
-    //       .writeBn(new Bn(1))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('51')
-    //     new Script()
-    //       .writeBn(new Bn(16))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('60')
-    //     new Script()
-    //       .writeBn(new Bn(-1))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('4f')
-    //     new Script()
-    //       .writeBn(new Bn(-2))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('0182')
-    //   })
-    // })
+    group('@writeBn', () {
+      test('should write these numbers', () {
+        expect(Script.writeBn(BigIntX.fromNum(0)).toBuffer().toHex(), ('00'));
+        expect(Script.writeBn(BigIntX.fromNum(1)).toBuffer().toHex(), ('51'));
+        expect(Script.writeBn(BigIntX.fromNum(16)).toBuffer().toHex(), ('60'));
+        expect(Script.writeBn(BigIntX.fromNum(-1)).toBuffer().toHex(), ('4f'));
+        expect(
+            Script.writeBn(BigIntX.fromNum(-2)).toBuffer().toHex(), ('0182'));
+      });
+    });
 
-    // group('@writeBn',  () {
-    //   test('should write these numbers',  () {
-    //     Script.writeBn(new Bn(0))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('00')
-    //     Script.writeBn(new Bn(1))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('51')
-    //     Script.writeBn(new Bn(16))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('60')
-    //     Script.writeBn(new Bn(-1))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('4f')
-    //     Script.writeBn(new Bn(-2))
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('0182')
-    //   })
-    // })
+    group('#writeNumber', () {
+      test('should write these numbers', () {
+        expect(new Script().writeNumber(0).toBuffer().toHex(), ('00'));
+        expect(new Script().writeNumber(1).toBuffer().toHex(), ('51'));
+        expect(new Script().writeNumber(16).toBuffer().toHex(), ('60'));
+        expect(new Script().writeNumber(-1).toBuffer().toHex(), ('4f'));
+        expect(new Script().writeNumber(-2).toBuffer().toHex(), ('0182'));
+      });
+    });
 
-    // group('#writeNumber',  () {
-    //   test('should write these numbers',  () {
-    //     new Script()
-    //       .writeNumber(0)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('00')
-    //     new Script()
-    //       .writeNumber(1)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('51')
-    //     new Script()
-    //       .writeNumber(16)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('60')
-    //     new Script()
-    //       .writeNumber(-1)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('4f')
-    //     new Script()
-    //       .writeNumber(-2)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('0182')
-    //   })
-    // })
+    group('@writeNumber', () {
+      test('should write these numbers', () {
+        expect(Script.writeNumber(0).toBuffer().toHex(), ('00'));
+        expect(Script.writeNumber(1).toBuffer().toHex(), ('51'));
+        expect(Script.writeNumber(16).toBuffer().toHex(), ('60'));
+        expect(Script.writeNumber(-1).toBuffer().toHex(), ('4f'));
+        expect(Script.writeNumber(-2).toBuffer().toHex(), ('0182'));
+      });
+    });
 
-    // group('@writeNumber',  () {
-    //   test('should write these numbers',  () {
-    //     Script.writeNumber(0)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('00')
-    //     Script.writeNumber(1)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('51')
-    //     Script.writeNumber(16)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('60')
-    //     Script.writeNumber(-1)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('4f')
-    //     Script.writeNumber(-2)
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('0182')
-    //   })
-    // })
+    group('#setChunkBn', () {
+      test('should set this bn', () {
+        var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG);
+        script.setChunkBn(0, BigIntX.fromNum(5000000000000000));
+        expect(
+          script.chunks[0].buf.toHex(),
+          BigIntX.fromNum(5000000000000000)
+              .toBuffer(endian: Endian.little)
+              .toHex(),
+        );
+      });
+    });
 
-    // group('#setChunkBn',  () {
-    //   test('should set this bn',  () {
-    //     var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG)
-    //     script.setChunkBn(0, new Bn(5000000000000000))
-    //     script.chunks[0].buf
-    //       .toString('hex')
-    //       .should.equal(
-    //         new Bn(5000000000000000)
-    //           .toBuffer({ endian: 'little' })
-    //           .toString('hex')
-    //       )
-    //   })
-    // })
+    group('#writeBuffer', () {
+      test('should write these push data', () {
+        var buf = Uint8List(1);
+        expect(new Script().writeBuffer(buf).toString(), '1 0x00');
+        buf = Uint8List(255);
+        expect(new Script().writeBuffer(buf).toString(),
+            'OP_PUSHDATA1 255 0x' + buf.toHex());
+        buf = Uint8List(256);
+        expect(new Script().writeBuffer(buf).toString(),
+            'OP_PUSHDATA2 256 0x' + buf.toHex());
+        buf = Uint8List(pow(2, 16));
+        expect(new Script().writeBuffer(buf).toString(),
+            'OP_PUSHDATA4 ' + '${pow(2, 16)}' + ' 0x' + buf.toHex());
+      });
+    });
 
-    // group('#writeBuffer',  () {
-    //   test('should write these push data',  () {
-    //     let buf = Buffer.alloc(1)
-    //     buf.fill(0)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .toString()
-    //       .should.equal('1 0x00')
-    //     buf = Buffer.alloc(255)
-    //     buf.fill(0)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .toString()
-    //       .should.equal('OP_PUSHDATA1 255 0x' + buf.toString('hex'))
-    //     buf = Buffer.alloc(256)
-    //     buf.fill(0)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .toString()
-    //       .should.equal('OP_PUSHDATA2 256 0x' + buf.toString('hex'))
-    //     buf = Buffer.alloc(Math.pow(2, 16))
-    //     buf.fill(0)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .toString()
-    //       .should.equal(
-    //         'OP_PUSHDATA4 ' + Math.pow(2, 16) + ' 0x' + buf.toString('hex')
-    //       )
-    //   })
-    // })
+    group('@writeBuffer', () {
+      test('should write these push data', () {
+        var buf = Uint8List(1);
+        expect(Script.writeBuffer(buf).toString(), '1 0x00');
+        buf = Uint8List(255);
+        expect(Script.writeBuffer(buf).toString(),
+            'OP_PUSHDATA1 255 0x' + buf.toHex());
+        buf = Uint8List(256);
+        expect(Script.writeBuffer(buf).toString(),
+            'OP_PUSHDATA2 256 0x' + buf.toHex());
+        buf = Uint8List(pow(2, 16));
+        expect(Script.writeBuffer(buf).toString(),
+            'OP_PUSHDATA4 ' + '${pow(2, 16)}' + ' 0x' + buf.toHex());
+      });
+    });
 
-    // group('@writeBuffer',  () {
-    //   test('should write these push data',  () {
-    //     let buf = Buffer.alloc(1)
-    //     buf.fill(0)
-    //     Script.writeBuffer(buf)
-    //       .toString()
-    //       .should.equal('1 0x00')
-    //     buf = Buffer.alloc(255)
-    //     buf.fill(0)
-    //     Script.writeBuffer(buf)
-    //       .toString()
-    //       .should.equal('OP_PUSHDATA1 255 0x' + buf.toString('hex'))
-    //     buf = Buffer.alloc(256)
-    //     buf.fill(0)
-    //     Script.writeBuffer(buf)
-    //       .toString()
-    //       .should.equal('OP_PUSHDATA2 256 0x' + buf.toString('hex'))
-    //     buf = Buffer.alloc(Math.pow(2, 16))
-    //     buf.fill(0)
-    //     Script.writeBuffer(buf)
-    //       .toString()
-    //       .should.equal(
-    //         'OP_PUSHDATA4 ' + Math.pow(2, 16) + ' 0x' + buf.toString('hex')
-    //       )
-    //   })
-    // })
+    group('#setChunkBuffer', () {
+      test('should set this buffer', () {
+        var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG);
+        var buf = new BigIntX.fromNum(5000000000000000).toBuffer();
+        script.setChunkBuffer(0, buf);
+        expect(script.chunks[0].buf.toHex(), (buf.toHex()));
+      });
+    });
 
-    // group('#setChunkBuffer',  () {
-    //   test('should set this buffer',  () {
-    //     var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG)
-    //     var buf = new Bn(5000000000000000).toBuffer()
-    //     script.setChunkBuffer(0, buf)
-    //     script.chunks[0].buf.toString('hex').should.equal(buf.toString('hex'))
-    //   })
-    // })
+    group('#writeString', () {
+      test('should write both pushdata and non-pushdata chunks', () {
+        expect(new Script().writeString('OP_CHECKMULTISIG').toString(),
+            ('OP_CHECKMULTISIG'));
+      });
+    });
 
-    // group('#writeString',  () {
-    //   test('should write both pushdata and non-pushdata chunks',  () {
-    //     new Script()
-    //       .writeString('OP_CHECKMULTISIG')
-    //       .toString()
-    //       .should.equal('OP_CHECKMULTISIG')
-    //   })
-    // })
+    group('@writeString', () {
+      test('should write both pushdata and non-pushdata chunks', () {
+        expect(Script.writeString('OP_CHECKMULTISIG').toString(),
+            ('OP_CHECKMULTISIG'));
+      });
+    });
 
-    // group('@writeString',  () {
-    //   test('should write both pushdata and non-pushdata chunks',  () {
-    //     Script.writeString('OP_CHECKMULTISIG')
-    //       .toString()
-    //       .should.equal('OP_CHECKMULTISIG')
-    //   })
-    // })
+    group('#checkMinimalPush', () {
+      test('should check these minimal pushes', () {
+        var buf;
+        expect(new Script().writeBn(BigIntX.fromNum(1)).checkMinimalPush(0),
+            (true));
+        expect(new Script().writeBn(BigIntX.fromNum(0)).checkMinimalPush(0),
+            (true));
+        expect(new Script().writeBn(BigIntX.fromNum(-1)).checkMinimalPush(0),
+            (true));
+        expect(
+            new Script()
+                .writeBuffer(Uint8List.fromList([0]))
+                .checkMinimalPush(0),
+            (true));
 
-    // group('#checkMinimalPush',  () {
-    //   test('should check these minimal pushes',  () {
-    //     let buf
-    //     new Script()
-    //       .writeBn(new Bn(1))
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
-    //     new Script()
-    //       .writeBn(new Bn(0))
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
-    //     new Script()
-    //       .writeBn(new Bn(-1))
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
-    //     new Script()
-    //       .writeBuffer(Uint8List.fromList([0]))
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
+        buf = Uint8List.fromList(List.generate(75, (index) => 1));
+        expect(new Script().writeBuffer(buf).checkMinimalPush(0), (true));
 
-    //     buf = Buffer.alloc(75)
-    //     buf.fill(1)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
+        buf = Uint8List.fromList(List.generate(76, (index) => 1));
+        expect(new Script().writeBuffer(buf).checkMinimalPush(0), (true));
 
-    //     buf = Buffer.alloc(76)
-    //     buf.fill(1)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
+        buf = Uint8List.fromList(List.generate(256, (index) => 1));
+        expect(new Script().writeBuffer(buf).checkMinimalPush(0), (true));
+      });
+    });
 
-    //     buf = Buffer.alloc(256)
-    //     buf.fill(1)
-    //     new Script()
-    //       .writeBuffer(buf)
-    //       .checkMinimalPush(0)
-    //       .should.equal(true)
-    //   })
-    // })
+    group('vectors', () {
+      group('scriptValid', () {
+        for (var i = 0; i < scriptValid.length; i++) {
+          var a = scriptValid[i];
 
-    // group('vectors',  () {
-    //   scriptValid.forEach( (a, i) {
-    //     if (a.length === 1) {
-    //       return
-    //     }
-    //     test('should not fail when reading scriptValid vector ' + i,  () {
-    //       ;( () {
-    //         new Script().fromBitcoindString(a[0]).toString()
-    //         new Script().fromBitcoindString(a[0]).toBitcoindString()
-    //       }.should.not.throw())
-    //       ;( () {
-    //         new Script().fromBitcoindString(a[1]).toString()
-    //         new Script().fromBitcoindString(a[1]).toBitcoindString()
-    //       }.should.not.throw())
+          if (a.length == 1) {
+            continue;
+          }
+          test(
+              'should not fail when reading scriptValid vector ' + i.toString(),
+              () {
+            // ;( () {
+            try {
+              new Script().fromBitcoindString(a[0]).toString();
+              new Script().fromBitcoindString(a[0]).toBitcoindString();
+              // }.should.not.throw())
+              // ;( () {
+              new Script().fromBitcoindString(a[1]).toString();
+              new Script().fromBitcoindString(a[1]).toBitcoindString();
+              expect(i, i);
+            } catch (e) {}
+            // }.should.not.throw())
 
-    //       // should be able to return the same output over and over
-    //       let str = new Script().fromBitcoindString(a[0]).toBitcoindString()
-    //       new Script()
-    //         .fromBitcoindString(str)
-    //         .toBitcoindString()
-    //         .should.equal(str)
-    //       str = new Script().fromBitcoindString(a[1]).toBitcoindString()
-    //       new Script()
-    //         .fromBitcoindString(str)
-    //         .toBitcoindString()
-    //         .should.equal(str)
-    //     })
-    //   })
+            // should be able to return the same output over and over
+            var str = new Script().fromBitcoindString(a[0]).toBitcoindString();
+            expect(
+                new Script().fromBitcoindString(str).toBitcoindString(), str);
 
-    //   scriptInvalid.forEach( (a, i) {
-    //     if (a.length === 1) {
-    //       return
-    //     }
-    //     test('should not fail when reading scriptInvalid vector ' + i,  () {
-    //       ;( () {
-    //         new Script().fromBitcoindString(a[0]).toString()
-    //         new Script().fromBitcoindString(a[0]).toBitcoindString()
-    //       }.should.not.throw())
-    //       ;( () {
-    //         new Script().fromBitcoindString(a[1]).toString()
-    //         new Script().fromBitcoindString(a[1]).toBitcoindString()
-    //       }.should.not.throw())
+            str = new Script().fromBitcoindString(a[1]).toBitcoindString();
 
-    //       // should be able to return the same output over and over
-    //       let str = new Script().fromBitcoindString(a[0]).toBitcoindString()
-    //       new Script()
-    //         .fromBitcoindString(str)
-    //         .toBitcoindString()
-    //         .should.equal(str)
-    //       str = new Script().fromBitcoindString(a[1]).toBitcoindString()
-    //       new Script()
-    //         .fromBitcoindString(str)
-    //         .toBitcoindString()
-    //         .should.equal(str)
-    //     })
-    //   })
-    // })
+            expect(
+                new Script().fromBitcoindString(str).toBitcoindString(), str);
+          });
+        }
+      });
+
+      group('scriptInvalid', () {
+        for (var i = 0; i < scriptInvalid.length; i++) {
+          var a = scriptInvalid[i];
+
+          if (a.length == 1) {
+            continue;
+          }
+          test(
+              'should not fail when reading scriptInvalid vector ' +
+                  i.toString(), () {
+            // ;( () {
+            new Script().fromBitcoindString(a[0]).toString();
+            new Script().fromBitcoindString(a[0]).toBitcoindString();
+            // }.should.not.throw())
+            // ;( () {
+            new Script().fromBitcoindString(a[1]).toString();
+            new Script().fromBitcoindString(a[1]).toBitcoindString();
+            // }.should.not.throw())
+
+            // should be able to return the same output over and over
+            var str = new Script().fromBitcoindString(a[0]).toBitcoindString();
+            expect(
+                new Script().fromBitcoindString(str).toBitcoindString(), str);
+
+            str = new Script().fromBitcoindString(a[1]).toBitcoindString();
+            expect(
+                new Script().fromBitcoindString(str).toBitcoindString(), str);
+          });
+        }
+      });
+    });
   });
 }
