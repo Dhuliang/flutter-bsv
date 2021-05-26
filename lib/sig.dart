@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
+import 'package:bsv/extentsions/list.dart';
 import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments
@@ -38,30 +39,44 @@ class Sig {
   bool compressed;
 
   Sig({
-    this.r,
-    this.s,
-    this.nHashType,
-    this.recovery,
-    this.compressed,
-  });
+    BigIntX r,
+    BigIntX s,
+    int nHashType,
+    int recovery,
+    bool compressed,
+  }) {
+    this.r = r ?? BigIntX.zero;
+    this.s = s ?? BigIntX.zero;
+    this.nHashType = nHashType;
+    this.recovery = recovery;
+    this.compressed = compressed;
+  }
 
-  factory Sig.fromCompact(buf) {
+  factory Sig.fromCompact(List<int> buf) {
     return new Sig().fromCompact(buf);
   }
 
-  factory Sig.fromRS(rsbuf) {
+  factory Sig.fromRS(List<int> rsbuf) {
     return new Sig().fromRS(rsbuf);
   }
 
-  factory Sig.fromDer(buf, strict) {
+  factory Sig.fromDer(List<int> buf, [bool strict]) {
     return new Sig().fromDer(buf, strict);
   }
 
-  factory Sig.fromTxFormat(buf) {
+  factory Sig.fromTxFormat(List<int> buf) {
     return new Sig().fromTxFormat(buf);
   }
 
-  fromBuffer(buf) {
+  factory Sig.fromHex(List<int> buf) {
+    return new Sig().fromBuffer(buf);
+  }
+
+  Sig fromHex(String str) {
+    return this.fromBuffer(hex.decode(str));
+  }
+
+  Sig fromBuffer(List<int> buf) {
     try {
       return this.fromDer(buf, true);
     } catch (e) {}
@@ -71,7 +86,7 @@ class Sig {
     return this.fromTxFormat(buf);
   }
 
-  toBuffer() {
+  List<int> toBuffer() {
     if (this.nHashType != null) {
       return this.toTxFormat();
     } else if (this.recovery != null) {
@@ -81,7 +96,7 @@ class Sig {
   }
 
   // The format used by "message"
-  fromCompact(buf) {
+  Sig fromCompact(List<int> buf) {
     var compressed = true;
     var recovery = buf.slice(0, 1)[0] - 27 - 4;
     if (recovery < 0) {
@@ -102,7 +117,7 @@ class Sig {
     return this;
   }
 
-  fromRS(rsbuf) {
+  fromRS(List<int> rsbuf) {
     var b2 = rsbuf.slice(0, 32);
     var b3 = rsbuf.slice(32, 64);
     if (b2.length != 32) {
@@ -117,16 +132,16 @@ class Sig {
   }
 
   // The format used in a tx, except without the nHashType at the end
-  fromDer(buf, strict) {
+  Sig fromDer(List<int> buf, [bool strict]) {
     var obj = Sig.parseDer(buf, strict);
-    this.r = obj.r;
-    this.s = obj.s;
+    this.r = obj['r'];
+    this.s = obj['s'];
 
     return this;
   }
 
   // The format used in a tx
-  fromTxFormat(buf) {
+  Sig fromTxFormat(List<int> buf) {
     if (buf.length == 0) {
       // allow setting a "blank" signature
       this.r = BigIntX.one;
@@ -134,22 +149,25 @@ class Sig {
       this.nHashType = 1;
       return this;
     }
-    var nHashType = buf.readUInt8(buf.length - 1);
+
+    // var nHashType = buf.readUInt8(buf.length - 1);
+    var nHashType =
+        ByteData.view(buf.toBuffer().buffer).getUint8(buf.length - 1);
     var derbuf = buf.slice(0, buf.length - 1);
     this.fromDer(derbuf, false);
     this.nHashType = nHashType;
     return this;
   }
 
-  fromString(str) {
-    // return this.fromHex(str);
+  dynamic fromString(str) {
+    return this.fromHex(str);
   }
 
   // ignore: slash_for_doc_comments
   /**
      * In order to mimic the non-strict DER encoding of OpenSSL, set strict = false.
      */
-  static parseDer(buf, strict) {
+  static Map<String, dynamic> parseDer(List<int> buf, [bool strict]) {
     if (strict == null) {
       strict = true;
     }
@@ -204,18 +222,18 @@ class Sig {
     }
 
     var obj = {
-      header: header,
-      length: length,
-      rheader: rheader,
-      rlength: rlength,
-      rneg: rneg,
-      rbuf: rbuf,
-      r: r,
-      sheader: sheader,
-      slength: slength,
-      sneg: sneg,
-      sbuf: sbuf,
-      s: s
+      "header": header,
+      "length": length,
+      "rheader": rheader,
+      "rlength": rlength,
+      "rneg": rneg,
+      "rbuf": rbuf,
+      "r": r,
+      "sheader": sheader,
+      "slength": slength,
+      "sneg": sneg,
+      "sbuf": sbuf,
+      "s": s
     };
 
     return obj;
@@ -235,7 +253,7 @@ class Sig {
      * See https://bitcointalk.org/index.php?topic=8392.msg127623#msg127623
      */
   // ignore: non_constant_identifier_names
-  static IsTxDer(buf) {
+  static bool IsTxDer(List<int> buf) {
     if (buf.length < 9) {
       //  Non-canonical signature: too short
       return false;
@@ -272,11 +290,11 @@ class Sig {
       //  Non-canonical signature: R length is zero
       return false;
     }
-    if (R[0] & 0x80) {
+    if (R[0] & 0x80 == 1) {
       //  Non-canonical signature: R value negative
       return false;
     }
-    if (nLEnR > 1 && R[0] == 0x00 && !(R[1] & 0x80)) {
+    if (nLEnR > 1 && R[0] == 0x00 && !(R[1] & 0x80 == 1)) {
       //  Non-canonical signature: R value excessively padded
       return false;
     }
@@ -290,11 +308,11 @@ class Sig {
       //  Non-canonical signature: S length is zero
       return false;
     }
-    if (S[0] & 0x80) {
+    if (S[0] & 0x80 == 1) {
       //  Non-canonical signature: S value negative
       return false;
     }
-    if (nLEnS > 1 && S[0] == 0x00 && !(S[1] & 0x80)) {
+    if (nLEnS > 1 && S[0] == 0x00 && !(S[1] & 0x80 == 1)) {
       //  Non-canonical signature: S value excessively padded
       return false;
     }
@@ -307,7 +325,7 @@ class Sig {
      * See also Ecdsa signature algorithm which enforces this.
      * See also Bip 62, "low S values in signatures"
      */
-  hasLowS() {
+  bool hasLowS() {
     if (this.s.lt(1) ||
         this.s.gt(BigIntX.fromBuffer(hex.decode(
                 '7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0')
@@ -326,7 +344,7 @@ class Sig {
      * Ensures the nHashType is exactly equal to one of the standard options or combinations thereof.
      * Translated from bitcoind's IsDefinedHashtypeSignature
      */
-  hasDefinedHashType() {
+  bool hasDefinedHashType() {
     if (this.nHashType < Sig.SIGHASH_ALL ||
         this.nHashType > Sig.SIGHASH_SINGLE) {
       return false;
@@ -334,7 +352,7 @@ class Sig {
     return true;
   }
 
-  toCompact({recovery, compressed}) {
+  List<int> toCompact({recovery, compressed}) {
     recovery = recovery == 'number' ? recovery : this.recovery;
     compressed = compressed == 'boolean' ? compressed : this.compressed;
 
@@ -346,22 +364,22 @@ class Sig {
     if (compressed == false) {
       val = val - 4;
     }
-    var b1 = Uint8List.fromList([val]);
+    var b1 = List<int>.from([val]);
     var b2 = this.r.toBuffer(size: 32);
     var b3 = this.s.toBuffer(size: 32);
-    return Uint8List.fromList([
+    return List<int>.from([
       ...b1,
       ...b2,
       ...b3,
     ]);
   }
 
-  toRS() {
+  List<int> toRS() {
     return List<int>.from(
         [...this.r.toBuffer(size: 32), ...this.s.toBuffer(size: 32)]);
   }
 
-  toDer() {
+  List<int> toDer() {
     var rnbuf = this.r.toBuffer();
     var snbuf = this.s.toBuffer();
 
@@ -392,12 +410,12 @@ class Sig {
       ...List<int>.from([header, length, rheader, rlength]),
       ...rbuf,
       ...List<int>.from([sheader, slength]),
-      ...sbuf
+      ...sbuf,
     ]);
     return der;
   }
 
-  toTxFormat() {
+  List<int> toTxFormat() {
     var derbuf = this.toDer();
     var buf = Uint8List(1);
     ByteData.view(buf.buffer).setUint8(0, this.nHashType);
@@ -407,7 +425,11 @@ class Sig {
     ]);
   }
 
-  toString() {
+  String toString() {
     return hex.encode(this.toDer());
+  }
+
+  String toHex() {
+    return this.toBuffer().toHex();
   }
 }
