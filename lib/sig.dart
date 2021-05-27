@@ -386,13 +386,13 @@ class Sig {
     var rneg = rnbuf[0] & 0x80;
     var sneg = snbuf[0] & 0x80;
 
-    var rbuf = rneg == 1
+    var rbuf = rneg != 0
         ? List<int>.from([
             ...List<int>.from([0x00]),
             ...rnbuf
           ])
         : rnbuf;
-    var sbuf = sneg == 1
+    var sbuf = sneg != 0
         ? List<int>.from([
             ...List<int>.from([0x00]),
             ...snbuf

@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:bsv/extentsions/string.dart';
 
+import 'vectors/sig.dart';
+
 void main() {
   group('Sig', () {
     // test('should make a blank signature', () {
@@ -394,12 +396,11 @@ void main() {
     group('#toHex', () {
       test('should convert these known r and s values into a known signature',
           () {
-        var r = BigIntX.fromHex(
+        var r = BigIntX.fromString(
             '63173831029936981022572627018246571655303050627048489594159321588908385378810');
-        var s = BigIntX.fromHex(
+        var s = BigIntX.fromString(
             '4331694221846364448463828256391194279133231453999942381442030409253074198130');
         var sig = new Sig(r: r, s: s);
-        // TODO:NEXT
         expect(
           sig.toHex(),
           '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
@@ -409,9 +410,9 @@ void main() {
       test(
           'should convert these known r, s, nHashType values into a known signature',
           () {
-        var r = BigIntX.fromHex(
+        var r = BigIntX.fromString(
             '63173831029936981022572627018246571655303050627048489594159321588908385378810');
-        var s = BigIntX.fromHex(
+        var s = BigIntX.fromString(
             '4331694221846364448463828256391194279133231453999942381442030409253074198130');
         var nHashType = Sig.SIGHASH_ALL;
         var sig = new Sig(r: r, s: s, nHashType: nHashType);
@@ -425,9 +426,9 @@ void main() {
       test(
           'should convert these known r and s values and guessed i values into signature',
           () {
-        var r = BigIntX.fromHex(
+        var r = BigIntX.fromString(
             '63173831029936981022572627018246571655303050627048489594159321588908385378810');
-        var s = BigIntX.fromHex(
+        var s = BigIntX.fromString(
             '4331694221846364448463828256391194279133231453999942381442030409253074198130');
 
         var sig = Sig(r: r, s: s, recovery: 0);
@@ -458,195 +459,187 @@ void main() {
       });
     });
 
-    // group('#toBuffer',  () {
-    //   test('should convert these known r and s values into a known signature',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     var sig = Sig.fromObject({ r: r, s: s });
-    //     var der = sig.toBuffer();
-    //     der
-    //       .toString('hex')
-    //       .should.equal(
-    //         '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //   })
+    group('#toBuffer', () {
+      test('should convert these known r and s values into a known signature',
+          () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
 
-    //   test('should convert these known r, s, nHashType values into a known signature',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     var nHashType = Sig.SIGHASH_ALL;
-    //     var sig = new Sig(r, s, nHashType);
-    //     var buf = sig.toBuffer();
-    //     buf
-    //       .toString('hex')
-    //       .should.equal(
-    //         '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201'
-    //       )
-    //   })
+        var sig = Sig(r: r, s: s);
+        var der = sig.toBuffer();
+        expect(
+          der.toHex(),
+          '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+      });
 
-    //   test('should convert these known r and s values and guessed recovery values into signature',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     let sig = Sig.fromObject({ r: r, s: s, recovery: 0 })
-    //     sig
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '1f8bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //     sig = Sig.fromObject({ r: r, s: s, recovery: 1 })
-    //     sig
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '208bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //     sig = Sig.fromObject({ r: r, s: s, recovery: 2 })
-    //     sig
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '218bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //     sig = Sig.fromObject({ r: r, s: s, recovery: 3 })
-    //     sig
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '228bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //   })
-    // })
+      test(
+          'should convert these known r, s, nHashType values into a known signature',
+          () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
 
-    // group('#toCompact',  () {
-    //   test('should convert these known r and s values and guessed i values into signature',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     let sig = Sig.fromObject({ r: r, s: s, recovery: 0 })
-    //     sig
-    //       .toCompact()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '1f8bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //     sig = Sig.fromObject({ r: r, s: s, recovery: 1 })
-    //     sig
-    //       .toCompact()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '208bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //     sig = Sig.fromObject({ r: r, s: s, recovery: 2 })
-    //     sig
-    //       .toCompact()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '218bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //     sig = Sig.fromObject({ r: r, s: s, recovery: 3 })
-    //     sig
-    //       .toCompact()
-    //       .toString('hex')
-    //       .should.equal(
-    //         '228bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //   })
-    // })
+        var nHashType = Sig.SIGHASH_ALL;
+        var sig = new Sig(r: r, s: s, nHashType: nHashType);
+        var buf = sig.toBuffer();
+        expect(
+          buf.toHex(),
+          '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201',
+        );
+      });
 
-    // group('#toDer',  () {
-    //   test('should convert these known r and s values into a known signature',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     var sig = Sig.fromObject({ r: r, s: s });
-    //     var der = sig.toDer();
-    //     der
-    //       .toString('hex')
-    //       .should.equal(
-    //         '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //       )
-    //   })
-    // })
+      test(
+          'should convert these known r and s values and guessed recovery values into signature',
+          () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
 
-    // group('#toTxFormat',  () {
-    //   test('should convert these known r, s, nHashType values into a known signature',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     var nHashType = Sig.SIGHASH_ALL;
-    //     var sig = new Sig(r, s, nHashType);
-    //     var buf = sig.toTxFormat();
-    //     buf
-    //       .toString('hex')
-    //       .should.equal(
-    //         '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201'
-    //       )
-    //   })
-    // })
+        var sig = Sig(r: r, s: s, recovery: 0);
 
-    // group('#toString',  () {
-    //   test('should convert this signature in to hex DER',  () {
-    //     var r = new Bn(;
-    //       '63173831029936981022572627018246571655303050627048489594159321588908385378810'
-    //     )
-    //     var s = new Bn(;
-    //       '4331694221846364448463828256391194279133231453999942381442030409253074198130'
-    //     )
-    //     var sig = Sig.fromObject({ r: r, s: s });
-    //     var hex = sig.toString();
-    //     hex.should.equal(
-    //       '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72'
-    //     )
-    //   })
-    // })
+        expect(
+          sig.toBuffer().toHex(),
+          '1f8bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
 
-    // group('vectors',  () {
-    //   // TODO: These vectors were taken from BitcoinJS-lib during a debugging
-    //   // expedition. I only took a subset relevant for the stuff I wanted to
-    //   // test, but it would be valuable to revisit these test vectors and make
-    //   // sure all of them pass.
-    //   vectors.valid.forEach(function (vector) {
-    //     test('should pass this vector',  () {
-    //       var compact = vector.compact;
-    //       var sig = Sig.fromCompact(Buffer.from(compact.hex, 'hex'));
-    //       sig.recovery.should.equal(compact.i)
-    //       sig.compressed.should.equal(compact.compressed)
-    //       sig
-    //         .toCompact()
-    //         .toString('hex')
-    //         .should.equal(compact.hex)
-    //     })
-    //   })
+        sig = Sig(r: r, s: s, recovery: 1);
 
-    //   vectors.invalid.compact.forEach(function (compact) {
-    //     test('should pass this vector',  () {
-    //       ;(function () {
-    //         Sig.fromCompact(Buffer.from(compact.hex, 'hex'))
-    //       }.should.throw())
-    //     })
-    //   })
-    // })
+        expect(
+          sig.toBuffer().toHex(),
+          '208bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+
+        sig = Sig(r: r, s: s, recovery: 2);
+        expect(
+          sig.toBuffer().toHex(),
+          '218bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+
+        sig = Sig(r: r, s: s, recovery: 3);
+
+        expect(
+          sig.toBuffer().toHex(),
+          '228bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+      });
+    });
+
+    group('#toCompact', () {
+      test(
+          'should convert these known r and s values and guessed i values into signature',
+          () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
+
+        var sig = Sig(r: r, s: s, recovery: 0);
+        expect(
+          sig.toCompact().toHex(),
+          '1f8bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+        sig = Sig(r: r, s: s, recovery: 1);
+        expect(
+          sig.toCompact().toHex(),
+          '208bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+
+        sig = Sig(r: r, s: s, recovery: 2);
+        expect(
+          sig.toCompact().toHex(),
+          '218bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+
+        sig = Sig(r: r, s: s, recovery: 3);
+
+        expect(
+          sig.toCompact().toHex(),
+          '228bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa0993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+      });
+    });
+
+    group('#toDer', () {
+      test('should convert these known r and s values into a known signature',
+          () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
+
+        var sig = Sig(r: r, s: s);
+        var der = sig.toDer();
+        expect(
+          der.toHex(),
+          '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72',
+        );
+      });
+    });
+
+    group('#toTxFormat', () {
+      test(
+          'should convert these known r, s, nHashType values into a known signature',
+          () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
+
+        var nHashType = Sig.SIGHASH_ALL;
+        var sig = new Sig(r: r, s: s, nHashType: nHashType);
+        var buf = sig.toTxFormat();
+        expect(
+          buf.toHex(),
+          '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e7201',
+        );
+      });
+    });
+
+    group('#toString', () {
+      test('should convert this signature in to hex DER', () {
+        var r = BigIntX.fromString(
+            '63173831029936981022572627018246571655303050627048489594159321588908385378810');
+        var s = BigIntX.fromString(
+            '4331694221846364448463828256391194279133231453999942381442030409253074198130');
+
+        var sig = Sig(r: r, s: s);
+        var hexStr = sig.toString();
+        expect(hexStr,
+            '30450221008bab1f0a2ff2f9cb8992173d8ad73c229d31ea8e10b0f4d4ae1a0d8ed76021fa02200993a6ec81755b9111762fc2cf8e3ede73047515622792110867d12654275e72');
+      });
+    });
+
+    group('vectors', () {
+      // TODO: These vectors were taken from BitcoinJS-lib during a debugging
+      // expedition. I only took a subset relevant for the stuff I wanted to
+      // test, but it would be valuable to revisit these test vectors and make
+      // sure all of them pass.
+
+      for (var i = 0; i < sigVector['valid'].length; i++) {
+        var vector = sigVector['valid'][i];
+        test('should pass this vector', () {
+          var compact = vector['compact'];
+          var sig = Sig.fromCompact(hex.decode(compact['hex']));
+          expect(sig.recovery, (compact['i']));
+          expect(sig.compressed, (compact['compressed']));
+          expect(sig.toCompact().toHex(), (compact['hex']));
+        });
+      }
+
+      for (var i = 0; i < sigVector['invalid']['compact'].length; i++) {
+        var compact = sigVector['invalid']['compact'][i];
+        test('should pass this vector', () {
+          expect(
+            () => Sig.fromCompact(hex.decode(compact['hex'])),
+            throwsA((temp) => temp is String),
+          );
+        });
+      }
+    });
   });
 }
