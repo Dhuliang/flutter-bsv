@@ -46,6 +46,10 @@ class PubKey {
     return PubKey().fromBuffer(hex.decode(str));
   }
 
+  factory PubKey.fromJSON(String str) {
+    return PubKey().fromJSON(str);
+  }
+
   PubKey fromJSON(String json) {
     this.fromFastBuffer(hex.decode(json));
     return this;
