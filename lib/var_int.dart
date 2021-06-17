@@ -29,6 +29,10 @@ class VarInt {
     return new VarInt().fromNumber(n);
   }
 
+  factory VarInt.fromBuffer(List<int> buf) {
+    return new VarInt().fromBuffer(buf);
+  }
+
   String toJSON() {
     return this.buf.toHex();
   }

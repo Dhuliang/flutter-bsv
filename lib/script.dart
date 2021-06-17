@@ -125,6 +125,10 @@ class Script {
     return new Script().writeOpCode(opCodeNum);
   }
 
+  factory Script.fromBuffer(Uint8List buf) {
+    return new Script().fromBuffer(buf);
+  }
+
   Script fromJSON(json) {
     return this.fromString(json);
   }
