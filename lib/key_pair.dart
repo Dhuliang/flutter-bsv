@@ -63,14 +63,14 @@ class KeyPair {
     if (this.privKey != null) {
       var privKeybuf = this.privKey.toBuffer();
       bw.writeUInt8(privKeybuf.length);
-      bw.write(privKeybuf.toBuffer());
+      bw.write(privKeybuf.asUint8List());
     } else {
       bw.writeUInt8(0);
     }
     if (this.pubKey != null) {
       var pubKeybuf = this.pubKey.toFastBuffer();
       bw.writeUInt8(pubKeybuf.length);
-      bw.write(pubKeybuf.toBuffer());
+      bw.write(pubKeybuf.asUint8List());
     } else {
       bw.writeUInt8(0);
     }
@@ -82,7 +82,7 @@ class KeyPair {
   }
 
   KeyPair fromBuffer(List<int> buf) {
-    var br = new Br(buf: buf.toBuffer());
+    var br = new Br(buf: buf.asUint8List());
     return this.fromBr(br);
   }
 

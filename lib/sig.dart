@@ -152,7 +152,7 @@ class Sig {
 
     // var nHashType = buf.readUInt8(buf.length - 1);
     var nHashType =
-        ByteData.view(buf.toBuffer().buffer).getUint8(buf.length - 1);
+        ByteData.view(buf.asUint8List().buffer).getUint8(buf.length - 1);
     var derbuf = buf.slice(0, buf.length - 1);
     this.fromDer(derbuf, false);
     this.nHashType = nHashType;

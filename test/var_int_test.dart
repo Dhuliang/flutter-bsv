@@ -69,7 +69,7 @@ void main() {
     group('#fromBr', () {
       test('should set a buffer reader', () {
         var buf = new Bw().writeVarIntNum(5).toBuffer();
-        var br = new Br(buf: buf.toBuffer());
+        var br = new Br(buf: buf.asUint8List());
         var varInt = new VarInt().fromBr(br);
         expect(varInt.toNumber(), 5);
       });

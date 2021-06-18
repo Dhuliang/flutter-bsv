@@ -13,6 +13,8 @@ import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
 import 'package:bsv/script.dart';
 import 'package:bsv/var_int.dart';
+import 'package:convert/convert.dart';
+import 'package:bsv/extentsions/list.dart';
 
 class TxOut {
   BigIntX valueBn;
@@ -63,13 +65,25 @@ class TxOut {
     return this;
   }
 
-  Bw toBw(Bw bw) {
+  TxOut fromHex(String str) {
+    return this.fromBr(Br(buf: hex.decode(str)));
+  }
+
+  TxOut fromBuffer(List<int> buf) {
+    return this.fromBr(Br(buf: buf));
+  }
+
+  Bw toBw([Bw bw]) {
     if (bw == null) {
       bw = new Bw();
     }
     bw.writeUInt64LEBn(this.valueBn);
-    bw.write(this.scriptVi.buf);
-    bw.write(this.script.toBuffer());
+    bw.write(this.scriptVi.buf.asUint8List());
+    bw.write(this.script.toBuffer().asUint8List());
     return bw;
+  }
+
+  List<int> toBuffer() {
+    return this.toBw().toBuffer();
   }
 }

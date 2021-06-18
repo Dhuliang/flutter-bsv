@@ -810,7 +810,7 @@ class Script {
       // see OP_1 - OP_16
       this.add(ScriptChunk(opCodeNum: bn.toNumber() + OpCode.OP_1 - 1));
     } else {
-      var buf = bn.toSm(endian: Endian.little).toBuffer();
+      var buf = bn.toSm(endian: Endian.little).asUint8List();
       this.writeBuffer(buf);
     }
     return this;

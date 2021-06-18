@@ -26,7 +26,7 @@ extension ListX<T> on List<T> {
         .join();
   }
 
-  Uint8List toBuffer() {
+  Uint8List asUint8List() {
     if (this is List<int>) {
       return Uint8List.fromList(this as List<int>);
     }

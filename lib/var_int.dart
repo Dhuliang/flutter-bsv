@@ -67,10 +67,10 @@ class VarInt {
   }
 
   BigIntX toBn() {
-    return new Br(buf: this.buf.toBuffer()).readVarIntBn();
+    return new Br(buf: this.buf.asUint8List()).readVarIntBn();
   }
 
   int toNumber() {
-    return new Br(buf: this.buf.toBuffer()).readVarIntNum();
+    return new Br(buf: this.buf.asUint8List()).readVarIntNum();
   }
 }

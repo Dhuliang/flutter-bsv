@@ -1,8 +1,11 @@
 import 'package:bsv/bn.dart';
+import 'package:bsv/br.dart';
 import 'package:bsv/script.dart';
 import 'package:bsv/tx_out.dart';
 import 'package:bsv/var_int.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:bsv/extentsions/list.dart';
 
 void main() {
   group('TxOut', () {
@@ -98,74 +101,54 @@ void main() {
     //   })
     // })
 
-    // TODO:NEXT
-    // group('#fromHex',  () {
-    //   test('should make this txIn from this known hex',  () {
-    //     var txOut = new TxOut().fromHex('050000000000000001ae')
-    //     txOut
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('050000000000000001ae')
-    //   })
+    group('#fromHex', () {
+      test('should make this txIn from this known hex', () {
+        var txOut = new TxOut().fromHex('050000000000000001ae');
+        expect(txOut.toBuffer().toHex(), '050000000000000001ae');
+      });
 
-    //   test('should work with this problematic json',  () {
-    //     var json = {
-    //       valueBn: '20000',
-    //       scriptVi: '56',
-    //       script: 'OP_SHA256 32 0x8cc17e2a2b10e1da145488458a6edec4a1fdb1921c2d5ccbc96aa0ed31b4d5f8 OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIGVERIFY OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG'
-    //     }
-    //     var txOut = TxOut.fromJSON(json)
-    //     txOut.toString().should.equal(TxOut.fromHex(txOut.toHex()).toString())
-    //   })
-    // })
+      // test('should work with this problematic json',  () {
+      //   var json = {
+      //     valueBn: '20000',
+      //     scriptVi: '56',
+      //     script: 'OP_SHA256 32 0x8cc17e2a2b10e1da145488458a6edec4a1fdb1921c2d5ccbc96aa0ed31b4d5f8 OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIGVERIFY OP_EQUALVERIFY OP_DUP OP_HASH160 20 0x1451baa3aad777144a0759998a03538018dd7b4b OP_EQUALVERIFY OP_CHECKSIG'
+      //   }
+      //   var txOut = TxOut.fromJSON(json)
+      //   txOut.toString().should.equal(TxOut.fromHex(txOut.toHex()).toString())
+      // });
+    });
 
-    // group('#fromBuffer',  () {
-    //   test('should make this txIn from this known buffer',  () {
-    //     var txOut = new TxOut().fromBuffer(
-    //       Buffer.from('050000000000000001ae', 'hex')
-    //     )
-    //     txOut
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('050000000000000001ae')
-    //   })
-    // })
+    group('#fromBuffer', () {
+      test('should make this txIn from this known buffer', () {
+        var txOut = new TxOut().fromBuffer(hex.decode('050000000000000001ae'));
+        expect(txOut.toBuffer().toHex(), '050000000000000001ae');
+      });
+    });
 
-    // group('#fromBr',  () {
-    //   test('should make this txIn from this known buffer',  () {
-    //     var txOut = new TxOut().fromBr(
-    //       new Br(Buffer.from('050000000000000001ae', 'hex'))
-    //     )
-    //     txOut
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('050000000000000001ae')
-    //   })
-    // })
+    group('#fromBr', () {
+      test('should make this txIn from this known buffer', () {
+        var txOut =
+            new TxOut().fromBr(Br(buf: hex.decode('050000000000000001ae')));
+        expect(txOut.toBuffer().toHex(), '050000000000000001ae');
+      });
+    });
 
-    // group('#toBuffer',  () {
-    //   test('should output this known buffer',  () {
-    //     var txOut = new TxOut().fromBr(
-    //       new Br(Buffer.from('050000000000000001ae', 'hex'))
-    //     )
-    //     txOut
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('050000000000000001ae')
-    //   })
-    // })
+    group('#toBuffer', () {
+      test('should output this known buffer', () {
+        var txOut =
+            new TxOut().fromBr(Br(buf: hex.decode('050000000000000001ae')));
 
-    // group('#toBw',  () {
-    //   test('should output this known buffer',  () {
-    //     var txOut = new TxOut().fromBr(
-    //       new Br(Buffer.from('050000000000000001ae', 'hex'))
-    //     )
-    //     txOut
-    //       .toBw()
-    //       .toBuffer()
-    //       .toString('hex')
-    //       .should.equal('050000000000000001ae')
-    //   })
-    // })
+        expect(txOut.toBuffer().toHex(), '050000000000000001ae');
+      });
+    });
+
+    group('#toBw', () {
+      test('should output this known buffer', () {
+        var txOut =
+            new TxOut().fromBr(Br(buf: hex.decode('050000000000000001ae')));
+
+        expect(txOut.toBw().toBuffer().toHex(), '050000000000000001ae');
+      });
+    });
   });
 }
