@@ -1,4 +1,14 @@
+import 'package:bsv/bn.dart';
+import 'package:bsv/constants.dart';
+import 'package:bsv/hash.dart';
+import 'package:bsv/op_code.dart';
+import 'package:bsv/priv_key.dart';
+import 'package:bsv/pub_key.dart';
+import 'package:bsv/script.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter/services.dart';
+import 'package:bsv/extentsions/list.dart';
+import 'package:bs58check/bs58check.dart' as Base58Check;
 
 // ignore: slash_for_doc_comments
 /**
@@ -23,6 +33,21 @@ import 'package:flutter/services.dart';
 class Address {
   int pubKeyHash;
   int versionByteNum;
+  int payToScriptHash;
+  List<int> hashBuf;
+
+  Address({
+    int pubKeyHash,
+    int versionByteNum,
+    int payToScriptHash,
+    List<int> hashBuf,
+  }) {
+    this.versionByteNum = versionByteNum;
+    this.hashBuf = hashBuf;
+    this.pubKeyHash = pubKeyHash ?? Constants.Mainnet.addressPubKeyHash;
+    this.payToScriptHash =
+        payToScriptHash ?? Constants.Mainnet.addressPayToScriptHash;
+  }
 
   static const INVALID_ADDRESS_LENGTH =
       'address buffers must be exactly 21 bytes';
@@ -35,25 +60,174 @@ class Address {
 
   static const INVALID_ADDRESS_VERSION_BYTE_NUM = 'invalid versionByteNum';
 
+  Address fromBuffer(List<int> buf) {
+    if (buf.length != 1 + 20) {
+      throw INVALID_ADDRESS_LENGTH;
+    }
+    if (buf[0] != this.pubKeyHash) {
+      throw INVALID_ADDRESS_VERSION_BYTE_NUM_BYTE;
+    }
+    this.versionByteNum = buf[0];
+    this.hashBuf = buf.slice(1);
+    return this;
+  }
+
+  Address fromPubKeyHashBuf(List<int> hashBuf) {
+    this.hashBuf = hashBuf;
+    this.versionByteNum = this.pubKeyHash;
+    return this;
+  }
+
+  factory Address.fromPubKeyHashBuf(List<int> hashBuf) {
+    return Address().fromPubKeyHashBuf(hashBuf);
+  }
+
+  Address fromPubKey(PubKey pubKey) {
+    var hashBuf = Hash.sha256Ripemd160(pubKey.toBuffer());
+    return this.fromPubKeyHashBuf(hashBuf.toBuffer());
+  }
+
+  factory Address.fromPubKey(PubKey pubKey) {
+    return Address().fromPubKey(pubKey);
+  }
+
+  Address fromPrivKey(PrivKey privKey) {
+    var pubKey = new PubKey().fromPrivKey(privKey);
+    var hashBuf = Hash.sha256Ripemd160(pubKey.toBuffer());
+    return this.fromPubKeyHashBuf(hashBuf.toBuffer());
+  }
+
+  factory Address.fromPrivKey(PrivKey privKey) {
+    return Address().fromPrivKey(privKey);
+  }
+
+  Address fromRandom() {
+    var randomPrivKey = new PrivKey().fromRandom();
+    return this.fromPrivKey(randomPrivKey);
+  }
+
+  factory Address.fromRandom() {
+    return Address().fromRandom();
+  }
+
+  Address fromString(String str) {
+    var buf = Base58Check.decode(str);
+    return this.fromBuffer(buf.toList());
+  }
+
+  static bool isValid(String addrstr) {
+    Address address;
+    try {
+      address = new Address().fromString(addrstr);
+    } catch (e) {
+      return false;
+    }
+    return address.checkValid();
+  }
+
+  bool checkValid() {
+    try {
+      this.validate();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Script toTxOutScript() {
+    var script = new Script();
+    script.writeOpCode(OpCode.OP_DUP);
+    script.writeOpCode(OpCode.OP_HASH160);
+    script.writeBuffer(this.hashBuf);
+    script.writeOpCode(OpCode.OP_EQUALVERIFY);
+    script.writeOpCode(OpCode.OP_CHECKSIG);
+
+    return script;
+  }
+
+  Address fromTxInScript(Script script) {
+    var pubKeyHashBuf = Hash.sha256Ripemd160(
+      script.chunks[1].buf ?? hex.decode('00' * 32),
+    );
+    return this.fromPubKeyHashBuf(pubKeyHashBuf.toBuffer());
+  }
+
+  factory Address.fromTxInScript(Script script) {
+    return new Address().fromTxInScript(script);
+  }
+
+  Address fromTxOutScript(Script script) {
+    return this.fromPubKeyHashBuf(script.chunks[2].buf);
+  }
+
+  factory Address.fromTxOutScript(Script script) {
+    return new Address().fromTxOutScript(script);
+  }
+
+  List<int> toBuffer() {
+    var versionByteBuf = List<int>.from([this.versionByteNum]);
+    var buf = List<int>.from([versionByteBuf, this.hashBuf]);
+    return buf;
+  }
+
+  // toJSON () {
+  //   var json = {}
+  //   if (this.hashBuf) {
+  //     json.hashBuf = this.hashBuf.toString('hex')
+  //   }
+  //   if (typeof this.versionByteNum != 'undefined') {
+  //     json.versionByteNum = this.versionByteNum
+  //   }
+  //   return json
+  // }
+
+  // fromJSON (json) {
+  //   if (json.hashBuf) {
+  //     this.hashBuf = Buffer.from(json.hashBuf, 'hex')
+  //   }
+  //   if (typeof json.versionByteNum != 'undefined') {
+  //     this.versionByteNum = json.versionByteNum
+  //   }
+  //   return this
+  // }
+
+  String toString() {
+    return Base58Check.encode(this.toBuffer());
+  }
+
+  Address validate() {
+    if (!(this.hashBuf is List<int>) || this.hashBuf.length != 20) {
+      throw INVALID_ADDRESS_HASH_BUF;
+    }
+    if (this.versionByteNum != this.pubKeyHash) {
+      throw INVALID_ADDRESS_VERSION_BYTE_NUM;
+    }
+    return this;
+  }
+
   // ignore: non_constant_identifier_names
-  // factory PrivKey.Testnet({BigIntX bn, bool compressed}) {
-  //   return PrivKey(
-  //     bn: bn,
-  //     compressed: compressed,
-  //     privKeyVersionByteNum: Constants.Testnet.privKeyVersionByteNum,
-  //   );
-  // }
+  factory Address.Testnet({
+    int versionByteNum,
+    List<int> hashBuf,
+  }) {
+    return Address(
+      versionByteNum: versionByteNum,
+      hashBuf: hashBuf,
+      pubKeyHash: Constants.Testnet.addressPubKeyHash,
+      payToScriptHash: Constants.Testnet.addressPayToScriptHash,
+    );
+  }
 
-  // // ignore: non_constant_identifier_names
-  // factory PrivKey.Mainnet({BigIntX bn, bool compressed}) {
-  //   return PrivKey(
-  //     bn: bn,
-  //     compressed: compressed,
-  //     privKeyVersionByteNum: Constants.Mainnet.privKeyVersionByteNum,
-  //   );
-  // }
-
-  Address() {
-    // var writer = ByteDataWriter();
+  // ignore: non_constant_identifier_names
+  factory Address.Mainnet({
+    int versionByteNum,
+    List<int> hashBuf,
+  }) {
+    return Address(
+      versionByteNum: versionByteNum,
+      hashBuf: hashBuf,
+      pubKeyHash: Constants.Mainnet.addressPubKeyHash,
+      payToScriptHash: Constants.Mainnet.addressPayToScriptHash,
+    );
   }
 }

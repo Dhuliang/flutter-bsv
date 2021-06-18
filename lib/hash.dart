@@ -15,6 +15,8 @@ class Hash {
 
   String get toHex => hex.encode(this.data);
 
+  List<int> toBuffer() => this.data.toList();
+
   ByteBuffer get buffer => this.data.buffer;
 
   static int sha1BlockSize = 512;

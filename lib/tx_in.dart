@@ -13,7 +13,10 @@ import 'package:bsv/bw.dart';
 import 'package:bsv/op_code.dart';
 import 'package:bsv/pub_key.dart';
 import 'package:bsv/script.dart';
+import 'package:bsv/tx_out.dart';
 import 'package:bsv/var_int.dart';
+import 'package:bsv/extentsions/list.dart';
+import 'package:convert/convert.dart';
 
 class TxIn {
   List<int> txHashBuf;
@@ -21,6 +24,18 @@ class TxIn {
   VarInt scriptVi;
   Script script;
   int nSequence = 0xffffffff;
+
+  static const LOCKTIME_VERIFY_SEQUENCE = 1 << 0;
+
+  static const SEQUENCE_FINAL = 0xffffffff;
+
+  static const SEQUENCE_LOCKTIME_DISABLE_FLAG = 1 << 31;
+
+  static const SEQUENCE_LOCKTIME_TYPE_FLAG = 1 << 22;
+
+  static const SEQUENCE_LOCKTIME_MASK = 0x0000ffff;
+
+  static const SEQUENCE_LOCKTIME_GRANULARITY = 9;
 
   TxIn({
     List<int> txHashBuf,
@@ -80,14 +95,14 @@ class TxIn {
     return this;
   }
 
-  Bw toBw(Bw bw) {
+  Bw toBw([Bw bw]) {
     if (bw == null) {
       bw = new Bw();
     }
-    bw.write(this.txHashBuf);
+    bw.write(this.txHashBuf.asUint8List());
     bw.writeUInt32LE(this.txOutNum);
-    bw.write(this.scriptVi.buf);
-    bw.write(this.script.toBuffer());
+    bw.write(this.scriptVi.buf.asUint8List());
+    bw.write(this.script.toBuffer().asUint8List());
     bw.writeUInt32LE(this.nSequence);
     return bw;
   }
@@ -98,8 +113,12 @@ class TxIn {
      * defaults to blank but can be substituted with the real public key if you
      * know what it is.
      */
-  TxIn fromPubKeyHashTxOut(
-      {List<int> txHashBuf, int txOutNum, txOut, PubKey pubKey}) {
+  TxIn fromPubKeyHashTxOut({
+    List<int> txHashBuf,
+    int txOutNum,
+    TxOut txOut,
+    PubKey pubKey,
+  }) {
     var script = new Script();
     if (txOut.script.isPubKeyHashOut()) {
       script.writeOpCode(OpCode.OP_0); // blank signature
@@ -115,5 +134,36 @@ class TxIn {
     this.txOutNum = txOutNum;
     this.setScript(script);
     return this;
+  }
+
+  bool hasNullInput() {
+    var hexStr = this.txHashBuf.toHex();
+    if (hexStr ==
+            '0000000000000000000000000000000000000000000000000000000000000000' &&
+        this.txOutNum == 0xffffffff) {
+      return true;
+    }
+    return false;
+  }
+
+  void setNullInput() {
+    this.txHashBuf = List<int>.generate(32, (index) => 0);
+    this.txOutNum = 0xffffffff; // -1 cast to unsigned int
+  }
+
+  TxIn fromHex(String str) {
+    return this.fromBr(Br(buf: hex.decode(str)));
+  }
+
+  TxIn fromBuffer(List<int> buf) {
+    return this.fromBr(Br(buf: buf));
+  }
+
+  String toHex() {
+    return this.toBw().toHex();
+  }
+
+  List<int> toBuffer() {
+    return this.toBw().toBuffer();
   }
 }
