@@ -6,7 +6,6 @@ import 'package:bsv/priv_key.dart';
 import 'package:bsv/pub_key.dart';
 import 'package:bsv/script.dart';
 import 'package:convert/convert.dart';
-import 'package:flutter/services.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:bs58check/bs58check.dart' as Base58Check;
 
@@ -72,6 +71,14 @@ class Address {
     return this;
   }
 
+  factory Address.fromBuffer(List<int> buf) {
+    return Address().fromBuffer(buf);
+  }
+
+  Address fromHex(String str) {
+    return this.fromBuffer(hex.decode(str));
+  }
+
   Address fromPubKeyHashBuf(List<int> hashBuf) {
     this.hashBuf = hashBuf;
     this.versionByteNum = this.pubKeyHash;
@@ -83,7 +90,7 @@ class Address {
   }
 
   Address fromPubKey(PubKey pubKey) {
-    var hashBuf = Hash.sha256Ripemd160(pubKey.toBuffer());
+    var hashBuf = Hash.sha256Ripemd160(pubKey.toBuffer().asUint8List());
     return this.fromPubKeyHashBuf(hashBuf.toBuffer());
   }
 
@@ -93,7 +100,7 @@ class Address {
 
   Address fromPrivKey(PrivKey privKey) {
     var pubKey = new PubKey().fromPrivKey(privKey);
-    var hashBuf = Hash.sha256Ripemd160(pubKey.toBuffer());
+    var hashBuf = Hash.sha256Ripemd160(pubKey.toBuffer().asUint8List());
     return this.fromPubKeyHashBuf(hashBuf.toBuffer());
   }
 
@@ -113,6 +120,10 @@ class Address {
   Address fromString(String str) {
     var buf = Base58Check.decode(str);
     return this.fromBuffer(buf.toList());
+  }
+
+  factory Address.fromString(String str) {
+    return Address().fromString(str);
   }
 
   static bool isValid(String addrstr) {
@@ -138,7 +149,7 @@ class Address {
     var script = new Script();
     script.writeOpCode(OpCode.OP_DUP);
     script.writeOpCode(OpCode.OP_HASH160);
-    script.writeBuffer(this.hashBuf);
+    script.writeBuffer(this.hashBuf.asUint8List());
     script.writeOpCode(OpCode.OP_EQUALVERIFY);
     script.writeOpCode(OpCode.OP_CHECKSIG);
 
@@ -166,7 +177,7 @@ class Address {
 
   List<int> toBuffer() {
     var versionByteBuf = List<int>.from([this.versionByteNum]);
-    var buf = List<int>.from([versionByteBuf, this.hashBuf]);
+    var buf = List<int>.from([...versionByteBuf, ...this.hashBuf]);
     return buf;
   }
 
@@ -192,7 +203,7 @@ class Address {
   // }
 
   String toString() {
-    return Base58Check.encode(this.toBuffer());
+    return Base58Check.encode(this.toBuffer().asUint8List());
   }
 
   Address validate() {
@@ -203,6 +214,10 @@ class Address {
       throw INVALID_ADDRESS_VERSION_BYTE_NUM;
     }
     return this;
+  }
+
+  String toHex() {
+    return this.toBuffer().toHex();
   }
 
   // ignore: non_constant_identifier_names
