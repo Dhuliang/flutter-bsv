@@ -69,6 +69,10 @@ class TxOut {
     return this.fromBr(Br(buf: hex.decode(str)));
   }
 
+  factory TxOut.fromHex(String str) {
+    return TxOut().fromBr(Br(buf: hex.decode(str)));
+  }
+
   TxOut fromBuffer(List<int> buf) {
     return this.fromBr(Br(buf: buf));
   }
