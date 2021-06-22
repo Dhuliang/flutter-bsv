@@ -1,11 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:bsv/bn.dart';
 import 'package:bsv/point.dart';
 import 'package:bsv/priv_key.dart';
 // import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:convert/convert.dart';
-import 'package:flutter/foundation.dart';
 
 class PubKey {
   PointWrapper point;

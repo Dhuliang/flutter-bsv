@@ -6,6 +6,7 @@ import 'package:bsv/priv_key.dart';
 import 'package:bsv/pub_key.dart';
 import 'package:bsv/extentsions/list.dart';
 
+// ignore: slash_for_doc_comments
 /**
  * KeyPair
  * =======

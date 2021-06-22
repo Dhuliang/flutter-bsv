@@ -4,6 +4,7 @@ import 'package:bsv/bw.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:bsv/extentsions/string.dart';
 
+// ignore: slash_for_doc_comments
 /**
  * VarInt (a.k.a. Compact Size)
  * ============================

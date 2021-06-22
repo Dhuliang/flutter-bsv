@@ -225,7 +225,6 @@ class BigIntX {
 
   BigIntX div(BigIntX other) => BigIntX(bn: bn ~/ other.bn);
 
-  // TODO should check is num or is bigintx will be better
   // int cmp(BigIntX other) => this.bn.compareTo(other.bn);
   int cmp(dynamic other) {
     if (other is BigIntX) {

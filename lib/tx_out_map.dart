@@ -1,6 +1,7 @@
 import 'package:bsv/tx_out.dart';
 import 'package:bsv/extentsions/list.dart';
 
+// ignore: slash_for_doc_comments
 /**
  * Transaction Output Map
  * ======================

@@ -107,6 +107,7 @@ class TxIn {
     return bw;
   }
 
+  // ignore: slash_for_doc_comments
   /**
      * Generate txIn with blank signatures from a txOut and its
      * txHashBuf+txOutNum. A "blank" signature is just an OP_0. The pubKey also
