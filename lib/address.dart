@@ -126,17 +126,18 @@ class Address {
     return Address().fromString(str);
   }
 
-  static bool isValid(String addrstr) {
+  static bool staticIsValid(String addrstr) {
     Address address;
     try {
       address = new Address().fromString(addrstr);
     } catch (e) {
       return false;
     }
-    return address.checkValid();
+    return address.isValid();
   }
 
-  bool checkValid() {
+  // ignore: unused_element
+  bool isValid() {
     try {
       this.validate();
       return true;

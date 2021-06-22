@@ -47,7 +47,7 @@ class PointWrapper {
       prefixByte = 0x02;
     }
 
-    var encoded = BigIntX(bn: x).toBuffer();
+    var encoded = BigIntX(bn: x).toBuffer(size: 32);
 
     var addressBytes = List<int>(1 + encoded.length);
     addressBytes[0] = prefixByte;

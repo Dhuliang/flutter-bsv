@@ -200,6 +200,10 @@ class BigIntX {
     return this.bn.toInt();
   }
 
+  BigIntX umod(BigIntX other) => BigIntX(bn: bn % other.bn);
+
+  BigIntX invm(BigIntX other) => BigIntX(bn: bn.modInverse(other.bn));
+
   BigIntX neg() => BigIntX(bn: bn * BigInt.from(-1));
 
   BigIntX add(BigIntX other) => BigIntX(bn: bn + other.bn);

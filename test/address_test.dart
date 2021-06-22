@@ -36,11 +36,11 @@ void main() {
 
     group('@isValid', () {
       test('should validate this valid address string', () {
-        expect(Address.isValid(str), (true));
+        expect(Address.staticIsValid(str), (true));
       });
 
       test('should invalidate this valid address string', () {
-        expect(Address.isValid(str.substring(1)), (false));
+        expect(Address.staticIsValid(str.substring(1)), (false));
       });
     });
 
@@ -357,7 +357,7 @@ void main() {
       test('should describe this valid address as valid', () {
         var address = new Address();
         address.fromString('1111111111111111111114oLvT2');
-        expect(address.checkValid(), true);
+        expect(address.isValid(), true);
       });
 
       test(
@@ -366,7 +366,7 @@ void main() {
         var address = new Address();
         address.fromString('1111111111111111111114oLvT2');
         address.versionByteNum = 1;
-        expect(address.checkValid(), false);
+        expect(address.isValid(), false);
       });
     });
 

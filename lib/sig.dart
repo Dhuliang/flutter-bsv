@@ -159,7 +159,7 @@ class Sig {
     return this;
   }
 
-  dynamic fromString(str) {
+  Sig fromString(String str) {
     return this.fromHex(str);
   }
 
@@ -329,10 +329,7 @@ class Sig {
     if (this.s.lt(1) ||
         this.s.gt(BigIntX.fromBuffer(hex.decode(
                 '7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0')
-            // Buffer.from(
-            //   '7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0',
-            //   'hex'
-            // )
+            //
             ))) {
       return false;
     }
