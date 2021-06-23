@@ -267,6 +267,10 @@ class BigIntX {
     return this.bn.toRadixString(radix);
   }
 
+  String toJSON() {
+    return this.toString();
+  }
+
   //上面的推论，除了我们不抛出的明显例外
   //如果输出大于四个字节，则返回错误。 （如果
   //执行数值运算，导致溢出超过4

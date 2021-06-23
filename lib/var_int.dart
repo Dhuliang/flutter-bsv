@@ -3,6 +3,7 @@ import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:bsv/extentsions/string.dart';
+import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments
 /**
@@ -32,6 +33,10 @@ class VarInt {
 
   factory VarInt.fromBuffer(List<int> buf) {
     return new VarInt().fromBuffer(buf);
+  }
+
+  factory VarInt.fromJSON(String str) {
+    return new VarInt(buf: hex.decode(str));
   }
 
   String toJSON() {

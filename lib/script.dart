@@ -129,6 +129,10 @@ class Script {
     return new Script().fromBuffer(buf);
   }
 
+  factory Script.fromJSON(String str) {
+    return new Script().fromJSON(str);
+  }
+
   Script fromJSON(json) {
     return this.fromString(json);
   }

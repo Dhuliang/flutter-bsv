@@ -41,6 +41,22 @@ class TxOut {
     );
   }
 
+  TxOut fromJSON(Map json) {
+    return TxOut(
+      valueBn: new BigIntX.fromString(json['valueBn']),
+      scriptVi: new VarInt().fromJSON(json['scriptVi']),
+      script: new Script().fromJSON(json['script']),
+    );
+  }
+
+  Map<String, String> toJSON() {
+    return {
+      "valueBn": this.valueBn.toJSON(),
+      "scriptVi": this.scriptVi.toJSON(),
+      "script": this.script.toJSON()
+    };
+  }
+
   TxOut setScript(Script script) {
     this.scriptVi = VarInt.fromNumber(script.toBuffer().length);
     this.script = script;

@@ -13,7 +13,9 @@ void main() {
     var txHashBuf = List.generate(32, (index) => 0);
     var label = txHashBuf.toHex() + ':' + '0';
     var txOut = TxOut.fromProperties(
-        valueBn: BigIntX.zero, script: Script.fromString('OP_RETURN'));
+      valueBn: BigIntX.zero,
+      script: Script.fromString('OP_RETURN'),
+    );
     var map = new Map();
     map[label] = txOut;
 

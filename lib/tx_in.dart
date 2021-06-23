@@ -65,6 +65,28 @@ class TxIn {
     );
   }
 
+  TxIn fromJSON(Map json) {
+    return TxIn(
+      txHashBuf:
+          json['txHashBuf'] != null ? hex.decode(json['txHashBuf']) : null,
+      txOutNum: json['txOutNum'],
+      scriptVi:
+          json['scriptVi'] != null ? VarInt.fromJSON(json['scriptVi']) : null,
+      script: json['script'] != null ? Script.fromJSON(json['script']) : null,
+      nSequence: json['nSequence'],
+    );
+  }
+
+  Map<String, dynamic> toJSON() {
+    return {
+      "txHashBuf": this.txHashBuf != null ? this.txHashBuf.toHex() : null,
+      "txOutNum": this.txOutNum,
+      "scriptVi": this.scriptVi != null ? this.scriptVi.toJSON() : null,
+      "script": this.script != null ? this.script.toJSON() : null,
+      "nSequence": this.nSequence
+    };
+  }
+
   TxIn setScript(Script script) {
     this.scriptVi = VarInt.fromNumber(script.toBuffer().length);
     this.script = script;

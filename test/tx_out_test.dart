@@ -74,32 +74,32 @@ void main() {
       });
     });
 
-    // group('#fromJSON',  () {
-    //   test('should set from this json',  () {
-    //     var txOut = new TxOut().fromJSON({
-    //       valueBn: valueBn.toJSON(),
-    //       scriptVi: scriptVi.toJSON(),
-    //       script: script.toJSON()
-    //     })
-    //     should.exist(txOut.valueBn)
-    //     should.exist(txOut.scriptVi)
-    //     should.exist(txOut.script)
-    //   })
-    // })
+    group('#fromJSON', () {
+      test('should set from this json', () {
+        var txOut = new TxOut().fromJSON({
+          "valueBn": valueBn.toJSON(),
+          "scriptVi": scriptVi.toJSON(),
+          "script": script.toJSON()
+        });
+        expect(txOut.valueBn != null, true);
+        expect(txOut.scriptVi != null, true);
+        expect(txOut.script != null, true);
+      });
+    });
 
-    // group('#toJSON',  () {
-    //   test('should return this json',  () {
-    //     var txOut = new TxOut().fromJSON({
-    //       valueBn: valueBn.toJSON(),
-    //       scriptVi: scriptVi.toJSON(),
-    //       script: script.toJSON()
-    //     })
-    //     var json = txOut.toJSON()
-    //     should.exist(json.valueBn)
-    //     should.exist(json.scriptVi)
-    //     should.exist(json.script)
-    //   })
-    // })
+    group('#toJSON', () {
+      test('should return this json', () {
+        var txOut = new TxOut().fromJSON({
+          "valueBn": valueBn.toJSON(),
+          "scriptVi": scriptVi.toJSON(),
+          "script": script.toJSON()
+        });
+        var json = txOut.toJSON();
+        expect(json['valueBn'] != null, true);
+        expect(json['scriptVi'] != null, true);
+        expect(json['script'] != null, true);
+      });
+    });
 
     group('#fromHex', () {
       test('should make this txIn from this known hex', () {

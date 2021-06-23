@@ -1,9 +1,6 @@
-import 'package:bsv/address.dart';
 import 'package:bsv/br.dart';
-import 'package:bsv/key_pair.dart';
 import 'package:bsv/script.dart';
 import 'package:bsv/tx_in.dart';
-import 'package:bsv/tx_out.dart';
 import 'package:bsv/var_int.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bsv/extentsions/string.dart';
@@ -99,27 +96,27 @@ void main() {
       });
     });
 
-    // group('#fromJSON',  () {
-    //   test('should set these vars',  () {
-    //     var txIn2 = new TxIn().fromJSON(txIn.toJSON())
-    //     should.exist(txIn2.txHashBuf)
-    //     should.exist(txIn2.txOutNum)
-    //     should.exist(txIn2.scriptVi)
-    //     should.exist(txIn2.script)
-    //     should.exist(txIn2.nSequence)
-    //   })
-    // })
+    group('#fromJSON', () {
+      test('should set these vars', () {
+        var txIn2 = new TxIn().fromJSON(txIn.toJSON());
+        expect(txIn2.txHashBuf != null, true);
+        expect(txIn2.txOutNum != null, true);
+        expect(txIn2.scriptVi != null, true);
+        expect(txIn2.script != null, true);
+        expect(txIn2.nSequence != null, true);
+      });
+    });
 
-    // group('#toJSON',  () {
-    //   test('should set these vars',  () {
-    //     var json = txIn.toJSON()
-    //     should.exist(json.txHashBuf)
-    //     should.exist(json.txOutNum)
-    //     should.exist(json.scriptVi)
-    //     should.exist(json.script)
-    //     should.exist(json.nSequence)
-    //   })
-    // })
+    group('#toJSON', () {
+      test('should set these vars', () {
+        var json = txIn.toJSON();
+        expect(json['txHashBuf'] != null, true);
+        expect(json['txOutNum'] != null, true);
+        expect(json['scriptVi'] != null, true);
+        expect(json['script'] != null, true);
+        expect(json['nSequence'] != null, true);
+      });
+    });
 
     group('#fromHex', () {
       test('should convert this known buffer', () {
