@@ -1,12 +1,21 @@
+import 'dart:typed_data';
+
+import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
+import 'package:bsv/ecdsa.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:bsv/hash.dart';
 import 'package:bsv/hash_cache.dart';
+import 'package:bsv/key_pair.dart';
+import 'package:bsv/pub_key.dart';
+import 'package:bsv/script.dart';
 import 'package:bsv/sig.dart';
 import 'package:bsv/tx_in.dart';
 import 'package:bsv/tx_out.dart';
 import 'package:bsv/var_int.dart';
+import 'package:convert/convert.dart';
+import 'package:flutter/foundation.dart';
 
 class Tx {
   static const int MAX_MONEY = 2100000000000000;
@@ -93,7 +102,7 @@ class Tx {
     return this;
   }
 
-  Bw toBw(Bw bw) {
+  Bw toBw([Bw bw]) {
     if (bw == null) {
       bw = new Bw();
     }
@@ -145,13 +154,31 @@ class Tx {
    * p2sh transaction, subScript is usually the redeemScript. If you're not
    * normal because you're using OP_CODESEPARATORs, you know what to do.
    */
-  // sighash ({nHashType, nIn, subScript, valueBn, flags = 0, hashCache = new HashCache()}) {
-  //   var buf = this.sighashPreimage(nHashType, nIn, subScript, valueBn, flags, hashCache)
-  //   if (buf.compare(Buffer.from('0000000000000000000000000000000000000000000000000000000000000001', 'hex')) == 0) {
-  //     return buf
-  //   }
-  //   return new Br(Hash.sha256Sha256(buf)).readReverse()
-  // }
+  List<int> sighash({
+    int nHashType,
+    int nIn,
+    Script subScript,
+    BigIntX valueBn,
+    int flags = 0,
+    HashCache hashCache,
+  }) {
+    hashCache = hashCache ?? HashCache();
+    var buf = this.sighashPreimage(
+      nHashType: nHashType,
+      nIn: nIn,
+      subScript: subScript,
+      valueBn: valueBn,
+      flags: flags,
+      hashCache: hashCache,
+    );
+    if (listEquals(
+        buf,
+        hex.decode(
+            '0000000000000000000000000000000000000000000000000000000000000001'))) {
+      return buf;
+    }
+    return new Br(buf: Hash.sha256Sha256(buf).data).readReverse();
+  }
 
   // async asyncSighash (nHashType, nIn, subScript, valueBn, flags = 0, hashCache = {}) {
   //   var workersResult = await Workers.asyncObjectMethod(this, 'sighash', [
@@ -165,36 +192,42 @@ class Tx {
   //   return workersResult.resbuf
   // }
 
-  // TODO NEXT
-  sighashPreimage({nHashType, nIn, subScript, valueBn, flags = 0, hashCache}) {
+  List<int> sighashPreimage({
+    int nHashType,
+    int nIn,
+    Script subScript,
+    BigIntX valueBn,
+    int flags = 0,
+    HashCache hashCache,
+  }) {
     // start with UAHF part (Bitcoin SV)
     // https://github.com/Bitcoin-UAHF/spec/blob/master/replay-protected-sighash.md
     hashCache = hashCache ?? new HashCache();
-    if (nHashType & Sig.SIGHASH_FORKID &&
-        flags & Tx.SCRIPT_ENABLE_SIGHASH_FORKID) {
+    if ((nHashType & Sig.SIGHASH_FORKID == 1) &&
+        (flags & Tx.SCRIPT_ENABLE_SIGHASH_FORKID == 1)) {
       var hashPrevouts = List.generate(32, (index) => 0);
       var hashSequence = List.generate(32, (index) => 0);
       var hashOutputs = List.generate(32, (index) => 0);
 
-      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY)) {
-        hashPrevouts = hashCache.prevoutsHashBuf
+      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY == 1)) {
+        hashPrevouts = hashCache.prevoutsHashBuf != null
             ? hashCache.prevoutsHashBuf
-            : hashCache.prevoutsHashBuf = this.hashPrevouts();
+            : hashCache.prevoutsHashBuf = this.hashPrevouts().data.toList();
       }
 
-      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY) &&
+      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY == 1) &&
           (nHashType & 0x1f) != Sig.SIGHASH_SINGLE &&
           (nHashType & 0x1f) != Sig.SIGHASH_NONE) {
-        hashSequence = hashCache.sequenceHashBuf
+        hashSequence = hashCache.sequenceHashBuf != null
             ? hashCache.sequenceHashBuf
-            : hashCache.sequenceHashBuf = this.hashSequence();
+            : hashCache.sequenceHashBuf = this.hashSequence().data.toList();
       }
 
       if ((nHashType & 0x1f) != Sig.SIGHASH_SINGLE &&
           (nHashType & 0x1f) != Sig.SIGHASH_NONE) {
-        hashOutputs = hashCache.outputsHashBuf
+        hashOutputs = hashCache.outputsHashBuf != null
             ? hashCache.outputsHashBuf
-            : hashCache.outputsHashBuf = this.hashOutputs();
+            : hashCache.outputsHashBuf = this.hashOutputs().data.toList();
       } else if ((nHashType & 0x1f) == Sig.SIGHASH_SINGLE &&
           nIn < this.txOuts.length) {
         hashOutputs = Hash.sha256Sha256(this.txOuts[nIn].toBuffer()).data;
@@ -216,75 +249,81 @@ class Tx {
 
       return bw.toBuffer();
     }
+
+    // original bitcoin code follows - not related to UAHF (Bitcoin SV)
+    var txcopy = this.cloneByBuffer();
+
+    subScript = new Script().fromBuffer(subScript.toBuffer());
+    subScript.removeCodeseparators();
+
+    for (var i = 0; i < txcopy.txIns.length; i++) {
+      txcopy.txIns[i] =
+          TxIn().fromBuffer(txcopy.txIns[i].toBuffer()).setScript(new Script());
+    }
+
+    txcopy.txIns[nIn] =
+        TxIn().fromBuffer(txcopy.txIns[nIn].toBuffer()).setScript(subScript);
+
+    if ((nHashType & 31) == Sig.SIGHASH_NONE) {
+      txcopy.txOuts.length = 0;
+      txcopy.txOutsVi = VarInt.fromNumber(0);
+
+      for (var i = 0; i < txcopy.txIns.length; i++) {
+        if (i != nIn) {
+          txcopy.txIns[i].nSequence = 0;
+        }
+      }
+    } else if ((nHashType & 31) == Sig.SIGHASH_SINGLE) {
+      // The SIGHASH_SINGLE bug.
+      // https://bitcointalk.org/index.php?topic=260595.0
+      if (nIn > txcopy.txOuts.length - 1) {
+        return hex.decode(
+          '0000000000000000000000000000000000000000000000000000000000000001',
+        );
+      }
+
+      txcopy.txOuts.length = nIn + 1;
+      txcopy.txOutsVi = VarInt.fromNumber(nIn + 1);
+
+      for (var i = 0; i < txcopy.txOuts.length; i++) {
+        if (i < nIn) {
+          txcopy.txOuts[i] = TxOut.fromProperties(
+            valueBn: new BigIntX.fromBuffer(hex.decode('ffffffffffffffff')),
+            script: new Script(),
+          );
+        }
+      }
+
+      for (var i = 0; i < txcopy.txIns.length; i++) {
+        if (i != nIn) {
+          txcopy.txIns[i].nSequence = 0;
+        }
+      }
+    }
+    // else, SIGHASH_ALL
+
+    if (nHashType & Sig.SIGHASH_ANYONECANPAY == 1) {
+      txcopy.txIns[0] = txcopy.txIns[nIn];
+      txcopy.txIns.length = 1;
+      txcopy.txInsVi = VarInt.fromNumber(1);
+    }
+
+    var buf =
+        new Bw().write(txcopy.toBuffer()).writeInt32LE(nHashType).toBuffer();
+    return buf;
   }
 
-  //   // original bitcoin code follows - not related to UAHF (Bitcoin SV)
-  //   var txcopy = this.cloneByBuffer()
+  Tx cloneByBuffer() {
+    return this.fromBuffer(this.toBuffer());
+  }
 
-  //   subScript = new Script().fromBuffer(subScript.toBuffer())
-  //   subScript.removeCodeseparators()
+  List<int> toBuffer() {
+    return this.toBw().toBuffer();
+  }
 
-  //   for (var i = 0; i < txcopy.txIns.length; i++) {
-  //     txcopy.txIns[i] = TxIn.fromBuffer(txcopy.txIns[i].toBuffer()).setScript(
-  //       new Script()
-  //     )
-  //   }
-
-  //   txcopy.txIns[nIn] = TxIn.fromBuffer(
-  //     txcopy.txIns[nIn].toBuffer()
-  //   ).setScript(subScript)
-
-  //   if ((nHashType & 31) == Sig.SIGHASH_NONE) {
-  //     txcopy.txOuts.length = 0
-  //     txcopy.txOutsVi = VarInt.fromNumber(0)
-
-  //     for (var i = 0; i < txcopy.txIns.length; i++) {
-  //       if (i != nIn) {
-  //         txcopy.txIns[i].nSequence = 0
-  //       }
-  //     }
-  //   } else if ((nHashType & 31) == Sig.SIGHASH_SINGLE) {
-  //     // The SIGHASH_SINGLE bug.
-  //     // https://bitcointalk.org/index.php?topic=260595.0
-  //     if (nIn > txcopy.txOuts.length - 1) {
-  //       return Buffer.from(
-  //         '0000000000000000000000000000000000000000000000000000000000000001',
-  //         'hex'
-  //       )
-  //     }
-
-  //     txcopy.txOuts.length = nIn + 1
-  //     txcopy.txOutsVi = VarInt.fromNumber(nIn + 1)
-
-  //     for (var i = 0; i < txcopy.txOuts.length; i++) {
-  //       if (i < nIn) {
-  //         txcopy.txOuts[i] = TxOut.fromProperties(
-  //           new Bn().fromBuffer(Buffer.from('ffffffffffffffff', 'hex')),
-  //           new Script()
-  //         )
-  //       }
-  //     }
-
-  //     for (var i = 0; i < txcopy.txIns.length; i++) {
-  //       if (i != nIn) {
-  //         txcopy.txIns[i].nSequence = 0
-  //       }
-  //     }
-  //   }
-  //   // else, SIGHASH_ALL
-
-  //   if (nHashType & Sig.SIGHASH_ANYONECANPAY) {
-  //     txcopy.txIns[0] = txcopy.txIns[nIn]
-  //     txcopy.txIns.length = 1
-  //     txcopy.txInsVi = VarInt.fromNumber(1)
-  //   }
-
-  //   var buf = new Bw()
-  //     .write(txcopy.toBuffer())
-  //     .writeInt32LE(nHashType)
-  //     .toBuffer()
-  //   return buf
-  // }
+  Tx fromBuffer(List<int> buf) {
+    return this.fromBr(Br(buf: buf));
+  }
 
   // async asyncSighashPreimage (nHashType, nIn, subScript, valueBn, flags = 0, hashCache = {}) {
   //   var workersResult = await Workers.asyncObjectMethod(this, 'sighashPreimage', [
@@ -298,14 +337,33 @@ class Tx {
   //   return workersResult.resbuf
   // }
 
-  // // This  returns a signature but does not update any inputs
-  // sign (keyPair, nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID, nIn, subScript, valueBn, flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID, hashCache = {}) {
-  //   var hashBuf = this.sighash(nHashType, nIn, subScript, valueBn, flags, hashCache)
-  //   var sig = Ecdsa.sign(hashBuf, keyPair, 'little').fromObject({
-  //     nHashType: nHashType
-  //   })
-  //   return sig
-  // }
+  // This  returns a signature but does not update any inputs
+  sign({
+    KeyPair keyPair,
+    int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
+    int nIn,
+    Script subScript,
+    BigIntX valueBn,
+    int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
+    HashCache hashCache,
+  }) {
+    var hashBuf = this.sighash(
+      nHashType: nHashType,
+      nIn: nIn,
+      subScript: subScript,
+      valueBn: valueBn,
+      flags: flags,
+      hashCache: hashCache,
+    );
+
+    var sig = Ecdsa.staticSign(
+      hashBuf: hashBuf,
+      keyPair: keyPair,
+      endian: Endian.little,
+    );
+    sig.nHashType = nHashType;
+    return sig;
+  }
 
   // async asyncSign (keyPair, nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID, nIn, subScript, valueBn, flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID, hashCache = {}) {
   //   var workersResult = await Workers.asyncObjectMethod(this, 'sign', [
@@ -320,20 +378,34 @@ class Tx {
   //   return new Sig().fromFastBuffer(workersResult.resbuf)
   // }
 
-  // // This  takes a signature as input and does not parse any inputs
-  // verify (
-  //   sig,
-  //   pubKey,
-  //   nIn,
-  //   subScript,
-  //   enforceLowS = false,
-  //   valueBn,
-  //   flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
-  //   hashCache = {}
-  // ) {
-  //   var hashBuf = this.sighash(sig.nHashType, nIn, subScript, valueBn, flags, hashCache)
-  //   return Ecdsa.verify(hashBuf, sig, pubKey, 'little', enforceLowS)
-  // }
+  // This  takes a signature as input and does not parse any inputs
+  verify({
+    Sig sig,
+    PubKey pubKey,
+    int nIn,
+    Script subScript,
+    bool enforceLowS = false,
+    BigIntX valueBn,
+    int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
+    HashCache hashCache,
+  }) {
+    var hashBuf = this.sighash(
+      nHashType: sig.nHashType,
+      nIn: nIn,
+      subScript: subScript,
+      valueBn: valueBn,
+      flags: flags,
+      hashCache: hashCache,
+    );
+
+    return Ecdsa.staticVerify(
+      hashBuf: hashBuf,
+      sig: sig,
+      pubKey: pubKey,
+      endian: Endian.little,
+      enforceLowS: enforceLowS,
+    );
+  }
 
   // async asyncVerify (
   //   sig,
@@ -358,71 +430,94 @@ class Tx {
   //   return JSON.parse(workersResult.resbuf.toString())
   // }
 
-  // hash () {
-  //   return Hash.sha256Sha256(this.toBuffer())
-  // }
+  Hash hash() {
+    return Hash.sha256Sha256(this.toBuffer());
+  }
 
   // async asyncHash () {
   //   var workersResult = await Workers.asyncObjectMethod(this, 'hash', [])
   //   return workersResult.resbuf
   // }
 
-  // id () {
-  //   return new Br(this.hash()).readReverse().toString('hex')
-  // }
+  String id() {
+    return new Br(buf: this.hash().data).readReverse().toHex();
+  }
 
   // async asyncId () {
   //   var workersResult = await Workers.asyncObjectMethod(this, 'id', [])
   //   return JSON.parse(workersResult.resbuf.toString())
   // }
 
-  // addTxIn (txHashBuf, txOutNum, script, nSequence) {
-  //   var txIn
-  //   if (txHashBuf instanceof TxIn) {
-  //     txIn = txHashBuf
-  //   } else {
-  //     txIn = new TxIn()
-  //       .fromObject({ txHashBuf, txOutNum, nSequence })
-  //       .setScript(script)
-  //   }
-  //   this.txIns.push(txIn)
-  //   this.txInsVi = VarInt.fromNumber(this.txInsVi.toNumber() + 1)
-  //   return this
-  // }
+  Tx addTxIn({
+    dynamic txHashBuf,
+    int txOutNum,
+    Script script,
+    int nSequence,
+  }) {
+    var txIn;
+    if (txHashBuf is TxIn) {
+      txIn = txHashBuf;
+    } else {
+      txIn = TxIn.fromProperties(
+        txHashBuf: txHashBuf,
+        txOutNum: txOutNum,
+        nSequence: nSequence,
+      ).setScript(script);
+    }
+    this.txIns.add(txIn);
+    this.txInsVi = VarInt.fromNumber(this.txInsVi.toNumber() + 1);
+    return this;
+  }
 
-  // addTxOut (valueBn, script) {
-  //   var txOut
-  //   if (valueBn instanceof TxOut) {
-  //     txOut = valueBn
-  //   } else {
-  //     txOut = new TxOut().fromObject({ valueBn }).setScript(script)
-  //   }
-  //   this.txOuts.push(txOut)
-  //   this.txOutsVi = VarInt.fromNumber(this.txOutsVi.toNumber() + 1)
-  //   return this
-  // }
+  Tx addTxOut({BigIntX valueBn, Script script}) {
+    var txOut;
+    if (valueBn is TxOut) {
+      txOut = valueBn;
+    } else {
+      txOut = new TxOut(valueBn: valueBn).setScript(script);
+    }
+    this.txOuts.add(txOut);
+    this.txOutsVi = VarInt.fromNumber(this.txOutsVi.toNumber() + 1);
+    return this;
+  }
 
-  // /**
-  //  * Analagous to bitcoind's IsCoinBase  in transaction.h
-  //  */
-  // isCoinbase () {
-  //   return this.txIns.length == 1 && this.txIns[0].hasNullInput()
-  // }
+  // ignore: slash_for_doc_comments
+  /**
+   * Analagous to bitcoind's IsCoinBase  in transaction.h
+   */
+  bool isCoinbase() {
+    return this.txIns.length == 1 && this.txIns[0].hasNullInput();
+  }
 
-  // /**
-  //  * BIP 69 sorting. Be sure to sign after sorting.
-  //  */
-  // sort () {
-  //   this.txIns.sort((first, second) => {
-  //     return new Br(first.txHashBuf).readReverse().compare(new Br(second.txHashBuf).readReverse()) ||
-  //       first.txOutNum - second.txOutNum
-  //   })
+  // ignore: slash_for_doc_comments
+  /**
+   * BIP 69 sorting. Be sure to sign after sorting.
+   */
+  Tx sort() {
+    this.txIns.sort((first, second) {
+      // return new Br(buf: first.txHashBuf)
+      //         .readReverse()
+      //         .compare(new Br(buf: second.txHashBuf).readReverse()) ??
+      //     first.txOutNum - second.txOutNum;
+      var a = new Br(buf: first.txHashBuf).readReverse();
+      var b = new Br(buf: second.txHashBuf).readReverse();
 
-  //   this.txOuts.sort((first, second) => {
-  //     return first.valueBn.sub(second.valueBn).toNumber() ||
-  //       first.script.toBuffer().compare(second.script.toBuffer())
-  //   })
+      var result = a.compareTo(b);
+      // 如果是0, 则返回first.txOutNum - second.txOutNum;
+      // 否则返回相对应的排序
+      if (result == 0) return first.txOutNum - second.txOutNum;
+      return result;
+    });
 
-  //   return this
-  // }
+    this.txOuts.sort((first, second) {
+      var result = first.valueBn.sub(second.valueBn).toNumber();
+      if (result != 0) return result;
+
+      var a = first.script.toBuffer();
+      var b = second.script.toBuffer();
+      return a.compareTo(b);
+    });
+
+    return this;
+  }
 }

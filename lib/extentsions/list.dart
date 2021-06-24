@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+
 extension ListX<T> on List<T> {
   int get doubleLength => length * 2;
   List<T> operator -() => reversed.toList();
@@ -55,5 +57,32 @@ extension ListX<T> on List<T> {
     }
 
     return cloned;
+  }
+
+  int compareTo(List<int> b) {
+    var a = this as List<int>;
+    if (listEquals(a, b)) return 0;
+
+    var x = a.length;
+    var y = b.length;
+    var len = min(x, y);
+
+    var i = 0;
+    for (; i < len; i++) {
+      if (a[i] != b[i]) {
+        break;
+      }
+    }
+
+    if (i != len) {
+      x = a[i];
+      y = b[i];
+    }
+
+    return x < y
+        ? -1
+        : y < x
+            ? 1
+            : 0;
   }
 }
