@@ -174,7 +174,7 @@ class Br {
   }
 
   List<int> readVarIntBuf() {
-    var temp = Br(buf: this.buf);
+    var temp = Br(buf: this.buf, pos: this.pos);
     var first = temp.readUInt8();
     switch (first) {
       case 0xfd:

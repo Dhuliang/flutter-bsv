@@ -179,7 +179,7 @@ class TxIn {
   }
 
   TxIn fromBuffer(List<int> buf) {
-    return this.fromBr(Br(buf: buf));
+    return this.fromBr(Br(buf: buf.asUint8List()));
   }
 
   String toHex() {

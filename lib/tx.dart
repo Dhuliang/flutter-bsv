@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
@@ -86,20 +87,28 @@ class Tx {
 
   Tx fromBr(Br br) {
     this.versionBytesNum = br.readUInt32LE();
-    this.txInsVi = new VarInt(buf: br.readVarIntBuf());
+    this.txInsVi = VarInt(buf: br.readVarIntBuf());
     var txInsNum = this.txInsVi.toNumber();
     this.txIns = [];
     for (var i = 0; i < txInsNum; i++) {
-      this.txIns.add(new TxIn().fromBr(br));
+      this.txIns.add(TxIn().fromBr(br));
     }
-    this.txOutsVi = new VarInt(buf: br.readVarIntBuf());
+    this.txOutsVi = VarInt(buf: br.readVarIntBuf());
     var txOutsNum = this.txOutsVi.toNumber();
     this.txOuts = [];
     for (var i = 0; i < txOutsNum; i++) {
-      this.txOuts.add(new TxOut().fromBr(br));
+      this.txOuts.add(TxOut().fromBr(br));
     }
     this.nLockTime = br.readUInt32LE();
     return this;
+  }
+
+  factory Tx.fromBuffer(List<int> buf) {
+    return Tx().fromBr(Br(buf: buf));
+  }
+
+  factory Tx.fromHex(String str) {
+    return Tx().fromHex(str);
   }
 
   Bw toBw([Bw bw]) {
@@ -107,11 +116,11 @@ class Tx {
       bw = new Bw();
     }
     bw.writeUInt32LE(this.versionBytesNum);
-    bw.write(this.txInsVi.buf);
+    bw.write(this.txInsVi.buf.asUint8List());
     for (var i = 0; i < this.txIns.length; i++) {
       this.txIns[i].toBw(bw);
     }
-    bw.write(this.txOutsVi.buf);
+    bw.write(this.txOutsVi.buf.asUint8List());
     for (var i = 0; i < this.txOuts.length; i++) {
       this.txOuts[i].toBw(bw);
     }
@@ -127,7 +136,7 @@ class Tx {
       bw.write(txIn.txHashBuf); // outpoint (1/2)
       bw.writeUInt32LE(txIn.txOutNum); // outpoint (2/2)
     }
-    return Hash.sha256Sha256(bw.toBuffer());
+    return Hash.sha256Sha256(bw.toBuffer().asUint8List());
   }
 
   Hash hashSequence() {
@@ -136,16 +145,16 @@ class Tx {
       // var txIn = this.txIns[i]
       bw.writeUInt32LE(txIn.nSequence);
     }
-    return Hash.sha256Sha256(bw.toBuffer());
+    return Hash.sha256Sha256(bw.toBuffer().asUint8List());
   }
 
   Hash hashOutputs() {
     var bw = new Bw();
     for (var txOut in this.txOuts) {
       // var txOut = this.txOuts[i]
-      bw.write(txOut.toBuffer());
+      bw.write(txOut.toBuffer().asUint8List());
     }
-    return Hash.sha256Sha256(bw.toBuffer());
+    return Hash.sha256Sha256(bw.toBuffer().asUint8List());
   }
 
   // ignore: slash_for_doc_comments
@@ -171,13 +180,16 @@ class Tx {
       flags: flags,
       hashCache: hashCache,
     );
-    if (listEquals(
-        buf,
-        hex.decode(
-            '0000000000000000000000000000000000000000000000000000000000000001'))) {
+    var result = listEquals(
+      buf,
+      hex.decode(
+        '0000000000000000000000000000000000000000000000000000000000000001',
+      ),
+    );
+    if (result) {
       return buf;
     }
-    return new Br(buf: Hash.sha256Sha256(buf).data).readReverse();
+    return new Br(buf: Hash.sha256Sha256(buf.asUint8List()).data).readReverse();
   }
 
   // async asyncSighash (nHashType, nIn, subScript, valueBn, flags = 0, hashCache = {}) {
@@ -203,19 +215,19 @@ class Tx {
     // start with UAHF part (Bitcoin SV)
     // https://github.com/Bitcoin-UAHF/spec/blob/master/replay-protected-sighash.md
     hashCache = hashCache ?? new HashCache();
-    if ((nHashType & Sig.SIGHASH_FORKID == 1) &&
-        (flags & Tx.SCRIPT_ENABLE_SIGHASH_FORKID == 1)) {
+    if ((nHashType & Sig.SIGHASH_FORKID != 0) &&
+        (flags & Tx.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
       var hashPrevouts = List.generate(32, (index) => 0);
       var hashSequence = List.generate(32, (index) => 0);
       var hashOutputs = List.generate(32, (index) => 0);
 
-      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY == 1)) {
+      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY != 0)) {
         hashPrevouts = hashCache.prevoutsHashBuf != null
             ? hashCache.prevoutsHashBuf
             : hashCache.prevoutsHashBuf = this.hashPrevouts().data.toList();
       }
 
-      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY == 1) &&
+      if (!(nHashType & Sig.SIGHASH_ANYONECANPAY != 0) &&
           (nHashType & 0x1f) != Sig.SIGHASH_SINGLE &&
           (nHashType & 0x1f) != Sig.SIGHASH_NONE) {
         hashSequence = hashCache.sequenceHashBuf != null
@@ -230,7 +242,8 @@ class Tx {
             : hashCache.outputsHashBuf = this.hashOutputs().data.toList();
       } else if ((nHashType & 0x1f) == Sig.SIGHASH_SINGLE &&
           nIn < this.txOuts.length) {
-        hashOutputs = Hash.sha256Sha256(this.txOuts[nIn].toBuffer()).data;
+        hashOutputs =
+            Hash.sha256Sha256(this.txOuts[nIn].toBuffer().asUint8List()).data;
       }
 
       var bw = new Bw();
@@ -240,10 +253,10 @@ class Tx {
       bw.write(this.txIns[nIn].txHashBuf.asUint8List()); // outpoint (1/2);
       bw.writeUInt32LE(this.txIns[nIn].txOutNum); // outpoint (2/2);
       bw.writeVarIntNum(subScript.toBuffer().length);
-      bw.write(subScript.toBuffer());
+      bw.write(subScript.toBuffer().asUint8List());
       bw.writeUInt64LEBn(valueBn);
       bw.writeUInt32LE(this.txIns[nIn].nSequence);
-      bw.write(hashOutputs);
+      bw.write(hashOutputs.asUint8List());
       bw.writeUInt32LE(this.nLockTime);
       bw.writeUInt32LE(nHashType >> 0);
 
@@ -253,7 +266,7 @@ class Tx {
     // original bitcoin code follows - not related to UAHF (Bitcoin SV)
     var txcopy = this.cloneByBuffer();
 
-    subScript = new Script().fromBuffer(subScript.toBuffer());
+    subScript = new Script().fromBuffer(subScript.toBuffer().asUint8List());
     subScript.removeCodeseparators();
 
     for (var i = 0; i < txcopy.txIns.length; i++) {
@@ -302,14 +315,17 @@ class Tx {
     }
     // else, SIGHASH_ALL
 
-    if (nHashType & Sig.SIGHASH_ANYONECANPAY == 1) {
+    if (nHashType & Sig.SIGHASH_ANYONECANPAY != 0) {
       txcopy.txIns[0] = txcopy.txIns[nIn];
       txcopy.txIns.length = 1;
       txcopy.txInsVi = VarInt.fromNumber(1);
     }
 
-    var buf =
-        new Bw().write(txcopy.toBuffer()).writeInt32LE(nHashType).toBuffer();
+    var buf = new Bw()
+        .write(txcopy.toBuffer().asUint8List())
+        .writeInt32LE(nHashType)
+        .toBuffer();
+    print(buf.toHex());
     return buf;
   }
 
@@ -322,7 +338,15 @@ class Tx {
   }
 
   Tx fromBuffer(List<int> buf) {
-    return this.fromBr(Br(buf: buf));
+    return this.fromBr(Br(buf: buf.asUint8List()));
+  }
+
+  Tx fromHex(String str) {
+    return this.fromBuffer(hex.decode(str));
+  }
+
+  String toHex() {
+    return this.toBuffer().toHex();
   }
 
   // async asyncSighashPreimage (nHashType, nIn, subScript, valueBn, flags = 0, hashCache = {}) {
@@ -338,7 +362,7 @@ class Tx {
   // }
 
   // This  returns a signature but does not update any inputs
-  sign({
+  Sig sign({
     KeyPair keyPair,
     int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
     int nIn,
@@ -379,7 +403,7 @@ class Tx {
   // }
 
   // This  takes a signature as input and does not parse any inputs
-  verify({
+  bool verify({
     Sig sig,
     PubKey pubKey,
     int nIn,
@@ -431,7 +455,7 @@ class Tx {
   // }
 
   Hash hash() {
-    return Hash.sha256Sha256(this.toBuffer());
+    return Hash.sha256Sha256(this.toBuffer().asUint8List());
   }
 
   // async asyncHash () {
@@ -449,17 +473,17 @@ class Tx {
   // }
 
   Tx addTxIn({
-    dynamic txHashBuf,
+    dynamic data,
     int txOutNum,
     Script script,
     int nSequence,
   }) {
     var txIn;
-    if (txHashBuf is TxIn) {
-      txIn = txHashBuf;
+    if (data is TxIn) {
+      txIn = data;
     } else {
       txIn = TxIn.fromProperties(
-        txHashBuf: txHashBuf,
+        txHashBuf: data,
         txOutNum: txOutNum,
         nSequence: nSequence,
       ).setScript(script);
@@ -469,12 +493,12 @@ class Tx {
     return this;
   }
 
-  Tx addTxOut({BigIntX valueBn, Script script}) {
+  Tx addTxOut({dynamic data, Script script}) {
     var txOut;
-    if (valueBn is TxOut) {
-      txOut = valueBn;
+    if (data is TxOut) {
+      txOut = data;
     } else {
-      txOut = new TxOut(valueBn: valueBn).setScript(script);
+      txOut = new TxOut(valueBn: data).setScript(script);
     }
     this.txOuts.add(txOut);
     this.txOutsVi = VarInt.fromNumber(this.txOutsVi.toNumber() + 1);
@@ -499,8 +523,8 @@ class Tx {
       //         .readReverse()
       //         .compare(new Br(buf: second.txHashBuf).readReverse()) ??
       //     first.txOutNum - second.txOutNum;
-      var a = new Br(buf: first.txHashBuf).readReverse();
-      var b = new Br(buf: second.txHashBuf).readReverse();
+      var a = new Br(buf: first.txHashBuf.asUint8List()).readReverse();
+      var b = new Br(buf: second.txHashBuf.asUint8List()).readReverse();
 
       var result = a.compareTo(b);
       // 如果是0, 则返回first.txOutNum - second.txOutNum;
