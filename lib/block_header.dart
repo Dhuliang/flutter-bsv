@@ -42,7 +42,7 @@ class BlockHeader {
   }
 
   BlockHeader fromBuffer(List<int> buf) {
-    return this.fromBr(Br(buf: buf));
+    return this.fromBr(Br(buf: buf.asUint8List()));
   }
 
   String toHex() {
@@ -55,12 +55,13 @@ class BlockHeader {
 
   BlockHeader fromJSON(Map json) {
     return BlockHeader(
-        versionBytesNum: json['versionBytesNum'],
-        prevBlockHashBuf: hex.decode(json['prevBlockHashBuf']),
-        merkleRootBuf: hex.decode(json['merkleRootBuf']),
-        time: json['time'],
-        bits: json['bits'],
-        nonce: json['nonce']);
+      versionBytesNum: json['versionBytesNum'],
+      prevBlockHashBuf: hex.decode(json['prevBlockHashBuf']),
+      merkleRootBuf: hex.decode(json['merkleRootBuf']),
+      time: json['time'],
+      bits: json['bits'],
+      nonce: json['nonce'],
+    );
   }
 
   Map<String, dynamic> toJSON() {
