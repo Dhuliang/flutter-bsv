@@ -30,24 +30,25 @@ class Merkle {
       return this.hashBuf;
     }
     if (this.buf != null) {
-      return Hash.sha256Sha256(this.buf).data.toList();
+      return Hash.sha256Sha256(this.buf.asUint8List()).data.toList();
     }
     var hashBuf1 = this.merkle1.hash();
     var hashBuf2 = this.merkle2.hash();
     this.buf = List<int>.from([...hashBuf1, ...hashBuf2]);
-    return Hash.sha256Sha256(this.buf).data.toList();
+    return Hash.sha256Sha256(this.buf.asUint8List()).data.toList();
   }
 
   double logBase(num x, num base) => Math.log(x) / Math.log(base);
   double log10(num x) => Math.log(x) / Math.ln10;
+  double log2(num x) => Math.log(x) / Math.ln2;
   bool isInteger(num x) => x.toInt() == x;
 
-  Merkle fromBuffers(List<int> bufs) {
+  Merkle fromBuffers(List<List<int>> bufs) {
     if (bufs.length < 1) {
       throw ('buffers must have a length');
     }
     bufs = bufs.slice(0);
-    var log = log10(bufs.length);
+    var log = log2(bufs.length);
 
     if (!isInteger(log)) {
       // If a merkle tree does not have a number of ends that is a power of 2,
@@ -57,7 +58,8 @@ class Merkle {
       var lastval = bufs[bufs.length - 1];
       var len = Math.pow(2, log.ceil());
       for (var i = bufs.length; i < len; i++) {
-        bufs.add(lastval);
+        // bufs.add(lastval);
+        bufs = [...bufs, lastval];
       }
     }
     var bufs1 = bufs.slice(0, bufs.length ~/ 2);
@@ -66,26 +68,26 @@ class Merkle {
     return this;
   }
 
-  factory Merkle.fromBuffers(List<int> bufs) {
+  factory Merkle.fromBuffers(List<List<int>> bufs) {
     return new Merkle().fromBuffers(bufs);
   }
 
   // ignore: slash_for_doc_comments
   /**
-     * Takes two arrays, both of which *must* be of a length that is a power of
-     * two.
-     */
-  Merkle fromBufferArrays(bufs1, bufs2) {
+   * Takes two arrays, both of which *must* be of a length that is a power of
+   * two.
+   */
+  Merkle fromBufferArrays(List<List<int>> bufs1, List<List<int>> bufs2) {
     if (bufs1.length == 1) {
-      // this.merkle1 = new Merkle(null, bufs1[0])
-      // this.merkle2 = new Merkle(null, bufs2[0])
+      this.merkle1 = new Merkle(hashBuf: null, buf: bufs1[0]);
+      this.merkle2 = new Merkle(hashBuf: null, buf: bufs2[0]);
       return this;
     }
-    var bufs11 = bufs1.slice(0, bufs1.length / 2);
-    var bufs12 = bufs1.slice(bufs1.length / 2);
+    var bufs11 = bufs1.slice(0, bufs1.length ~/ 2);
+    var bufs12 = bufs1.slice(bufs1.length ~/ 2);
     this.merkle1 = new Merkle().fromBufferArrays(bufs11, bufs12);
-    var bufs21 = bufs2.slice(0, bufs2.length / 2);
-    var bufs22 = bufs2.slice(bufs2.length / 2);
+    var bufs21 = bufs2.slice(0, bufs2.length ~/ 2);
+    var bufs22 = bufs2.slice(bufs2.length ~/ 2);
     this.merkle2 = new Merkle().fromBufferArrays(bufs21, bufs22);
     return this;
   }
