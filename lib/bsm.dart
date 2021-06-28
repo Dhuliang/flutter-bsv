@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:bsv/address.dart';
+import 'package:bsv/cmp.dart';
 import 'package:bsv/ecdsa.dart';
 import 'package:bsv/hash.dart';
 import 'package:bsv/key_pair.dart';
 import 'package:bsv/sig.dart';
-import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:convert/convert.dart';
@@ -24,7 +24,7 @@ import 'package:convert/convert.dart';
  */
 
 class Bsm {
-  static var magicBytes = hex.decode('Bitcoin Signed Message:\n');
+  static var magicBytes = utf8.encode('Bitcoin Signed Message:\n');
 
   List<int> messageBuf;
   KeyPair keyPair;
@@ -62,12 +62,12 @@ class Bsm {
   //   return workersResult.resbuf
   // }
 
-  static staticSign({List<int> messageBuf, KeyPair keyPair}) {
+  static String staticSign({List<int> messageBuf, KeyPair keyPair}) {
     var m = new Bsm(messageBuf: messageBuf, keyPair: keyPair);
     m.sign();
     var sigbuf = m.sig.toCompact();
-
-    var sigstr = utf8.decode(sigbuf);
+    // var sigstr = utf8.decode(sigbuf);
+    var sigstr = base64Encode(sigbuf);
     return sigstr;
   }
 
@@ -78,15 +78,19 @@ class Bsm {
   //   return sigstr
   // }
 
-  // static verify (messageBuf, sigstr, address) {
-  //   var sigbuf = Buffer.from(sigstr, 'base64')
-  //   var message = new Bsm()
-  //   message.messageBuf = messageBuf
-  //   message.sig = new Sig().fromCompact(sigbuf)
-  //   message.address = address
+  static staticVerify({
+    List<int> messageBuf,
+    String sigstr,
+    Address address,
+  }) {
+    var sigbuf = base64Decode(sigstr).toList();
+    var message = new Bsm();
+    message.messageBuf = messageBuf;
+    message.sig = new Sig().fromCompact(sigbuf);
+    message.address = address;
 
-  //   return message.verify().verified
-  // }
+    return message.verify().verified;
+  }
 
   // static async asyncVerify (messageBuf, sigstr, address) {
   //   var args = [messageBuf, sigstr, address]
@@ -104,32 +108,35 @@ class Bsm {
     return this;
   }
 
-  // verify () {
-  //   var hashBuf = Bsm.magicHash(this.messageBuf)
+  verify() {
+    var hashBuf = Bsm.magicHash(this.messageBuf);
 
-  //   var ecdsa = new Ecdsa()
-  //   ecdsa.hashBuf = hashBuf
-  //   ecdsa.sig = this.sig
-  //   ecdsa.keyPair = new KeyPair()
-  //   ecdsa.keyPair.pubKey = ecdsa.sig2PubKey()
+    var ecdsa = new Ecdsa();
+    ecdsa.hashBuf = hashBuf.toBuffer();
+    ecdsa.sig = this.sig;
+    ecdsa.keyPair = new KeyPair();
+    ecdsa.keyPair.pubKey = ecdsa.sig2PubKey();
 
-  //   if (!ecdsa.verify()) {
-  //     this.verified = false
-  //     return this
-  //   }
+    if (!ecdsa.verify().verified) {
+      this.verified = false;
+      return this;
+    }
 
-  //   var address = new Address().fromPubKey(
-  //     ecdsa.keyPair.pubKey,
-  //     undefined,
-  //     this.sig.compressed
-  //   )
-  //   // TODO: what if livenet/testnet mismatch?
-  //   if (cmp(address.hashBuf, this.address.hashBuf)) {
-  //     this.verified = true
-  //   } else {
-  //     this.verified = false
-  //   }
+    var address = new Address().fromPubKey(
+      ecdsa.keyPair.pubKey,
+      // null,
+      // this.sig.compressed,
+    );
+    // TODO: what if livenet/testnet mismatch?
+    if (cmp(
+      address.hashBuf.asUint8List(),
+      this.address.hashBuf.asUint8List(),
+    )) {
+      this.verified = true;
+    } else {
+      this.verified = false;
+    }
 
-  //   return this
-  // }
+    return this;
+  }
 }
