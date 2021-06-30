@@ -35,7 +35,7 @@ extension ListX<T> on List<T> {
     throw 'not List<int>';
   }
 
-  List<T> slice(int begin, [int end]) {
+  List<T> slice([int begin, int end]) {
     var i, cloned = <T>[], size, len = this.length;
 
     var start = begin ?? 0;
@@ -57,6 +57,19 @@ extension ListX<T> on List<T> {
     }
 
     return cloned;
+  }
+
+  List<T> splice(int start, [int toRemove = 0, T insert]) {
+    insert = insert ?? [];
+    var remove = this.slice(start, start + toRemove);
+    var temp = [
+      ...this.slice(0, start),
+      insert,
+      ...this.slice(start + toRemove)
+    ];
+    // this.length = 0;
+    this.addAll(temp);
+    return remove;
   }
 
   int compareTo(List<int> b) {
