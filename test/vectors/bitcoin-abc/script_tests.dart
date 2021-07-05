@@ -1,4 +1,4 @@
-[
+var bitcoinABCScriptTests = [
   [
     "Format is: [[wit..., amount]?, scriptSig, scriptPubKey, flags, expected_scripterror, ... comments]"
   ],
@@ -13,11 +13,9 @@
     "correct prevout hash), using the given scriptSig. All nLockTimes are 0, all"
   ],
   ["nSequences are max."],
-
   [
     "For Yours Bitcoin, all tests except those relevant for Bitcoin ABC have been removed."
   ],
-
   ["SIGHASH_FORKID"],
   [
     "0x09 0x300602010102010141",
@@ -43,6 +41,5 @@
     "SIGHASH_FORKID",
     "OK"
   ],
-
   ["The End"]
-]
+];

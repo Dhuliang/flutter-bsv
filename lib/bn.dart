@@ -212,6 +212,10 @@ class BigIntX {
 
   BigIntX mul(BigIntX other) => BigIntX(bn: bn * other.bn);
 
+  BigIntX ushln(n) => BigIntX(bn: bn >> n);
+
+  BigIntX ushrn(n) => BigIntX(bn: bn << n);
+
   /// in dart -50%47=44 , in nodejs -50%47=3 , use remainder fix it
   BigIntX mod(BigIntX other) {
     // var a = 10;

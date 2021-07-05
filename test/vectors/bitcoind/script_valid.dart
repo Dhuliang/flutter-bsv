@@ -1,4 +1,4 @@
-var scriptValid = [
+var bitcoindScriptValid = [
   ["Format is: [scriptSig, scriptPubKey, flags, ... comments]"],
   [
     "It is evaluated as if there was a crediting coinbase transaction with two 0"

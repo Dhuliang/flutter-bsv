@@ -486,6 +486,7 @@ class Tx {
         txHashBuf: data,
         txOutNum: txOutNum,
         nSequence: nSequence,
+        script: script,
       ).setScript(script);
     }
     this.txIns.add(txIn);

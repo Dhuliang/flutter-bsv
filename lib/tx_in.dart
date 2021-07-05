@@ -87,9 +87,9 @@ class TxIn {
     };
   }
 
-  TxIn setScript(Script script) {
-    this.scriptVi = VarInt.fromNumber(script.toBuffer().length);
-    this.script = script;
+  TxIn setScript(Script s) {
+    this.scriptVi = VarInt.fromNumber(s.toBuffer().length);
+    this.script = s;
     return this;
   }
 

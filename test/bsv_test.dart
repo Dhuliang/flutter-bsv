@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/bsv.dart';
-
 class A {
   String getMessage() => 'A';
 }

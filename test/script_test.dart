@@ -1075,8 +1075,8 @@ void main() {
 
     group('vectors', () {
       group('scriptValid', () {
-        for (var i = 0; i < scriptValid.length; i++) {
-          var a = scriptValid[i];
+        for (var i = 0; i < bitcoindScriptValid.length; i++) {
+          var a = bitcoindScriptValid[i];
 
           if (a.length == 1) {
             continue;
@@ -1110,8 +1110,8 @@ void main() {
       });
 
       group('scriptInvalid', () {
-        for (var i = 0; i < scriptInvalid.length; i++) {
-          var a = scriptInvalid[i];
+        for (var i = 0; i < bitcoindScriptInvalid.length; i++) {
+          var a = bitcoindScriptInvalid[i];
 
           if (a.length == 1) {
             continue;

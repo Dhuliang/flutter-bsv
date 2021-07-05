@@ -35,38 +35,78 @@ extension ListX<T> on List<T> {
     throw 'not List<int>';
   }
 
-  List<T> slice([int begin, int end]) {
-    var i, cloned = <T>[], size, len = this.length;
+  // List<T> slice([int begin, int end]) {
+  //   var i, cloned = <T>[], size, len = this.length;
 
-    var start = begin ?? 0;
-    end = end ?? len;
+  //   var start = begin ?? 0;
+  //   end = end ?? len;
 
-    var upTo = end != null ? min(end, len) : len;
+  //   var upTo = end != null ? min(end, len) : len;
 
-    if (end < 0) {
-      upTo = len + end;
+  //   if (end < 0) {
+  //     upTo = len + end;
+  //   }
+
+  //   size = upTo - start;
+
+  //   if (size > 0) {
+  //     cloned = List<T>(size);
+  //     for (i = 0; i < size; i++) {
+  //       cloned[i] = this[start + i];
+  //     }
+  //   }
+
+  //   return cloned;
+  // }
+
+  List<T> slice([int start, int end]) {
+    var len = this.length;
+    List<T> range = [];
+
+    start = idx(len, start);
+    end = idx(len, end, len);
+
+    while (start < end) {
+      range.add(this[start++]);
     }
 
-    size = upTo - start;
+    return range;
+  }
 
-    if (size > 0) {
-      cloned = List<T>(size);
-      for (i = 0; i < size; i++) {
-        cloned[i] = this[start + i];
-      }
+  int idx(int len, int pos, [int end]) {
+    if (pos == null) {
+      pos = end ?? 0;
+    } else if (pos < 0) {
+      pos = max(len + pos, 0);
+    } else {
+      pos = min(pos, len);
     }
 
-    return cloned;
+    return pos;
   }
 
   List<T> splice(int start, [int toRemove = 0, T insert]) {
-    insert = insert ?? [];
+    // insert = insert ?? [] as T;
+    // T insertEl = insert ?? [];
     var remove = this.slice(start, start + toRemove);
-    var temp = [
+    // var temp = List<T>.from([
+    //   ...this.slice(0, start),
+    //   // insert,
+    //   insertEl,
+    //   ...this.slice(start + toRemove),
+    // ]);
+    var temp = List<T>.from([
       ...this.slice(0, start),
-      insert,
-      ...this.slice(start + toRemove)
-    ];
+    ]);
+    if (insert != null) {
+      temp = List<T>.from([...temp, insert]);
+    }
+    temp = List<T>.from([
+      ...temp,
+      ...this.slice(start + toRemove),
+    ]);
+
+    this.clear();
     // this.length = 0;
     this.addAll(temp);
     return remove;

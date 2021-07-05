@@ -290,11 +290,11 @@ class Sig {
       //  Non-canonical signature: R length is zero
       return false;
     }
-    if (R[0] & 0x80 == 1) {
+    if (R[0] & 0x80 != 0) {
       //  Non-canonical signature: R value negative
       return false;
     }
-    if (nLEnR > 1 && R[0] == 0x00 && !(R[1] & 0x80 == 1)) {
+    if (nLEnR > 1 && R[0] == 0x00 && !(R[1] & 0x80 != 0)) {
       //  Non-canonical signature: R value excessively padded
       return false;
     }
@@ -308,11 +308,11 @@ class Sig {
       //  Non-canonical signature: S length is zero
       return false;
     }
-    if (S[0] & 0x80 == 1) {
+    if (S[0] & 0x80 != 0) {
       //  Non-canonical signature: S value negative
       return false;
     }
-    if (nLEnS > 1 && S[0] == 0x00 && !(S[1] & 0x80 == 1)) {
+    if (nLEnS > 1 && S[0] == 0x00 && !(S[1] & 0x80 != 0)) {
       //  Non-canonical signature: S value excessively padded
       return false;
     }

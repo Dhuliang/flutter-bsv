@@ -12,8 +12,6 @@ import 'package:bsv/script.dart';
 import 'package:bsv/sig.dart';
 import 'package:bsv/tx.dart';
 import 'package:bsv/tx_in.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/var_int.dart';
 import 'package:bsv/extentsions/list.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/services.dart';
@@ -38,8 +36,8 @@ import 'package:flutter/services.dart';
  */
 
 class Interp {
-  static const TRUE = [1];
-  static const FALSE = [];
+  static const List<int> TRUE = [1];
+  static const List<int> FALSE = [];
   static const MAX_SCRIPT_ELEMENT_SIZE = 520;
   static const LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
   static const SCRIPT_VERIFY_NONE = 0;
@@ -63,6 +61,8 @@ class Interp {
   int nIn;
   List<List<int>> stack = [];
   List<List<int>> altStack = [];
+  // List<String> stack;
+  // List<String> altStack;
   int pc = 0;
   int pBeginCodeHash = 0;
   int nOpCount = 0;
@@ -72,19 +72,64 @@ class Interp {
   BigIntX valueBn = BigIntX.zero;
 
   Interp({
-    this.script,
-    this.tx,
-    this.nIn,
-    this.stack,
-    this.altStack,
-    this.pc,
-    this.pBeginCodeHash,
-    this.nOpCount,
-    this.ifStack,
-    this.errStr,
-    this.flags,
-    this.valueBn,
-  });
+    Script script,
+    Tx tx,
+    int nIn,
+    List<List<int>> stack,
+    List<List<int>> altStack,
+    // List<String> stack,
+    // List<String> altStack,
+    int pc = 0,
+    int pBeginCodeHash = 0,
+    int nOpCount = 0,
+    List<bool> ifStack,
+    String errStr = '',
+    int flags,
+    BigIntX valueBn,
+  }) {
+    this.script = script;
+    this.tx = tx;
+    this.nIn = nIn;
+    this.stack = stack ?? [];
+    this.altStack = altStack ?? [];
+    this.pc = pc;
+    this.pBeginCodeHash = pBeginCodeHash;
+    this.nOpCount = nOpCount;
+    this.ifStack = ifStack ?? [];
+    this.errStr = errStr ?? '';
+    this.flags = flags ?? Interp.defaultFlags;
+    this.valueBn = valueBn ?? BigIntX.zero;
+  }
+
+  Interp fromBr(Br br) {
+    var jsonNoTxBufLEn = br.readVarIntNum();
+    var jsonNoTxBuf = br.read(jsonNoTxBufLEn);
+    // utf8.decode(jsonNoTxBuf)
+    // this.fromJSONNoTx(json.decode(jsonNoTxBuf.toString()));
+    this.fromJSONNoTx(json.decode(utf8.decode(jsonNoTxBuf)));
+    var txbuflen = br.readVarIntNum();
+    if (txbuflen > 0) {
+      var txbuf = br.read(txbuflen);
+      this.tx = new Tx().fromBuffer(txbuf);
+    }
+    return this;
+  }
+
+  Interp fromHex(String str) {
+    return this.fromBr(Br(buf: hex.decode(str)));
+  }
+
+  factory Interp.fromHex(String str) {
+    return Interp().fromBr(Br(buf: hex.decode(str)));
+  }
+
+  Interp fromBuffer(List<int> buf) {
+    return this.fromBr(Br(buf: buf.asUint8List()));
+  }
+
+  List<int> toBuffer() {
+    return this.toBw().toBuffer();
+  }
 
   Interp initialize() {
     this.script = new Script();
@@ -131,28 +176,16 @@ class Interp {
     this.pc = json['pc'];
     this.pBeginCodeHash = json['pBeginCodeHash'];
     this.nOpCount = json['nOpCount'];
-    this.ifStack = json['ifStack'];
+    this.ifStack = List<bool>.from(json['ifStack']);
     this.errStr = json['errStr'];
     this.flags = json['flags'];
 
     return this;
   }
 
-  Interp fromBr(Br br) {
-    var jsonNoTxBufLEn = br.readVarIntNum();
-    var jsonNoTxBuf = br.read(jsonNoTxBufLEn);
-    this.fromJSONNoTx(json.decode(jsonNoTxBuf.toString()));
-    var txbuflen = br.readVarIntNum();
-    if (txbuflen > 0) {
-      var txbuf = br.read(txbuflen);
-      this.tx = new Tx().fromBuffer(txbuf);
-    }
-    return this;
-  }
-
   Map<String, dynamic> toJSON() {
     var json = this.toJSONNoTx();
-    json.tx = this.tx != null ? this.tx.toJSON() : null;
+    json['tx'] = this.tx != null ? this.tx.toJSON() : null;
     return json;
   }
 
@@ -186,13 +219,13 @@ class Interp {
     if (bw == null) {
       bw = new Bw();
     }
-    var jsonNoTxBuf = hex.decode(json.encode(this.toJSONNoTx()));
+    var jsonNoTxBuf = utf8.encode(json.encode(this.toJSONNoTx()));
     bw.writeVarIntNum(jsonNoTxBuf.length);
     bw.write(jsonNoTxBuf);
     if (this.tx != null) {
       var txbuf = this.tx.toBuffer();
       bw.writeVarIntNum(txbuf.length);
-      bw.write(txbuf);
+      bw.write(txbuf.asUint8List());
     } else {
       bw.writeVarIntNum(0);
     }
@@ -249,7 +282,7 @@ class Interp {
     return flags;
   }
 
-  static bool castToBool(buf) {
+  static bool castToBool(List<int> buf) {
     for (var i = 0; i < buf.length; i++) {
       if (buf[i] != 0) {
         // can be negative zero
@@ -272,6 +305,16 @@ class Interp {
     if (buf.length == 0) {
       return true;
     }
+    // bool a = (this.flags &
+    //             (Interp.SCRIPT_VERIFY_DERSIG |
+    //                 Interp.SCRIPT_VERIFY_LOW_S |
+    //                 Interp.SCRIPT_VERIFY_STRICTENC)) !=
+    //         0 &&
+    //     !Sig.IsTxDer(buf);
+    // bool a1 = (Interp.SCRIPT_VERIFY_DERSIG |Interp.SCRIPT_VERIFY_LOW_S |Interp.SCRIPT_VERIFY_STRICTENC) != 0;
+    // (this.flags & (Interp.SCRIPT_VERIFY_DERSIG |Interp.SCRIPT_VERIFY_LOW_S | Interp.SCRIPT_VERIFY_STRICTENC)) !=0
+    // print(a);
+
     if ((this.flags &
                 (Interp.SCRIPT_VERIFY_DERSIG |
                     Interp.SCRIPT_VERIFY_LOW_S |
@@ -410,13 +453,14 @@ class Interp {
    * Interp.prototype.step()
    * bitcoin core commit: b5d1b1092998bc95313856d535c632ea5a8f9104
    */
-  eval() async* {
+  Stream<bool> eval() async* {
     if (this.script.toBuffer().length > 10000) {
       this.errStr = 'SCRIPT_ERR_SCRIPT_SIZE';
       yield false;
     }
 
     try {
+      print("${this.pc}${this.script.chunks.length}");
       while (this.pc < this.script.chunks.length) {
         var fSuccess = this.step();
         if (!fSuccess) {
@@ -432,8 +476,16 @@ class Interp {
         yield false;
       }
     } catch (e) {
-      this.errStr = 'SCRIPT_ERR_UNKNOWN_ERROR: ' + e;
-      yield false;
+      if (e is String) {
+        this.errStr = 'SCRIPT_ERR_UNKNOWN_ERROR: $e';
+        yield false;
+      } else if (e is Exception) {
+        this.errStr = 'SCRIPT_ERR_UNKNOWN_ERROR: ${e.toString()}';
+        yield false;
+      } else {
+        print(e?.stackTrace);
+        throw e;
+      }
     }
 
     if (this.ifStack.length > 0) {
@@ -451,7 +503,6 @@ class Interp {
   bool step() {
     var fRequireMinimal = (this.flags & Interp.SCRIPT_VERIFY_MINIMALDATA) != 0;
 
-    // bool fExec = !count(ifStack.begin(), ifStack.end(), false)
     var fExec = !((this.ifStack.indexOf(false) + 1) != 0);
 
     //
@@ -459,6 +510,7 @@ class Interp {
     //
     var chunk = this.script.chunks[this.pc];
     this.pc++;
+    print(this.pc);
     var opCodeNum = chunk.opCodeNum;
     if (opCodeNum == null) {
       this.errStr = 'SCRIPT_ERR_BAD_OPCODE';
@@ -489,7 +541,7 @@ class Interp {
         this.errStr = 'SCRIPT_ERR_MINIMALDATA';
         return false;
       }
-      if (!(chunk.buf == null)) {
+      if (chunk.buf == null) {
         this.stack.add(Interp.FALSE);
       } else if (chunk.len != chunk.buf.length) {
         throw ('LEngth of push value not equal to length of data');
@@ -570,9 +622,10 @@ class Interp {
             // beyond the 2**32-1 limit of the nLockTime field itself.
             var nLockTimebuf = this.stack[this.stack.length - 1];
             var nLockTimebn = new BigIntX.fromScriptNumBuffer(
-                buf: nLockTimebuf,
-                fRequireMinimal: fRequireMinimal,
-                nMaxNumSize: 5);
+              buf: nLockTimebuf,
+              fRequireMinimal: fRequireMinimal,
+              nMaxNumSize: 5,
+            );
             var nLockTime = nLockTimebn.toNumber();
 
             // In the rare event that the argument may be < 0 due to
@@ -614,9 +667,10 @@ class Interp {
             // 5-byte numeric operands.
             var nSequencebuf = this.stack[this.stack.length - 1];
             var nSequencebn = new BigIntX.fromScriptNumBuffer(
-                buf: nSequencebuf,
-                fRequireMinimal: fRequireMinimal,
-                nMaxNumSize: 5);
+              buf: nSequencebuf,
+              fRequireMinimal: fRequireMinimal,
+              nMaxNumSize: 5,
+            );
             var nSequence = nSequencebn.toNumber();
 
             // In the rare event that the argument may be < 0 due to
@@ -896,7 +950,9 @@ class Interp {
             }
             var buf = this.stack[this.stack.length - 1];
             var bn = new BigIntX.fromScriptNumBuffer(
-                buf: buf, fRequireMinimal: fRequireMinimal);
+              buf: buf,
+              fRequireMinimal: fRequireMinimal,
+            );
             var n = bn.toNumber();
             this.stack.removeLast();
             if (n < 0 || n >= this.stack.length) {
@@ -1033,9 +1089,9 @@ class Interp {
             var buf1 = this.stack[this.stack.length - 2];
             var value = new BigIntX.fromBuffer(buf1);
             var n = new BigIntX.fromScriptNumBuffer(
-                    buf: this.stack[this.stack.length - 1],
-                    fRequireMinimal: fRequireMinimal)
-                .toNumber();
+              buf: this.stack[this.stack.length - 1],
+              fRequireMinimal: fRequireMinimal,
+            ).toNumber();
             if (n < 0) {
               this.errStr = 'SCRIPT_ERR_INVALID_NUMBER_RANGE';
               return false;
@@ -1046,18 +1102,22 @@ class Interp {
 
             switch (opCodeNum) {
               case OpCode.OP_LSHIFT:
-                // TODO
-                // value = value.ushln(n);
+                value = value.ushln(n);
                 break;
               case OpCode.OP_RSHIFT:
-                // value = value.ushrn(n);
+                value = value.ushrn(n);
                 break;
             }
 
+            // TODO
             var buf2 = value.toBuffer().slice(-buf1.length);
             if (buf2.length < buf1.length) {
-              buf2 =
-                  List<int>.from([List<int>(buf1.length - buf2.length), buf2]);
+              // buf2 = List<int>.from(
+              //     [...List<int>(buf1.length - buf2.length), ...buf2]);
+              buf2 = List<int>.from([
+                ...List<int>.filled(buf1.length - buf2.length, 0),
+                ...buf2,
+              ]);
             }
 
             this.stack.add(buf2);
@@ -1074,7 +1134,7 @@ class Interp {
             }
             var buf1 = this.stack[this.stack.length - 2];
             var buf2 = this.stack[this.stack.length - 1];
-            var fEqual = cmp(buf1, buf2);
+            var fEqual = cmp(buf1.asUint8List(), buf2.asUint8List());
             // OpCode.OP_NOTEQUAL is disabled because it would be too easy to say
             // something like n != 1 and have some wiseguy pass in 1 with extra
             // zero bytes after it (numerically, 0x01 == 0x0001 == 0x000001)
@@ -1111,7 +1171,9 @@ class Interp {
             }
             var buf = this.stack[this.stack.length - 1];
             var bn = new BigIntX.fromScriptNumBuffer(
-                buf: buf, fRequireMinimal: fRequireMinimal);
+              buf: buf,
+              fRequireMinimal: fRequireMinimal,
+            );
             switch (opCodeNum) {
               case OpCode.OP_1ADD:
                 bn = bn.add(BigIntX.one);
@@ -1163,11 +1225,13 @@ class Interp {
               return false;
             }
             var bn1 = new BigIntX.fromScriptNumBuffer(
-                buf: this.stack[this.stack.length - 2],
-                fRequireMinimal: fRequireMinimal);
+              buf: this.stack[this.stack.length - 2],
+              fRequireMinimal: fRequireMinimal,
+            );
             var bn2 = new BigIntX.fromScriptNumBuffer(
-                buf: this.stack[this.stack.length - 1],
-                fRequireMinimal: fRequireMinimal);
+              buf: this.stack[this.stack.length - 1],
+              fRequireMinimal: fRequireMinimal,
+            );
             var bn = BigIntX.zero;
 
             switch (opCodeNum) {
@@ -1278,14 +1342,17 @@ class Interp {
               return false;
             }
             var bn1 = new BigIntX.fromScriptNumBuffer(
-                buf: this.stack[this.stack.length - 3],
-                fRequireMinimal: fRequireMinimal);
+              buf: this.stack[this.stack.length - 3],
+              fRequireMinimal: fRequireMinimal,
+            );
             var bn2 = new BigIntX.fromScriptNumBuffer(
-                buf: this.stack[this.stack.length - 2],
-                fRequireMinimal: fRequireMinimal);
+              buf: this.stack[this.stack.length - 2],
+              fRequireMinimal: fRequireMinimal,
+            );
             var bn3 = new BigIntX.fromScriptNumBuffer(
-                buf: this.stack[this.stack.length - 1],
-                fRequireMinimal: fRequireMinimal);
+              buf: this.stack[this.stack.length - 1],
+              fRequireMinimal: fRequireMinimal,
+            );
             // bool fValue = (bn2 <= bn1 && bn1 < bn3)
             var fValue = bn2.leq(bn1) && bn1.lt(bn3);
             this.stack.removeLast();
@@ -1313,15 +1380,15 @@ class Interp {
             // valtype vchnew Hash((opCode == OpCode.OP_RIPEMD160 || opCode == OpCode.OP_SHA1 || opCode == OpCode.OP_HASH160) ? 20 : 32)
             var bufHash;
             if (opCodeNum == OpCode.OP_RIPEMD160) {
-              bufHash = Hash.ripemd160(buf).data.toList();
+              bufHash = Hash.ripemd160(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_SHA1) {
-              bufHash = Hash.sha1(buf).data.toList();
+              bufHash = Hash.sha1(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_SHA256) {
-              bufHash = Hash.sha256(buf).data.toList();
+              bufHash = Hash.sha256(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_HASH160) {
-              bufHash = Hash.sha256Ripemd160(buf).data.toList();
+              bufHash = Hash.sha256Ripemd160(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_HASH256) {
-              bufHash = Hash.sha256Sha256(buf).data.toList();
+              bufHash = Hash.sha256Sha256(buf.asUint8List()).data.toList();
             }
             this.stack.removeLast();
             this.stack.add(bufHash);
@@ -1364,7 +1431,8 @@ class Interp {
                 return false;
               }
             } else {
-              subScript.findAndDelete(new Script().writeBuffer(bufSig));
+              subScript.findAndDelete(
+                  new Script().writeBuffer(bufSig.asUint8List()));
             }
 
             if (!this.checkSigEncoding(bufSig) ||
@@ -1377,6 +1445,7 @@ class Interp {
             try {
               var sig = new Sig().fromTxFormat(bufSig);
               var pubKey = new PubKey().fromBuffer(bufPubKey, false);
+              print('verify');
               fSuccess = this.tx.verify(
                   sig: sig,
                   pubKey: pubKey,
@@ -1417,9 +1486,9 @@ class Interp {
             }
 
             var nKeysCount = new BigIntX.fromScriptNumBuffer(
-                    buf: this.stack[this.stack.length - i],
-                    fRequireMinimal: fRequireMinimal)
-                .toNumber();
+              buf: this.stack[this.stack.length - i],
+              fRequireMinimal: fRequireMinimal,
+            ).toNumber();
             if (nKeysCount < 0 || nKeysCount > 20) {
               this.errStr = 'SCRIPT_ERR_PUBKEY_COUNT';
               return false;
@@ -1438,9 +1507,9 @@ class Interp {
             }
 
             var nSigsCount = new BigIntX.fromScriptNumBuffer(
-                    buf: this.stack[this.stack.length - i],
-                    fRequireMinimal: fRequireMinimal)
-                .toNumber();
+              buf: this.stack[this.stack.length - i],
+              fRequireMinimal: fRequireMinimal,
+            ).toNumber();
             if (nSigsCount < 0 || nSigsCount > nKeysCount) {
               this.errStr = 'SCRIPT_ERR_SIG_COUNT';
               return false;
@@ -1472,7 +1541,8 @@ class Interp {
                 }
               } else {
                 // Drop the signature, since there's no way for a signature to sign itself
-                subScript.findAndDelete(new Script().writeBuffer(bufSig));
+                subScript.findAndDelete(
+                    new Script().writeBuffer(bufSig.asUint8List()));
               }
             }
 
@@ -1570,7 +1640,8 @@ class Interp {
           var vch1 = this.stack[this.stack.length - 2];
           var vch2 = this.stack[this.stack.length - 1];
 
-          this.stack[this.stack.length - 2] = List.from([vch1, vch2]);
+          this.stack[this.stack.length - 2] =
+              List<int>.from([...vch1, ...vch2]);
           this.stack.removeLast();
           break;
 
@@ -1582,8 +1653,9 @@ class Interp {
 
           var data = this.stack[this.stack.length - 2];
           var position = new BigIntX.fromScriptNumBuffer(
-              buf: this.stack[this.stack.length - 1],
-              fRequireMinimal: fRequireMinimal);
+            buf: this.stack[this.stack.length - 1],
+            fRequireMinimal: fRequireMinimal,
+          );
 
           if (position.lt(0) || position.gt(data.length)) {
             this.errStr = 'SCRIPT_ERR_INVALID_SPLIT_RANGE';
@@ -1634,12 +1706,18 @@ class Interp {
       valueBn: valueBn,
     );
 
+    var result = true;
     await for (var success in results) {
+      print("one of results is $success");
       if (!success) {
-        return false;
+        // return false;
+        result = false;
+        break;
       }
     }
-    return true;
+
+    // return true;
+    return result;
   }
 
   // ignore: slash_for_doc_comments
@@ -1666,52 +1744,58 @@ class Interp {
   }) async* {
     var stackCopy;
 
-    this.script = scriptSig;
-    this.tx = tx;
-    this.nIn = nIn;
-    this.flags = flags;
-    this.valueBn = valueBn;
+    this.script = scriptSig ?? this.script;
+    this.tx = tx ?? this.tx;
+    this.nIn = nIn ?? this.nIn;
+    this.flags = flags ?? this.flags;
+    this.valueBn = valueBn ?? this.valueBn;
 
-    if ((flags & Interp.SCRIPT_VERIFY_SIGPUSHONLY) != 0 &&
+    if (((flags ?? 0) & Interp.SCRIPT_VERIFY_SIGPUSHONLY) != 0 &&
         !scriptSig.isPushOnly()) {
-      this.errStr = this.errStr ?? 'SCRIPT_ERR_SIG_PUSHONLY';
+      this.errStr =
+          this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_SIG_PUSHONLY';
       yield false;
     }
 
     yield* this.eval();
 
-    if (flags & Interp.SCRIPT_VERIFY_P2SH != 0) {
+    if ((flags ?? 0) & Interp.SCRIPT_VERIFY_P2SH != 0) {
       stackCopy = this.stack.slice();
     }
 
     var stack = this.stack;
     this.initialize();
-    this.script = scriptPubKey;
-    this.stack = stack;
-    this.tx = tx;
-    this.nIn = nIn;
-    this.flags = flags;
-    this.valueBn = valueBn;
+    this.script = scriptPubKey ?? this.script;
+    this.stack = stack ?? this.stack;
+    this.tx = tx ?? this.tx;
+    this.nIn = nIn ?? this.nIn;
+    this.flags = flags ?? this.flags;
+    this.valueBn = valueBn ?? this.valueBn;
 
     yield* this.eval();
 
     if (this.stack.length == 0) {
-      this.errStr = this.errStr ?? 'SCRIPT_ERR_EVAL_FALSE';
+      this.errStr =
+          this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
       yield false;
+      return;
     }
 
-    var buf = this.stack[this.stack.length - 1];
+    // var buf = this.stack[this.stack.length - 1];
+    var buf = this.stack.last;
     if (!Interp.castToBool(buf)) {
-      this.errStr = this.errStr ?? 'SCRIPT_ERR_EVAL_FALSE';
+      this.errStr =
+          this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
       yield false;
     }
 
     // Additional validation for spend-to-script-hash transactions:
-    if ((flags & Interp.SCRIPT_VERIFY_P2SH != 0) &&
+    if (((flags ?? 0) & Interp.SCRIPT_VERIFY_P2SH != 0) &&
         scriptPubKey.isScriptHashOut()) {
       // scriptSig must be literals-only or validation fails
       if (!scriptSig.isPushOnly()) {
-        this.errStr = this.errStr ?? 'SCRIPT_ERR_SIG_PUSHONLY';
+        this.errStr =
+            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_SIG_PUSHONLY';
         yield false;
       }
 
@@ -1744,12 +1828,14 @@ class Interp {
       yield* this.eval();
 
       if (stack.length == 0) {
-        this.errStr = this.errStr ?? 'SCRIPT_ERR_EVAL_FALSE';
+        this.errStr =
+            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
         yield false;
       }
 
       if (!Interp.castToBool(stack[stack.length - 1])) {
-        this.errStr = this.errStr ?? 'SCRIPT_ERR_EVAL_FALSE';
+        this.errStr =
+            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
         yield false;
       } else {
         yield true;
@@ -1759,15 +1845,16 @@ class Interp {
     // The CLEANSTACK check is only performed after potential P2SH evaluation,
     // as the non-P2SH evaluation of a P2SH script will obviously not result in
     // a clean stack (the P2SH inputs remain).
-    if ((flags & Interp.SCRIPT_VERIFY_CLEANSTACK) != 0) {
+    if (((flags ?? 0) & Interp.SCRIPT_VERIFY_CLEANSTACK) != 0) {
       // Disallow CLEANSTACK without P2SH, as otherwise a switch
       // CLEANSTACK->P2SH+CLEANSTACK would be possible, which is not a softfork
       // (and P2SH should be one).
-      if (!(flags & Interp.SCRIPT_VERIFY_P2SH != 0)) {
+      if (!((flags ?? 0) & Interp.SCRIPT_VERIFY_P2SH != 0)) {
         throw ('cannot use CLEANSTACK without P2SH');
       }
       if (stack.length != 1) {
-        this.errStr = this.errStr ?? 'SCRIPT_ERR_CLEANSTACK';
+        this.errStr =
+            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_CLEANSTACK';
         yield false;
       }
     }
