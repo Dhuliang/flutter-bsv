@@ -106,4 +106,8 @@ class TxOut {
   List<int> toBuffer() {
     return this.toBw().toBuffer();
   }
+
+  String toHex() {
+    return this.toBw().toHex();
+  }
 }

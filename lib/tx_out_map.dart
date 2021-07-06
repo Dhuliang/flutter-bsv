@@ -1,3 +1,4 @@
+import 'package:bsv/tx.dart';
 import 'package:bsv/tx_out.dart';
 import 'package:bsv/extentsions/list.dart';
 
@@ -14,11 +15,10 @@ import 'package:bsv/extentsions/list.dart';
  */
 
 class TxOutMap {
-  Map map;
-  TxOutMap({
-    Map map,
-  }) {
-    this.map = map;
+  Map<dynamic, dynamic> map;
+
+  TxOutMap({Map map}) {
+    this.map = map ?? Map();
   }
 
   Map toJSON() {
@@ -37,23 +37,24 @@ class TxOutMap {
     return this;
   }
 
-  TxOutMap set(List<int> txHashBuf, txOutNum, txOut) {
-    var label = txHashBuf.toHex() + ':' + txOutNum;
+  TxOutMap set(List<int> txHashBuf, int txOutNum, TxOut txOut) {
+    var label = "${txHashBuf.toHex()}:$txOutNum";
     this.map[label] = txOut;
     return this;
   }
 
-  dynamic get(txHashBuf, txOutNum) {
-    var label = txHashBuf.toHex() + ':' + txOutNum;
+  dynamic get(List<int> txHashBuf, int txOutNum) {
+    var label = "${txHashBuf.toHex()}:$txOutNum";
     return this.map[label];
   }
 
-  TxOutMap setTx(tx) {
-    var txhashhex = tx.hash().toString('hex');
-    tx.txOuts.forEach((txOut, index) {
-      var label = txhashhex + ':' + index;
+  TxOutMap setTx(Tx tx) {
+    var txhashhex = tx.hash().data.toHex();
+    for (var i = 0; i < tx.txOuts.length; i++) {
+      var txOut = tx.txOuts[i];
+      var label = txhashhex + ':' + i.toString();
       this.map[label] = txOut;
-    });
+    }
     return this;
   }
 }

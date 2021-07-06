@@ -174,6 +174,10 @@ class TxIn {
     this.txOutNum = 0xffffffff; // -1 cast to unsigned int
   }
 
+  factory TxIn.fromHex(String str) {
+    return TxIn().fromBr(Br(buf: hex.decode(str)));
+  }
+
   TxIn fromHex(String str) {
     return this.fromBr(Br(buf: hex.decode(str)));
   }
