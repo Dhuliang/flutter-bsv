@@ -34,7 +34,7 @@ void main() {
           type: type,
           addressStr: addressStr,
         );
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['nScriptChunk'], nScriptChunk);
         expect(obj['nHashType'], Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID);
@@ -51,7 +51,7 @@ void main() {
           type: type,
           addressStr: addressStr,
         );
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['nScriptChunk'], nScriptChunk);
         expect(obj['type'], 'pubKey');
@@ -70,7 +70,7 @@ void main() {
           nHashType: Sig.SIGHASH_ALL,
         );
 
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['nHashType'], Sig.SIGHASH_ALL);
         expect(obj['nHashType'] == Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID, false);
@@ -88,7 +88,7 @@ void main() {
           txOutNum: txOutNum,
           arr: arr,
         );
-        arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
 
         expect(obj['nScriptChunk'], nScriptChunk);
@@ -108,7 +108,7 @@ void main() {
           type: type,
           addressStr: addressStr,
         );
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['nScriptChunk'], nScriptChunk);
         expect(obj['nHashType'], Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID);
@@ -124,7 +124,7 @@ void main() {
           type: type,
           addressStr: addressStr,
         );
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['nScriptChunk'], nScriptChunk);
         expect(obj['addressStr'], addressStr);
@@ -139,7 +139,7 @@ void main() {
           type: type,
           addressStr: addressStr2,
         );
-        arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        arr = sigOperations.get(txHashBuf, txOutNum);
         obj = arr[1];
 
         expect(obj['nScriptChunk'], nScriptChunk2);
@@ -155,7 +155,7 @@ void main() {
           type: SigOperations.PubKeyType,
           addressStr: addressStr,
         );
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['type'], SigOperations.PubKeyType);
         expect(obj['nScriptChunk'], nScriptChunk);
@@ -171,7 +171,7 @@ void main() {
           type: type,
           addressStr: addressStr2,
         );
-        arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        arr = sigOperations.get(txHashBuf, txOutNum);
         obj = arr[1];
 
         expect(obj['nScriptChunk'], nScriptChunk2);
@@ -189,7 +189,7 @@ void main() {
           type: type,
           addressStr: addressStr,
         );
-        var arr = sigOperations.get(txHashBuf: txHashBuf, txOutNum: txOutNum);
+        var arr = sigOperations.get(txHashBuf, txOutNum);
         var obj = arr[0];
         expect(obj['nScriptChunk'], nScriptChunk);
         expect(obj['addressStr'], addressStr);
@@ -206,7 +206,7 @@ void main() {
           type: type,
           addressStr: addressStr2,
         );
-        arr = sigOperations.get(txHashBuf: txHashBuf2, txOutNum: txOutNum2);
+        arr = sigOperations.get(txHashBuf2, txOutNum2);
         obj = arr[0];
 
         expect(obj['nScriptChunk'], nScriptChunk2);
@@ -216,7 +216,7 @@ void main() {
       test('should return empty list when no sig operation was registered', () {
         var sigOperations = new SigOperations();
         var txHashBuf = List.filled(32, 1);
-        var result = sigOperations.get(txHashBuf: txHashBuf, txOutNum: 0);
+        var result = sigOperations.get(txHashBuf, 0);
         expect(result, []);
       });
     });

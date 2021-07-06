@@ -122,7 +122,7 @@ class SigOperations {
     String addressStr,
     int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
   }) {
-    var arr = this.get(txHashBuf: txHashBuf, txOutNum: txOutNum) ?? List();
+    var arr = this.get(txHashBuf, txOutNum) ?? List();
 
     arr.add({
       "nScriptChunk": nScriptChunk,
@@ -145,7 +145,7 @@ class SigOperations {
    * we are going to place the signature.
    * @returns {PubKey}
    */
-  dynamic get({List<int> txHashBuf, int txOutNum}) {
+  dynamic get(List<int> txHashBuf, int txOutNum) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
     return this.map[label] ?? [];
   }
