@@ -23,6 +23,8 @@ import 'package:convert/convert.dart';
  */
 
 class Block {
+  static const MAX_BLOCK_SIZE = 1000000;
+
   BlockHeader blockHeader;
   VarInt txsVi;
   List<Tx> txs;
