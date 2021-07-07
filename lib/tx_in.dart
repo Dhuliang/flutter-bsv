@@ -42,13 +42,13 @@ class TxIn {
     int txOutNum,
     VarInt scriptVi,
     Script script,
-    int nSequence = 0xffffffff,
+    int nSequence,
   }) {
     this.txHashBuf = txHashBuf;
     this.txOutNum = txOutNum;
     this.scriptVi = scriptVi;
     this.script = script;
-    this.nSequence = nSequence;
+    this.nSequence = nSequence ?? 0xffffffff;
   }
 
   factory TxIn.fromProperties({
@@ -146,7 +146,7 @@ class TxIn {
     if (txOut.script.isPubKeyHashOut()) {
       script.writeOpCode(OpCode.OP_0); // blank signature
       if (pubKey != null) {
-        script.writeBuffer(pubKey.toBuffer());
+        script.writeBuffer(pubKey.toBuffer().asUint8List());
       } else {
         script.writeOpCode(OpCode.OP_0);
       }

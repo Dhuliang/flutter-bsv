@@ -28,6 +28,19 @@ class BigIntX {
     return BigIntX(bn: BigInt.from(n));
   }
 
+  factory BigIntX.fromDynamic(dynamic v) {
+    if (v is num) {
+      return BigIntX.fromNum(v);
+    }
+    if (v is String) {
+      return BigIntX.fromString(v);
+    }
+    if (v is List<int>) {
+      return BigIntX.fromBuffer(v);
+    }
+    throw 'error';
+  }
+
   factory BigIntX.fromString(String source, {int radix = 10}) {
     return BigIntX(bn: BigInt.parse(source, radix: radix));
   }

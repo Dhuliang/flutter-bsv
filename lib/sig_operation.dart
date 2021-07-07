@@ -28,29 +28,37 @@ class SigOperations {
   }
 
   Map toJSON() {
-    var json = {};
-    this.map.forEach((arr, label) => {
-          json[label] = arr.map((obj) => {
-                "nScriptChunk": obj.nScriptChunk,
-                "type": obj.type, // 'sig' or 'pubKey'
-                "addressStr": obj.addressStr,
-                "nHashType": obj.nHashType,
-                "log": obj.log
-              })
-        });
+    Map json = {};
+    this.map.forEach((key, arr) {
+      for (var i = 0; i < arr.length; i++) {
+        var obj = arr[i];
+        json[key] = [
+          {
+            "nScriptChunk": obj['nScriptChunk'],
+            "type": obj['type'], // 'sig' or 'pubKey'
+            "addressStr": obj['addressStr'],
+            "nHashType": obj['nHashType'],
+            "log": obj['log']
+          }
+        ].toList();
+        // print(json);
+      }
+    });
     return json;
   }
 
   SigOperations fromJSON(Map json) {
-    json.keys.toList().forEach((label) => {
-          this.map[label] = json[label].map((obj) => ({
-                "nScriptChunk": obj.nScriptChunk,
-                "type": obj.type,
-                "addressStr": obj.addressStr,
-                "nHashType": obj.nHashType,
-                "log": obj.log
-              }))
-        });
+    json.keys.toList().forEach((label) {
+      this.map[label] = json[label].map((obj) {
+        return {
+          "nScriptChunk": obj['nScriptChunk'],
+          "type": obj['type'],
+          "addressStr": obj['addressStr'],
+          "nHashType": obj['nHashType'],
+          "log": obj['log'],
+        };
+      }).toList();
+    });
     return this;
   }
 

@@ -38,25 +38,44 @@ class TxBuilder {
   HashCache hashCache = new HashCache();
 
   TxBuilder({
-    this.tx,
-    this.txIns,
-    this.txOuts,
-    this.uTxOutMap,
-    this.sigOperations,
-    this.feePerKbNum,
-    this.nLockTime,
-    this.versionBytesNum,
-    this.sigsPerInput,
-    this.dust,
-    this.dustChangeToFees,
-    this.hashCache,
-  });
+    Tx tx,
+    List<TxIn> txIns,
+    List<TxOut> txOuts,
+    TxOutMap uTxOutMap,
+    SigOperations sigOperations,
+    Script changeScript,
+    BigIntX changeAmountBn,
+    BigIntX feeAmountBn,
+    num feePerKbNum,
+    int nLockTime,
+    int versionBytesNum,
+    int sigsPerInput,
+    int dust,
+    bool dustChangeToFees,
+    HashCache hashCache,
+  }) {
+    this.tx = tx ?? new Tx();
+    this.txIns = txIns ?? [];
+    this.txOuts = txOuts ?? [];
+    this.uTxOutMap = uTxOutMap ?? new TxOutMap();
+    this.sigOperations = sigOperations ?? new SigOperations();
+    this.changeScript = changeScript;
+    this.changeAmountBn = changeAmountBn;
+    this.feeAmountBn = feeAmountBn;
+    this.feePerKbNum = feePerKbNum ?? Constants.Mainnet.txBuilderFeePerKbNum;
+    this.nLockTime = nLockTime ?? 0;
+    this.versionBytesNum = versionBytesNum ?? 1;
+    this.sigsPerInput = sigsPerInput ?? 1;
+    this.dust = dust ?? Constants.Mainnet.txBuilderDust;
+    this.dustChangeToFees = dustChangeToFees ?? false;
+    this.hashCache = hashCache ?? new HashCache();
+  }
 
   Map toJSON() {
     var json = {};
     json['tx'] = this.tx.toHex();
-    json['txIns'] = this.txIns.map((txIn) => txIn.toHex());
-    json['txOuts'] = this.txOuts.map((txOut) => txOut.toHex());
+    json['txIns'] = this.txIns.map((txIn) => txIn.toHex()).toList();
+    json['txOuts'] = this.txOuts.map((txOut) => txOut.toHex()).toList();
     json['uTxOutMap'] = this.uTxOutMap.toJSON();
     json['sigOperations'] = this.sigOperations.toJSON();
     json['changeScript'] =
@@ -73,20 +92,22 @@ class TxBuilder {
     return json;
   }
 
-  fromJSON(json) {
+  fromJSON(Map json) {
     this.tx = new Tx().fromHex(json['tx']);
-    this.txIns = json['txIns'].map((txIn) => TxIn.fromHex(txIn));
-    this.txOuts = json['txOuts'].map((txOut) => TxOut.fromHex(txOut));
+    this.txIns = List<TxIn>.from(
+        json['txIns'].map((txIn) => TxIn.fromHex(txIn)).toList());
+    this.txOuts = List<TxOut>.from(
+        json['txOuts'].map((txOut) => TxOut.fromHex(txOut)).toList());
     this.uTxOutMap = new TxOutMap().fromJSON(json['uTxOutMap']);
     this.sigOperations = new SigOperations().fromJSON(json['sigOperations']);
-    this.changeScript = json['changeScript']
+    this.changeScript = json['changeScript'] != null
         ? new Script().fromHex(json['changeScript'])
         : null;
-    this.changeAmountBn = json['changeAmountBn']
-        ? new BigIntX.fromString(json['changeAmountBn'])
+    this.changeAmountBn = json['changeAmountBn'] != null
+        ? new BigIntX.fromDynamic(json['changeAmountBn'])
         : null;
-    this.feeAmountBn = json['feeAmountBn']
-        ? new BigIntX.fromString(json['feeAmountBn'])
+    this.feeAmountBn = json['feeAmountBn'] != null
+        ? new BigIntX.fromDynamic(json['feeAmountBn'])
         : null;
     this.feePerKbNum = json['feePerKbNum'] ?? this.feePerKbNum;
     this.sigsPerInput = json['sigsPerInput'] ?? this.sigsPerInput;
@@ -97,7 +118,7 @@ class TxBuilder {
   }
 
   TxBuilder setFeePerKbNum(num feePerKbNum) {
-    if ((feePerKbNum is num) || feePerKbNum < 0) {
+    if (!(feePerKbNum is num) || feePerKbNum < 0) {
       throw ('cannot set a fee of zero or less');
     }
     this.feePerKbNum = feePerKbNum;
@@ -274,7 +295,7 @@ class TxBuilder {
     if (!(addr is Address) || !(valueBn is BigIntX)) {
       throw ('addr must be an Address, and valueBn must be a Bn');
     }
-    var script = new Script().fromPubKeyHash(addr.hashBuf);
+    var script = new Script().fromPubKeyHash(addr.hashBuf.asUint8List());
     this.outputToScript(valueBn: valueBn, script: script);
     return this;
   }
@@ -351,7 +372,7 @@ class TxBuilder {
         size -= scriptSize;
         if (type == SigOperations.SigType) {
           size += sigSize;
-        } else if (obj.type == SigOperations.PubKeyType) {
+        } else if (obj['type'] == SigOperations.PubKeyType) {
           size += pubKeySize;
         } else {
           throw ('unsupported sig operations type');
