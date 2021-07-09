@@ -66,7 +66,7 @@ class TxVerifier {
   /**
      * Convenience method to verify a transaction.
      */
-  static staticVerify({Tx tx, TxOutMap txOutMap, int flags}) {
+  static Future<bool> staticVerify({Tx tx, TxOutMap txOutMap, int flags}) {
     return new TxVerifier(tx: tx, txOutMap: txOutMap).verify(flags);
   }
 

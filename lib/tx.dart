@@ -330,7 +330,7 @@ class Tx {
   }
 
   Tx cloneByBuffer() {
-    return this.fromBuffer(this.toBuffer());
+    return new Tx().fromBuffer(this.toBuffer());
   }
 
   List<int> toBuffer() {
@@ -544,5 +544,10 @@ class Tx {
     });
 
     return this;
+  }
+
+  @override
+  String toString() {
+    return this.toHex();
   }
 }

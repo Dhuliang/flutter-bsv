@@ -512,6 +512,9 @@ class Interp {
     this.pc++;
     print(this.pc);
     var opCodeNum = chunk.opCodeNum;
+    // chunk.opCodeNum.toRadixString(16);
+    // print("%d")
+    OpCode.fromNumber(chunk.opCodeNum);
     if (opCodeNum == null) {
       this.errStr = 'SCRIPT_ERR_BAD_OPCODE';
       return false;
@@ -537,6 +540,7 @@ class Interp {
     }
 
     if (fExec && opCodeNum >= 0 && opCodeNum <= OpCode.OP_PUSHDATA4) {
+      print('============');
       if (fRequireMinimal && !this.script.checkMinimalPush(this.pc - 1)) {
         this.errStr = 'SCRIPT_ERR_MINIMALDATA';
         return false;
@@ -858,7 +862,6 @@ class Interp {
               return false;
             }
             var spliced = this.stack.splice(this.stack.length - 6, 2);
-            // var spliced = this.stack.slice(this.stack.length - 6, 2);
             this.stack.add(spliced[0]);
             this.stack.add(spliced[1]);
           }
@@ -872,7 +875,6 @@ class Interp {
               return false;
             }
             var spliced = this.stack.splice(this.stack.length - 4, 2);
-            // var spliced = this.stack.slice(this.stack.length - 4, 2);
             this.stack.add(spliced[0]);
             this.stack.add(spliced[1]);
           }
@@ -927,7 +929,6 @@ class Interp {
             return false;
           }
           this.stack.splice(this.stack.length - 2, 1);
-          // this.stack.slice(this.stack.length - 2, 1);
           break;
 
         case OpCode.OP_OVER:
@@ -962,7 +963,6 @@ class Interp {
             buf = this.stack[this.stack.length - n - 1];
             if (opCodeNum == OpCode.OP_ROLL) {
               this.stack.splice(this.stack.length - n - 1, 1);
-              // this.stack.slice(this.stack.length - n - 1, 1);
             }
             this.stack.add(buf);
           }
@@ -1140,8 +1140,10 @@ class Interp {
             // zero bytes after it (numerically, 0x01 == 0x0001 == 0x000001)
             // if (opCode == OpCode.OP_NOTEQUAL)
             //  fEqual = !fEqual
-            this.stack.removeLast();
-            this.stack.removeLast();
+            this.stack = [...this.stack.getRange(0, this.stack.length - 1)];
+            this.stack = [...this.stack.getRange(0, this.stack.length - 1)];
+            // this.stack.removeLast();
+            // this.stack.removeLast();
             this.stack.add(fEqual ? Interp.TRUE : Interp.FALSE);
             if (opCodeNum == OpCode.OP_EQUALVERIFY) {
               if (fEqual) {
@@ -1415,7 +1417,8 @@ class Interp {
             // Subset of script starting at the most recent codeseparator
             // CScript scriptCode(pBeginCodeHash, pend)
             var subScript = new Script(
-                chunks: this.script.chunks.slice(this.pBeginCodeHash));
+              chunks: this.script.chunks.slice(this.pBeginCodeHash),
+            );
 
             // https://github.com/Bitcoin-UAHF/spec/blob/master/replay-protected-sighash.md
 
@@ -1447,20 +1450,24 @@ class Interp {
               var pubKey = new PubKey().fromBuffer(bufPubKey, false);
               print('verify');
               fSuccess = this.tx.verify(
-                  sig: sig,
-                  pubKey: pubKey,
-                  nIn: this.nIn,
-                  subScript: subScript,
-                  enforceLowS: (this.flags & Interp.SCRIPT_VERIFY_LOW_S) != 0,
-                  valueBn: this.valueBn,
-                  flags: this.flags);
+                    sig: sig,
+                    pubKey: pubKey,
+                    nIn: this.nIn,
+                    subScript: subScript,
+                    enforceLowS: (this.flags & Interp.SCRIPT_VERIFY_LOW_S) != 0,
+                    valueBn: this.valueBn,
+                    flags: this.flags,
+                  );
             } catch (e) {
               // invalid sig or pubKey
               fSuccess = false;
             }
 
-            this.stack.removeLast();
-            this.stack.removeLast();
+            print('q');
+            this.stack = [...this.stack.getRange(0, this.stack.length - 1)];
+            this.stack = [...this.stack.getRange(0, this.stack.length - 1)];
+            // this.stack.removeLast();
+            // this.stack.removeLast();
             // stack.push_back(fSuccess ? vchTrue : vchFalse)
             this.stack.add(fSuccess ? Interp.TRUE : Interp.FALSE);
             if (opCodeNum == OpCode.OP_CHECKSIGVERIFY) {
@@ -1766,7 +1773,7 @@ class Interp {
     var stack = this.stack;
     this.initialize();
     this.script = scriptPubKey ?? this.script;
-    this.stack = stack ?? this.stack;
+    this.stack = [...stack] ?? this.stack;
     this.tx = tx ?? this.tx;
     this.nIn = nIn ?? this.nIn;
     this.flags = flags ?? this.flags;

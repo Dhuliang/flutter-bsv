@@ -10,6 +10,9 @@ import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'vectors/bitcoind/tx_invalid.dart';
+import 'vectors/bitcoind/tx_valid.dart';
+import 'vectors/coolest-tx-ever-sent.dart';
+import 'vectors/sighash-single-bug.dart';
 
 void main() {
   group('TxVerifier', () {
@@ -85,157 +88,116 @@ void main() {
       });
     });
 
-    // TODO:NEXT
-    // group('vectors',  () {
-    //   test('should validate the coolest transaction ever',  () {
-    //     // This test vector was given to me by JJ of bcoin. It is a transaction
-    //     // with code seperators in the input. It also uses what used to be
-    //     // OP_NOP2 but is now OP_CHECKLOCKTIMEVERIFY, so the
-    //     // OP_CHECKLOCKTIMEVERIFY flag cannot be enabled to verify this tx.
-    //     var flags = 0
-    //     var tx = Tx.fromHex(coolestTxVector.tx)
-    //     var intx0 = Tx.fromHex(coolestTxVector.intx0)
-    //     var intx1 = Tx.fromHex(coolestTxVector.intx1)
-    //     var txOutMap = new TxOutMap()
-    //     txOutMap.setTx(intx0)
-    //     txOutMap.setTx(intx1)
-    //     var txVerifier = new TxVerifier(tx, txOutMap)
-    //     var str = txVerifier.verifyStr(flags)
-    //     str.should.equal(false)
-    //   })
+    group('vectors', () {
+      test('should validate the coolest transaction ever', () async {
+        // This test vector was given to me by JJ of bcoin. It is a transaction
+        // with code seperators in the input. It also uses what used to be
+        // OP_NOP2 but is now OP_CHECKLOCKTIMEVERIFY, so the
+        // OP_CHECKLOCKTIMEVERIFY flag cannot be enabled to verify this tx.
+        var flags = 0;
+        var tx = Tx.fromHex(coolestTxVector['tx']);
+        var intx0 = Tx.fromHex(coolestTxVector['intx0']);
+        var intx1 = Tx.fromHex(coolestTxVector['intx1']);
+        var txOutMap = new TxOutMap();
+        txOutMap.setTx(intx0);
+        txOutMap.setTx(intx1);
+        var txVerifier = new TxVerifier(tx: tx, txOutMap: txOutMap);
+        var str = await txVerifier.verifyStr(flags);
+        expect(str, false);
+      });
 
-    //   test('should validate this sighash single test vector',  () {
-    //     // This test vector was given to me by JJ of bcoin. It is a transaction
-    //     // on testnet, not mainnet. It highlights the famous "sighash single bug"
-    //     // which is where sighash single returns a transaction hash of all 00s in
-    //     // the case where there are more inputs than outputs. Peter Todd has
-    //     // written about the sighash single bug here:
-    //     // https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2014-November/006878.html
-    //     var flags = 0
-    //     var tx = Tx.fromHex(sighashSingleVector.tx)
-    //     var intx0 = Tx.fromHex(sighashSingleVector.intx0)
-    //     var intx1 = Tx.fromHex(sighashSingleVector.intx1)
-    //     var txOutMap = new TxOutMap()
-    //     txOutMap.setTx(intx0)
-    //     txOutMap.setTx(intx1)
-    //     var txVerifier = new TxVerifier(tx, txOutMap)
-    //     var str = txVerifier.verifyStr(flags)
-    //     str.should.equal(false)
-    //   })
-    // })
+      test('should validate this sighash single test vector', () async {
+        // This test vector was given to me by JJ of bcoin. It is a transaction
+        // on testnet, not mainnet. It highlights the famous "sighash single bug"
+        // which is where sighash single returns a transaction hash of all 00s in
+        // the case where there are more inputs than outputs. Peter Todd has
+        // written about the sighash single bug here:
+        // https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2014-November/006878.html
+        var flags = 0;
+        var tx = Tx.fromHex(sighashSingleVector['tx']);
+        var intx0 = Tx.fromHex(sighashSingleVector['intx0']);
+        var intx1 = Tx.fromHex(sighashSingleVector['intx1']);
+        var txOutMap = new TxOutMap();
+        txOutMap.setTx(intx0);
+        txOutMap.setTx(intx1);
+        var txVerifier = new TxVerifier(tx: tx, txOutMap: txOutMap);
+        var str = await txVerifier.verifyStr(flags);
+        expect(str != null, true);
+      });
+    });
 
-    // group('TxVerifier Vectors',  () {
-    //   var c = 0
-    //   txValid.forEach( (vector, i) {
-    //     if (vector.length == 1) {
-    //       return
-    //     }
-    //     c++
-    //     test('should verify txValid vector ' + c,  () {
-    //       var inputs = vector[0]
-    //       var txhex = vector[1]
-    //       var flags = Interp.getFlags(vector[2])
+    group('TxVerifier Vectors', () {
+      for (var i = 0; i < vectorsBitcoindTxValid.length; i++) {
+        var vector = vectorsBitcoindTxValid[i];
+        if (vector.length == 1) {
+          continue;
+        }
+        test('should verify txValid vector $i', () async {
+          List inputs = vector[0];
+          var txhex = vector[1];
+          var flags = Interp.getFlags(vector[2]);
 
-    //       var txOutMap = new TxOutMap()
-    //       inputs.forEach( (input) {
-    //         var txOutNum = input[1]
-    //         if (txOutNum == -1) {
-    //           txOutNum = 0xffffffff // bitcoind casts -1 to an unsigned int
-    //         }
-    //         var txOut = TxOut.fromProperties(
-    //           new Bn(0),
-    //           new Script().fromBitcoindString(input[2])
-    //         )
-    //         var txHashBuf = new Br(Buffer.from(input[0], 'hex')).readReverse()
-    //         txOutMap.set(txHashBuf, txOutNum, txOut)
-    //       })
+          var txOutMap = new TxOutMap();
+          inputs.forEach((input) {
+            var txOutNum = input[1];
+            if (txOutNum == -1) {
+              txOutNum = 0xffffffff; // bitcoind casts -1 to an unsigned int
+            }
+            var txOut = TxOut.fromProperties(
+              valueBn: BigIntX.zero,
+              script: new Script().fromBitcoindString(input[2]),
+            );
+            var txHashBuf = new Br(buf: hex.decode(input[0])).readReverse();
+            txOutMap.set(txHashBuf, txOutNum, txOut);
+          });
 
-    //       var tx = new Tx().fromBuffer(Buffer.from(txhex, 'hex'))
-    //       var verified = TxVerifier.verify(tx, txOutMap, flags)
-    //       verified.should.equal(true)
-    //     })
+          var tx = new Tx().fromBuffer(hex.decode(txhex));
+          var verified = await TxVerifier.staticVerify(
+            tx: tx,
+            txOutMap: txOutMap,
+            flags: flags,
+          );
+          expect(verified, true);
+        });
+        // break;
+      }
 
-    //     test('should async verify txValid vector ' + c, async  () {
-    //       var inputs = vector[0]
-    //       var txhex = vector[1]
-    //       var flags = Interp.getFlags(vector[2])
+      for (var i = 0; i < vectorsBitcoindTxInvalid.length; i++) {
+        var vector = vectorsBitcoindTxInvalid[i];
+        if (vector.length == 1) {
+          continue;
+        }
 
-    //       var txOutMap = new TxOutMap()
-    //       inputs.forEach( (input) {
-    //         var txOutNum = input[1]
-    //         if (txOutNum == -1) {
-    //           txOutNum = 0xffffffff // bitcoind casts -1 to an unsigned int
-    //         }
-    //         var txOut = TxOut.fromProperties(
-    //           new Bn(0),
-    //           new Script().fromBitcoindString(input[2])
-    //         )
-    //         var txHashBuf = new Br(Buffer.from(input[0], 'hex')).readReverse()
-    //         txOutMap.set(txHashBuf, txOutNum, txOut)
-    //       })
+        test('should unverify txInvalid vector $i', () async {
+          List inputs = vector[0];
+          var txhex = vector[1];
+          var flags = Interp.getFlags(vector[2]);
 
-    //       var tx = new Tx().fromBuffer(Buffer.from(txhex, 'hex'))
-    //       var verified = await TxVerifier.asyncVerify(tx, txOutMap, flags)
-    //       verified.should.equal(true)
-    //     })
-    //   })
+          var txOutMap = new TxOutMap();
+          inputs.forEach((input) {
+            var txOutNum = input[1];
+            if (txOutNum == -1) {
+              txOutNum = 0xffffffff; // bitcoind casts -1 to an unsigned int
+            }
+            var txOut = TxOut.fromProperties(
+              valueBn: BigIntX.zero,
+              script: new Script().fromBitcoindString(input[2]),
+            );
+            var txHashBuf = new Br(buf: hex.decode(input[0])).readReverse();
+            txOutMap.set(txHashBuf, txOutNum, txOut);
+          });
 
-    //   c = 0
-    //   txInvalid.forEach( (vector, i) {
-    //     if (vector.length == 1) {
-    //       return
-    //     }
-    //     c++
-    //     test('should unverify txInvalid vector ' + c,  () {
-    //       var inputs = vector[0]
-    //       var txhex = vector[1]
-    //       var flags = Interp.getFlags(vector[2])
+          var tx = new Tx().fromBuffer(hex.decode(txhex));
 
-    //       var txOutMap = new TxOutMap()
-    //       inputs.forEach( (input) {
-    //         var txOutNum = input[1]
-    //         if (txOutNum == -1) {
-    //           txOutNum = 0xffffffff // bitcoind casts -1 to an unsigned int
-    //         }
-    //         var txOut = TxOut.fromProperties(
-    //           new Bn(0),
-    //           new Script().fromBitcoindString(input[2])
-    //         )
-    //         var txHashBuf = new Br(Buffer.from(input[0], 'hex')).readReverse()
-    //         txOutMap.set(txHashBuf, txOutNum, txOut)
-    //       })
-
-    //       var tx = new Tx().fromBuffer(Buffer.from(txhex, 'hex'))
-
-    //       var verified = TxVerifier.verify(tx, txOutMap, flags)
-    //       verified.should.equal(false)
-    //     })
-
-    //     test('should async unverify txInvalid vector ' + c, async  () {
-    //       var inputs = vector[0]
-    //       var txhex = vector[1]
-    //       var flags = Interp.getFlags(vector[2])
-
-    //       var txOutMap = new TxOutMap()
-    //       inputs.forEach( (input) {
-    //         var txOutNum = input[1]
-    //         if (txOutNum == -1) {
-    //           txOutNum = 0xffffffff // bitcoind casts -1 to an unsigned int
-    //         }
-    //         var txOut = TxOut.fromProperties(
-    //           new Bn(0),
-    //           new Script().fromBitcoindString(input[2])
-    //         )
-    //         var txHashBuf = new Br(Buffer.from(input[0], 'hex')).readReverse()
-    //         txOutMap.set(txHashBuf, txOutNum, txOut)
-    //       })
-
-    //       var tx = new Tx().fromBuffer(Buffer.from(txhex, 'hex'))
-
-    //       var verified = await TxVerifier.asyncVerify(tx, txOutMap, flags)
-    //       verified.should.equal(false)
-    //     })
-    //   })
-    // })
+          var verified = await TxVerifier.staticVerify(
+            tx: tx,
+            txOutMap: txOutMap,
+            flags: flags,
+          );
+          expect(verified, false);
+        });
+        // break;
+      }
+    });
   });
 }
