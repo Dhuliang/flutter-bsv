@@ -517,7 +517,7 @@ class TxBuilder {
   TxBuilder fillSig({int nIn, int nScriptChunk, Sig sig}) {
     var txIn = this.tx.txIns[nIn];
     txIn.script.chunks[nScriptChunk] =
-        new Script().writeBuffer(sig.toTxFormat()).chunks[0];
+        new Script().writeBuffer(sig.toTxFormat().asUint8List()).chunks[0];
     txIn.scriptVi = VarInt.fromNumber(txIn.script.toBuffer().length);
     return this;
   }
@@ -533,18 +533,19 @@ class TxBuilder {
      */
   Sig getSig({
     KeyPair keyPair,
-    int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
+    int nHashType,
     int nIn,
     Script subScript,
     int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
   }) {
     BigIntX valueBn;
+    nHashType = nHashType ?? Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID;
     if ((nHashType & Sig.SIGHASH_FORKID != 0) &&
         (flags & Tx.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
       var txHashBuf = this.tx.txIns[nIn].txHashBuf;
       var txOutNum = this.tx.txIns[nIn].txOutNum;
       var txOut = this.uTxOutMap.get(txHashBuf, txOutNum);
-      if (!txOut) {
+      if (txOut == null) {
         throw ('for SIGHASH_FORKID must provide UTXOs');
       }
       valueBn = txOut.valueBn;
@@ -678,9 +679,9 @@ class TxBuilder {
         var type = obj['type'];
         var addressStr = obj['addressStr'];
         var nHashType = obj['nHashType'];
-        var keyPair = addressStrMap[addressStr];
-        if (!keyPair) {
-          obj.log = 'cannot find keyPair for addressStr $addressStr';
+        KeyPair keyPair = addressStrMap[addressStr];
+        if (keyPair == null) {
+          obj['log'] = 'cannot find keyPair for addressStr $addressStr';
           continue;
         }
         var txOut = this.uTxOutMap.get(txIn.txHashBuf, txIn.txOutNum);
@@ -692,14 +693,15 @@ class TxBuilder {
             nScriptChunk: nScriptChunk,
             nHashType: nHashType,
           );
-          obj.log = 'successfully inserted signature';
-        } else if (type == 'pubKey') {
-          txIn.script.chunks[nScriptChunk] =
-              new Script().writeBuffer(keyPair.pubKey.toBuffer()).chunks[0];
+          obj['log'] = 'successfully inserted signature';
+        } else if (type == SigOperations.PubKeyType) {
+          txIn.script.chunks[nScriptChunk] = new Script()
+              .writeBuffer(keyPair.pubKey.toBuffer().asUint8List())
+              .chunks[0];
           txIn.setScript(txIn.script);
-          obj.log = 'successfully inserted public key';
+          obj['log'] = 'successfully inserted public key';
         } else {
-          obj.log = 'cannot perform operation of type $type';
+          obj['log'] = 'cannot perform operation of type $type';
           continue;
         }
       }

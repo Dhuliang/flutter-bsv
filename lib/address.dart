@@ -1,4 +1,3 @@
-import 'package:bsv/bn.dart';
 import 'package:bsv/constants.dart';
 import 'package:bsv/hash.dart';
 import 'package:bsv/op_code.dart';

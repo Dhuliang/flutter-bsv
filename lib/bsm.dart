@@ -8,7 +8,6 @@ import 'package:bsv/key_pair.dart';
 import 'package:bsv/sig.dart';
 import 'package:bsv/bw.dart';
 import 'package:bsv/extentsions/list.dart';
-import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments
 /**

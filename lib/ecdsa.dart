@@ -11,7 +11,6 @@ import 'package:bsv/random.dart';
 import 'package:bsv/sig.dart';
 
 import 'package:bsv/extentsions/list.dart';
-import 'package:bsv/extentsions/string.dart';
 import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments

@@ -1718,6 +1718,7 @@ class Interp {
       print("one of results is $success");
       if (!success) {
         // return false;
+        print(this.errStr);
         result = false;
         break;
       }

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:bsv/bn.dart';
@@ -133,7 +132,7 @@ class Tx {
     var bw = new Bw();
     for (var txIn in this.txIns) {
       // var txIn = this.txIns[i];
-      bw.write(txIn.txHashBuf); // outpoint (1/2)
+      bw.write(txIn.txHashBuf.asUint8List()); // outpoint (1/2)
       bw.writeUInt32LE(txIn.txOutNum); // outpoint (2/2)
     }
     return Hash.sha256Sha256(bw.toBuffer().asUint8List());
