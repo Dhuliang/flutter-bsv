@@ -77,8 +77,6 @@ class Interp {
     int nIn,
     List<List<int>> stack,
     List<List<int>> altStack,
-    // List<String> stack,
-    // List<String> altStack,
     int pc = 0,
     int pBeginCodeHash = 0,
     int nOpCount = 0,
@@ -510,7 +508,7 @@ class Interp {
     //
     var chunk = this.script.chunks[this.pc];
     this.pc++;
-    print(this.pc);
+    print("pc============${this.pc}");
     var opCodeNum = chunk.opCodeNum;
     // chunk.opCodeNum.toRadixString(16);
     // print("%d")
@@ -1109,7 +1107,6 @@ class Interp {
                 break;
             }
 
-            // TODO
             var buf2 = value.toBuffer().slice(-buf1.length);
             if (buf2.length < buf1.length) {
               // buf2 = List<int>.from(
@@ -1459,11 +1456,11 @@ class Interp {
                     flags: this.flags,
                   );
             } catch (e) {
+              print(e);
               // invalid sig or pubKey
               fSuccess = false;
             }
 
-            print('q');
             this.stack = [...this.stack.getRange(0, this.stack.length - 1)];
             this.stack = [...this.stack.getRange(0, this.stack.length - 1)];
             // this.stack.removeLast();

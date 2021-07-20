@@ -1,6 +1,10 @@
+import 'package:bsv/address.dart';
+import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
+import 'package:bsv/key_pair.dart';
 import 'package:bsv/script.dart';
 import 'package:bsv/tx_in.dart';
+import 'package:bsv/tx_out.dart';
 import 'package:bsv/var_int.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bsv/extentsions/string.dart';
@@ -178,26 +182,22 @@ void main() {
       });
     });
 
-    // TODO:需要实现
-    // group('#fromPubKeyHashTxOut',  () {
-    //   test('should convert from pubKeyHash out',  () {
-    //     var keyPair = new KeyPair().fromRandom()
-    //     var address = new Address().fromPubKey(keyPair.pubKey)
-    //     var txOut = TxOut.fromProperties(
-    //       new Bn(1000),
-    //       new Script().fromPubKeyHash(address.hashBuf)
-    //     )
-    //     var txHashBuf = Buffer.alloc(32)
-    //     txHashBuf.fill(0)
-    //     var txOutNum = 0
-    //     var txIn = new TxIn().fromPubKeyHashTxOut(
-    //       txHashBuf,
-    //       txOutNum,
-    //       txOut,
-    //       keyPair.pubKey
-    //     )
-    //     should.exist(txIn)
-    //   });
-    // });
+    group('#fromPubKeyHashTxOut', () {
+      test('should convert from pubKeyHash out', () {
+        var keyPair = new KeyPair().fromRandom();
+        var address = new Address().fromPubKey(keyPair.pubKey);
+        var txOut = TxOut.fromProperties(
+            valueBn: BigIntX.fromNum(1000),
+            script: new Script().fromPubKeyHash(address.hashBuf.asUint8List()));
+        var txHashBuf = List.generate(32, (index) => 0);
+        var txOutNum = 0;
+        var txIn = new TxIn().fromPubKeyHashTxOut(
+            txHashBuf: txHashBuf,
+            txOutNum: txOutNum,
+            txOut: txOut,
+            pubKey: keyPair.pubKey);
+        expect(txIn != null, true);
+      });
+    });
   });
 }

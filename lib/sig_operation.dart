@@ -32,15 +32,25 @@ class SigOperations {
     this.map.forEach((key, arr) {
       for (var i = 0; i < arr.length; i++) {
         var obj = arr[i];
-        json[key] = [
-          {
-            "nScriptChunk": obj['nScriptChunk'],
-            "type": obj['type'], // 'sig' or 'pubKey'
-            "addressStr": obj['addressStr'],
-            "nHashType": obj['nHashType'],
-            "log": obj['log']
-          }
-        ].toList();
+        if (json[key] == null) {
+          json[key] = [];
+        }
+        json[key].add({
+          "nScriptChunk": obj['nScriptChunk'],
+          "type": obj['type'], // 'sig' or 'pubKey'
+          "addressStr": obj['addressStr'],
+          "nHashType": obj['nHashType'],
+          "log": obj['log']
+        });
+        // json[key] = [
+        //   {
+        //     "nScriptChunk": obj['nScriptChunk'],
+        //     "type": obj['type'], // 'sig' or 'pubKey'
+        //     "addressStr": obj['addressStr'],
+        //     "nHashType": obj['nHashType'],
+        //     "log": obj['log']
+        //   }
+        // ].toList();
         // print(json);
       }
     });

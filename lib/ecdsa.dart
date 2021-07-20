@@ -288,7 +288,8 @@ class Ecdsa {
     return ecdsa.sig2PubKey();
   }
 
-  dynamic verifyStr([bool enforceLowS = true]) {
+  dynamic verifyStr([bool enforceLowS]) {
+    enforceLowS = enforceLowS ?? true;
     if (!(this.hashBuf is List<int>) || this.hashBuf.length != 32) {
       return 'hashBuf must be a 32 byte buffer';
     }
@@ -312,8 +313,10 @@ class Ecdsa {
       }
     }
 
-    var e = new BigIntX.fromBuffer(this.hashBuf,
-        endian: this.endian != null ? this.endian : null);
+    var e = new BigIntX.fromBuffer(
+      this.hashBuf,
+      endian: this.endian != null ? this.endian : null,
+    );
     var n = PointWrapper.getN();
     var sinv = s.invm(n);
     var u1 = sinv.mul(e).mod(n);
@@ -403,7 +406,8 @@ class Ecdsa {
     return json.encode(obj);
   }
 
-  Ecdsa verify([bool enforceLowS = true]) {
+  Ecdsa verify([bool enforceLowS]) {
+    enforceLowS = enforceLowS ?? true;
     var result = this.verifyStr(enforceLowS);
     var verified;
     if (result is bool) {

@@ -10,6 +10,7 @@ import 'package:bsv/block.dart';
 import 'package:bsv/bn.dart';
 import 'package:bsv/interp.dart';
 import 'package:bsv/tx.dart';
+import 'package:bsv/tx_out.dart';
 import 'package:bsv/tx_out_map.dart';
 import 'package:bsv/extentsions/list.dart';
 
@@ -37,11 +38,12 @@ class TxVerifier {
      * valid, which is not performed by this test. That check is done with the
      * normal verify function.
      */
-  Future<bool> verify([int flags = Interp.SCRIPT_ENABLE_SIGHASH_FORKID]) async {
+  Future<bool> verify([int flags]) async {
     var result1 = this.checkStr();
     if (result1 is String) {
       return false;
     }
+    flags = flags ?? Interp.SCRIPT_ENABLE_SIGHASH_FORKID;
     var result2 = await this.verifyStr(flags);
     if (result2 is String) {
       return false;
@@ -180,7 +182,7 @@ class TxVerifier {
   Future<bool> verifyNIn(int nIn, int flags) async {
     var txIn = this.tx.txIns[nIn];
     var scriptSig = txIn.script;
-    var txOut = this.txOutMap.get(txIn.txHashBuf, txIn.txOutNum);
+    TxOut txOut = this.txOutMap.get(txIn.txHashBuf, txIn.txOutNum);
     if (txOut == null) {
       print('output ${txIn.txOutNum} not found');
       return false;

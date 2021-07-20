@@ -92,7 +92,7 @@ class TxBuilder {
     return json;
   }
 
-  fromJSON(Map json) {
+  TxBuilder fromJSON(Map json) {
     this.tx = new Tx().fromHex(json['tx']);
     this.txIns = List<TxIn>.from(
         json['txIns'].map((txIn) => TxIn.fromHex(txIn)).toList());
@@ -198,12 +198,12 @@ class TxBuilder {
   /**
      * Pay "from" a script - in other words, add an input to the transaction.
      */
-  inputFromScript({
+  TxBuilder inputFromScript({
     List<int> txHashBuf,
     int txOutNum,
+    TxOut txOut,
     Script script,
     int nSequence,
-    TxOut txOut,
   }) {
     if (!(txHashBuf is List<int>) ||
         !(txOutNum is int) ||
@@ -280,7 +280,6 @@ class TxBuilder {
       nScriptChunk: 1,
       type: SigOperations.PubKeyType,
       addressStr: addressStr,
-      nHashType: nHashType,
     );
 
     return this;
@@ -695,9 +694,9 @@ class TxBuilder {
           );
           obj['log'] = 'successfully inserted signature';
         } else if (type == SigOperations.PubKeyType) {
-          txIn.script.chunks[nScriptChunk] = new Script()
-              .writeBuffer(keyPair.pubKey.toBuffer().asUint8List())
-              .chunks[0];
+          var buf = keyPair.pubKey.toBuffer().asUint8List();
+          txIn.script.chunks[nScriptChunk] =
+              new Script().writeBuffer(buf).chunks[0];
           txIn.setScript(txIn.script);
           obj['log'] = 'successfully inserted public key';
         } else {

@@ -617,7 +617,6 @@ void main() {
       });
     });
 
-    // TODO: NOT IMPLEMENT
     // group('@fromPubKeys', () {
     //   test('should generate this known script from a list of public keys', () {
     //     var privKey = PrivKey.fromBn(BigIntX.fromNum(5));

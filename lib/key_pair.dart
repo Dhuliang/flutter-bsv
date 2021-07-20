@@ -37,10 +37,10 @@ class KeyPair {
 
   KeyPair fromJSON(Map<String, dynamic> json) {
     if (json['privKey'] != null) {
-      this.privKey = PrivKey.fromString(json['privKey']);
+      this.privKey = PrivKey.fromJSON(json['privKey']);
     }
     if (json['pubKey'] != null) {
-      this.pubKey = PubKey.fromHex(json['pubKey']);
+      this.pubKey = PubKey.fromJSON(json['pubKey']);
     }
     return this;
   }

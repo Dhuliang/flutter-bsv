@@ -9,6 +9,7 @@ import 'package:bsv/bw.dart';
 import 'package:bsv/cmp.dart';
 import 'package:bsv/op_code.dart';
 import 'package:bsv/pub_key.dart';
+import 'package:bsv/sig.dart';
 import 'package:convert/convert.dart';
 
 import 'package:bsv/extentsions/list.dart';
@@ -594,7 +595,7 @@ class Script {
    * defaults to true. If sort is true, the pubKeys are sorted
    * lexicographically.
    */
-  Script fromPubKeys(int m, List<PubKey> pubKeys, [sort = true]) {
+  Script fromPubKeys(int m, List<PubKey> pubKeys, [bool sort = true]) {
     if (sort == true) {
       pubKeys = Script.sortPubKeys(pubKeys);
     }
@@ -751,8 +752,7 @@ class Script {
       return false;
     }
     return remaining
-        // .every((chunk) => chunk.buf is Uint8List && Sig.IsTxDer(chunk.buf));
-        .every((chunk) => chunk.buf is Uint8List && true);
+        .every((chunk) => chunk.buf is Uint8List && Sig.IsTxDer(chunk.buf));
   }
 
   // ignore: slash_for_doc_comments
@@ -770,8 +770,7 @@ class Script {
       var script2 = new Script(chunks: [this.chunks[i]]);
       var buf2 = Uint8List.fromList(script2.toBuffer());
       if (cmp(buf, buf2)) {
-        // this.chunks.slice(i, 1);
-        this.chunks.removeAt(i);
+        this.chunks.splice(i, 1);
       }
     }
     return this;
