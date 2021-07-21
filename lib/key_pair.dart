@@ -97,8 +97,8 @@ class KeyPair {
 
   Map<String, String> toJSON() {
     return {
-      "privKey": privKey.toString(),
-      "pubKey": pubKey.toString(),
+      "privKey": privKey.toJSON(),
+      "pubKey": pubKey.toJSON(),
     };
   }
 

@@ -512,7 +512,8 @@ class Interp {
     var opCodeNum = chunk.opCodeNum;
     // chunk.opCodeNum.toRadixString(16);
     // print("%d")
-    OpCode.fromNumber(chunk.opCodeNum);
+    var str = OpCode.str[opCodeNum];
+    print(str);
     if (opCodeNum == null) {
       this.errStr = 'SCRIPT_ERR_BAD_OPCODE';
       return false;
@@ -1747,7 +1748,7 @@ class Interp {
     int flags,
     BigIntX valueBn,
   }) async* {
-    var stackCopy;
+    List<List<int>> stackCopy;
 
     this.script = scriptSig ?? this.script;
     this.tx = tx ?? this.tx;
@@ -1765,7 +1766,7 @@ class Interp {
     yield* this.eval();
 
     if ((flags ?? 0) & Interp.SCRIPT_VERIFY_P2SH != 0) {
-      stackCopy = this.stack.slice();
+      stackCopy = List<List<int>>.from(this.stack);
     }
 
     var stack = this.stack;
@@ -1857,7 +1858,7 @@ class Interp {
       if (!((flags ?? 0) & Interp.SCRIPT_VERIFY_P2SH != 0)) {
         throw ('cannot use CLEANSTACK without P2SH');
       }
-      if (stack.length != 1) {
+      if (this.stack.length != 1) {
         this.errStr =
             this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_CLEANSTACK';
         yield false;
