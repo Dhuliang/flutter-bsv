@@ -129,7 +129,7 @@ class Bip32 {
     this.depth = 0x00;
     this.parentFingerPrint = Uint8List.fromList([0, 0, 0, 0]);
     this.childIndex = 0;
-    this.chainCode = hash.slice(32, 64);
+    this.chainCode = hash.slice(32, 64).asUint8List();
     this.versionBytesNum = this.bip32PrivKey;
     this.privKey = PrivKey().fromBn(BigIntX.fromBuffer(hash.slice(0, 32)));
     this.pubKey = PubKey().fromPrivKey(this.privKey);
@@ -239,17 +239,17 @@ class Bip32 {
 
     Bip32 ret;
     if (this.privKey != null) {
-      var data;
+      Uint8List data;
 
       if (usePrivate) {
-        data = List<int>.from([
+        data = Uint8List.fromList([
           ...[0],
           ...this.privKey.bn.toBuffer(size: 32),
           ...ib,
         ]);
       } else {
         // data =  List<int>.from([this.pubKey.toBuffer( size: 32 ), ib]);
-        data = List<int>.from([this.pubKey.toBuffer(), ib]);
+        data = Uint8List.fromList([...this.pubKey.toBuffer(), ...ib]);
       }
 
       var hash = Hash.sha512Hmac(Uint8List.fromList(data), this.chainCode).data;
@@ -266,10 +266,10 @@ class Bip32 {
       ret.privKey = new PrivKey().fromBn(k);
       ret.pubKey = new PubKey().fromPrivKey(ret.privKey);
     } else {
-      var data = List<int>.from([this.pubKey.toBuffer(), ib]);
+      var data = Uint8List.fromList([...this.pubKey.toBuffer(), ...ib]);
       var hash = Hash.sha512Hmac(data, this.chainCode).data;
       var il = BigIntX.fromBuffer(hash.slice(0, 32));
-      var ir = hash.slice(32, 64);
+      var ir = hash.slice(32, 64).asUint8List();
 
       // Ki = (IL + kpar)*G = IL*G + Kpar
       var ilG = PointWrapper.getG().mul(il);

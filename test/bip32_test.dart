@@ -1,17 +1,5 @@
 import 'package:bsv/bip32.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:bsv/bn.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/constants.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/random.dart';
 import 'package:convert/convert.dart';
 import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:bsv/extentsions/list.dart';
@@ -139,383 +127,345 @@ void main() {
 //   test("should asynchronously get m/0' ext. private key from test vector 1", async () {
 //     var bip32 = new Bip32().fromString(vector1mPrivate)
 //     var child = await bip32.asyncDerive("m/0'")
-//     should.exist(child)
+//     expect(child != null, true);
 //     child.toString().should.equal(vector1m0hPrivate)
 //   })
 
-//   test("should get m/0' ext. public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0hPublic)
-//   })
+    test("should get m/0' ext. public key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector1m0hPublic);
+    });
 
-//   test("should get m/0'/1 ext. private key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1")
-//     should.exist(child)
-//     child.toString().should.equal(vector1m0h1Private)
-//   })
+    test("should get m/0'/1 ext. private key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1");
+      expect(child != null, true);
+      expect(child.toString(), vector1m0h1Private);
+    });
 
-//   test("should get m/0'/1 ext. public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h1Public)
-//   })
+    test("should get m/0'/1 ext. public key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector1m0h1Public);
+    });
 
-//   test("should get m/0'/1 ext. public key from m/0' public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'")
-//     var childPub = new Bip32().fromString(child.toPublic().toString())
-//     var child2 = childPub.derive('m/1')
-//     should.exist(child2)
-//     child2
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h1Public)
-//   })
+    test(
+        "should get m/0'/1 ext. public key from m/0' public key from test vector 1",
+        () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'");
+      var childPub = new Bip32().fromString(child.toPublic().toString());
+      var child2 = childPub.derive('m/1');
+      expect(child2 != null, true);
+      expect(child2.toPublic().toString(), vector1m0h1Public);
+    });
 
 //   test("should asynchronously get m/0'/1 ext. public key from m/0' public key from test vector 1", async () {
 //     var bip32 = new Bip32().fromString(vector1mPrivate)
 //     var child = bip32.derive("m/0'")
 //     var childPub = new Bip32().fromString(child.toPublic().toString())
 //     var child2 = await childPub.asyncDerive('m/1')
-//     should.exist(child2)
+// expect(child2 != null, true);
 //     child2
 //       .toPublic()
 //       .toString()
 //       .should.equal(vector1m0h1Public)
 //   })
 
-//   test("should get m/0'/1/2h ext. private key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'")
-//     should.exist(child)
-//     child.toString().should.equal(vector1m0h12hPrivate)
-//   })
+    test("should get m/0'/1/2h ext. private key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'");
+      expect(child != null, true);
+      expect(child.toString(), vector1m0h12hPrivate);
+    });
 
-//   test("should get m/0'/1/2h ext. public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h12hPublic)
-//   })
+    test("should get m/0'/1/2h ext. public key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector1m0h12hPublic);
+    });
 
-//   test("should get m/0'/1/2h/2 ext. private key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'/2")
-//     should.exist(child)
-//     child.toString().should.equal(vector1m0h12h2Private)
-//   })
+    test("should get m/0'/1/2h/2 ext. private key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'/2");
+      expect(child != null, true);
+      expect(child.toString(), vector1m0h12h2Private);
+    });
 
-//   test("should get m/0'/1/2'/2 ext. public key from m/0'/1/2' public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'")
-//     var childPub = new Bip32().fromString(child.toPublic().toString())
-//     var child2 = childPub.derive('m/2')
-//     should.exist(child2)
-//     child2
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h12h2Public)
-//   })
+    test(
+        "should get m/0'/1/2'/2 ext. public key from m/0'/1/2' public key from test vector 1",
+        () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'");
+      var childPub = new Bip32().fromString(child.toPublic().toString());
+      var child2 = childPub.derive('m/2');
+      expect(child2 != null, true);
+      expect(child2.toPublic().toString(), vector1m0h12h2Public);
+    });
 
-//   test("should get m/0'/1/2h/2 ext. public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'/2")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h12h2Public)
-//   })
+    test("should get m/0'/1/2h/2 ext. public key from test vector 1", () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'/2");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector1m0h12h2Public);
+    });
 
-//   test("should get m/0'/1/2h/2/1000000000 ext. private key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'/2/1000000000")
-//     should.exist(child)
-//     child.toString().should.equal(vector1m0h12h21000000000Private)
-//   })
+    test(
+        "should get m/0'/1/2h/2/1000000000 ext. private key from test vector 1",
+        () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'/2/1000000000");
+      expect(child != null, true);
 
-//   test("should get m/0'/1/2h/2/1000000000 ext. public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'/2/1000000000")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h12h21000000000Public)
-//   })
+      expect(child.toString(), vector1m0h12h21000000000Private);
+    });
 
-//   test("should get m/0'/1/2'/2/1000000000 ext. public key from m/0'/1/2'/2 public key from test vector 1", () {
-//     var bip32 = new Bip32().fromString(vector1mPrivate)
-//     var child = bip32.derive("m/0'/1/2'/2")
-//     var childPub = new Bip32().fromString(child.toPublic().toString())
-//     var child2 = childPub.derive('m/1000000000')
-//     should.exist(child2)
-//     child2
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector1m0h12h21000000000Public)
-//   })
+    test("should get m/0'/1/2h/2/1000000000 ext. public key from test vector 1",
+        () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'/2/1000000000");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector1m0h12h21000000000Public);
+    });
 
-//   test('should initialize test vector 2 from the extended public key', () {
-//     var bip32 = new Bip32().fromString(vector2mPublic)
-//     should.exist(bip32)
-//   })
+    test(
+        "should get m/0'/1/2'/2/1000000000 ext. public key from m/0'/1/2'/2 public key from test vector 1",
+        () {
+      var bip32 = new Bip32().fromString(vector1mPrivate);
+      var child = bip32.derive("m/0'/1/2'/2");
+      var childPub = new Bip32().fromString(child.toPublic().toString());
+      var child2 = childPub.derive('m/1000000000');
+      expect(child2 != null, true);
+      expect(child2.toPublic().toString(), vector1m0h12h21000000000Public);
+    });
 
-//   test('should initialize test vector 2 from the extended private key', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     should.exist(bip32)
-//   })
+    test('should initialize test vector 2 from the extended public key', () {
+      var bip32 = new Bip32().fromString(vector2mPublic);
+      expect(bip32 != null, true);
+      expect(bip32.pubKey != null, true);
+    });
 
-//   test('should get the extended public key from the extended private key for test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     bip32
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2mPublic)
-//   })
+    test('should initialize test vector 2 from the extended private key', () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      expect(bip32 != null, true);
+      expect(bip32.privKey != null, true);
+    });
 
-//   test('should get m/0 ext. private key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive('m/0')
-//     should.exist(child)
-//     child.toString().should.equal(vector2m0Private)
-//   })
+    test(
+        'should get the extended public key from the extended private key for test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      expect(bip32.toPublic().toString(), vector2mPublic);
+    });
 
-//   test('should get m/0 ext. public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive('m/0')
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m0Public)
-//   })
+    test('should get m/0 ext. private key from test vector 2', () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive('m/0');
+      expect(child != null, true);
+      expect(child.toString(), vector2m0Private);
+    });
 
-//   test('should get m/0 ext. public key from m public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive('m')
-//     var childPub = new Bip32().fromString(child.toPublic().toString())
-//     var child2 = childPub.derive('m/0')
-//     should.exist(child2)
-//     child2
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m0Public)
-//   })
+    test('should get m/0 ext. public key from test vector 2', () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive('m/0');
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector2m0Public);
+    });
 
-//   test('should get m/0/2147483647h ext. private key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'")
-//     should.exist(child)
-//     child.toString().should.equal(vector2m02147483647hPrivate)
-//   })
+    test('should get m/0 ext. public key from m public key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive('m');
+      var childPub = new Bip32().fromString(child.toPublic().toString());
+      var child2 = childPub.derive('m/0');
+      expect(child2 != null, true);
+      expect(child2.toPublic().toString(), vector2m0Public);
+    });
 
-//   test('should get m/0/2147483647h ext. public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m02147483647hPublic)
-//   })
+    test('should get m/0/2147483647h ext. private key from test vector 2', () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'");
+      expect(child != null, true);
+      expect(child.toString(), vector2m02147483647hPrivate);
+    });
 
-//   test('should get m/0/2147483647h/1 ext. private key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1")
-//     should.exist(child)
-//     child.toString().should.equal(vector2m02147483647h1Private)
-//   })
+    test('should get m/0/2147483647h ext. public key from test vector 2', () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector2m02147483647hPublic);
+    });
 
-//   test('should get m/0/2147483647h/1 ext. public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m02147483647h1Public)
-//   })
+    test('should get m/0/2147483647h/1 ext. private key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1");
+      expect(child != null, true);
+      expect(child.toString(), vector2m02147483647h1Private);
+    });
 
-//   test('should get m/0/2147483647h/1 ext. public key from m/0/2147483647h public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'")
-//     var childPub = new Bip32().fromString(child.toPublic().toString())
-//     var child2 = childPub.derive('m/1')
-//     should.exist(child2)
-//     child2
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m02147483647h1Public)
-//   })
+    test('should get m/0/2147483647h/1 ext. public key from test vector 2', () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1");
+      expect(child != null, true);
+      expect(child.toPublic().toString(), vector2m02147483647h1Public);
+    });
 
-//   test('should get m/0/2147483647h/1/2147483646h ext. private key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1/2147483646'")
-//     should.exist(child)
-//     child.toString().should.equal(vector2m02147483647h12147483646hPrivate)
-//   })
+    test(
+        'should get m/0/2147483647h/1 ext. public key from m/0/2147483647h public key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'");
+      var childPub = new Bip32().fromString(child.toPublic().toString());
+      var child2 = childPub.derive('m/1');
+      expect(child2 != null, true);
+      expect(child2.toPublic().toString(), vector2m02147483647h1Public);
+    });
 
-//   test('should get m/0/2147483647h/1/2147483646h ext. public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1/2147483646'")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m02147483647h12147483646hPublic)
-//   })
+    test(
+        'should get m/0/2147483647h/1/2147483646h ext. private key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1/2147483646'");
+      expect(child != null, true);
+      expect(child.toString(), vector2m02147483647h12147483646hPrivate);
+    });
 
-//   test('should get m/0/2147483647h/1/2147483646h/2 ext. private key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1/2147483646'/2")
-//     should.exist(child)
-//     child.toString().should.equal(vector2m02147483647h12147483646h2Private)
-//   })
+    test(
+        'should get m/0/2147483647h/1/2147483646h ext. public key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1/2147483646'");
+      expect(child != null, true);
+      expect(
+          child.toPublic().toString(), vector2m02147483647h12147483646hPublic);
+    });
 
-//   test('should get m/0/2147483647h/1/2147483646h/2 ext. public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1/2147483646'/2")
-//     should.exist(child)
-//     child
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m02147483647h12147483646h2Public)
-//   })
+    test(
+        'should get m/0/2147483647h/1/2147483646h/2 ext. private key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1/2147483646'/2");
+      expect(child != null, true);
+      expect(child.toString(), vector2m02147483647h12147483646h2Private);
+    });
 
-//   test('should get m/0/2147483647h/1/2147483646h/2 ext. public key from m/0/2147483647h/2147483646h public key from test vector 2', () {
-//     var bip32 = new Bip32().fromString(vector2mPrivate)
-//     var child = bip32.derive("m/0/2147483647'/1/2147483646'")
-//     var childPub = new Bip32().fromString(child.toPublic().toString())
-//     var child2 = childPub.derive('m/2')
-//     should.exist(child2)
-//     child2
-//       .toPublic()
-//       .toString()
-//       .should.equal(vector2m02147483647h12147483646h2Public)
-//   })
+    test(
+        'should get m/0/2147483647h/1/2147483646h/2 ext. public key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1/2147483646'/2");
+      expect(child != null, true);
+      expect(
+          child.toPublic().toString(), vector2m02147483647h12147483646h2Public);
+    });
 
-//   group('testnet', () {
-//     test('should initialize a new Bip32 correctly from a random Bip32', () {
-//       var b1 = new Bip32.Testnet()
-//       b1.fromRandom()
-//       ;(b1.privKey instanceof PrivKey.Testnet).should.equal(true)
-//       var b2 = new Bip32.Testnet().fromString(b1.toPublic().toString())
-//       b2
-//         .toPublic()
-//         .toString()
-//         .should.equal(b1.toPublic().toString())
-//     })
+    test(
+        'should get m/0/2147483647h/1/2147483646h/2 ext. public key from m/0/2147483647h/2147483646h public key from test vector 2',
+        () {
+      var bip32 = new Bip32().fromString(vector2mPrivate);
+      var child = bip32.derive("m/0/2147483647'/1/2147483646'");
+      var childPub = new Bip32().fromString(child.toPublic().toString());
+      var child2 = childPub.derive('m/2');
+      expect(child2 != null, true);
+      expect(child2.toPublic().toString(),
+          vector2m02147483647h12147483646h2Public);
+    });
 
-//     test('should generate valid ext pub key for testnet', () {
-//       var b = new Bip32.Testnet()
-//       b.fromRandom()
-//       ;(b.privKey instanceof PrivKey.Testnet).should.equal(true)
-//       b
-//         .toPublic()
-//         .toString()
-//         .substring(0, 4)
-//         .should.equal('tpub')
-//     })
-//   })
+    group('testnet', () {
+      test('should initialize a new Bip32 correctly from a random Bip32', () {
+        var b1 = new Bip32.Testnet();
+        b1.fromRandom();
+        // ;(b1.privKey instanceof PrivKey.Testnet).should.equal(true)
+        var b2 = new Bip32.Testnet().fromString(b1.toPublic().toString());
+        expect(b2.toPublic().toString(), b1.toPublic().toString());
+      });
 
-//   group('#fromObject', () {
-//     test('should set this bip32', () {
-//       var bip32 = new Bip32().fromString(vector1mPrivate)
-//       var bip322 = new Bip32().fromObject({
-//         versionBytesNum: bip32.versionBytesNum,
-//         depth: bip32.depth,
-//         parentFingerPrint: bip32.parentFingerPrint,
-//         childIndex: bip32.childIndex,
-//         chainCode: bip32.chainCode,
-//         privKey: bip32.privKey,
-//         pubKey: bip32.pubKey,
-//         hasPrivKey: bip32.hasPrivKey
-//       })
-//       bip322.toString().should.equal(bip32.toString())
-//       bip322
-//         .fromObject({})
-//         .toString()
-//         .should.equal(bip32.toString())
-//     })
-//   })
+      test('should generate valid ext pub key for testnet', () {
+        var b = new Bip32.Testnet();
+        b.fromRandom();
+        // ;(b.privKey instanceof PrivKey.Testnet).should.equal(true)
+        expect(b.toPublic().toString().substring(0, 4), 'tpub');
+      });
+    });
 
-//   group('#fromRandom', () {
-//     test('should not return the same one twice', () {
-//       var bip32a = new Bip32().fromRandom()
-//       var bip32b = new Bip32().fromRandom()
-//       bip32a.toString().should.not.equal(bip32b.toString())
-//     })
-//   })
+    group('#fromObject', () {
+      test('should set this bip32', () {
+        var bip32 = new Bip32().fromString(vector1mPrivate);
+        var bip322 = new Bip32(
+          versionBytesNum: bip32.versionBytesNum,
+          depth: bip32.depth,
+          parentFingerPrint: bip32.parentFingerPrint,
+          childIndex: bip32.childIndex,
+          chainCode: bip32.chainCode,
+          privKey: bip32.privKey,
+          pubKey: bip32.pubKey,
+          // hasPrivKey: bip32.hasPrivKey,
+        );
 
-//   group('@fromRandom', () {
-//     test('should not return the same one twice', () {
-//       var bip32a = Bip32.fromRandom()
-//       var bip32b = Bip32.fromRandom()
-//       bip32a.toString().should.not.equal(bip32b.toString())
-//     })
-//   })
+        expect(bip322.toString(), bip32.toString());
+      });
+    });
 
-//   group('#fromSeed', () {
-//     test('should initialize a new Bip32 correctly from test vector 1 seed', () {
-//       var hex = vector1master
-//       var bip32 = new Bip32().fromSeed(Buffer.from(hex, 'hex'), 'mainnet')
-//       should.exist(bip32)
-//       bip32.toString().should.equal(vector1mPrivate)
-//       bip32
-//         .toPublic()
-//         .toString()
-//         .should.equal(vector1mPublic)
-//     })
+    group('#fromRandom', () {
+      test('should not return the same one twice', () {
+        var bip32a = new Bip32().fromRandom();
+        var bip32b = new Bip32().fromRandom();
+        expect(bip32a.toString() != bip32b.toString(), true);
+      });
+    });
 
-//     test('should initialize a new Bip32 correctly from test vector 2 seed', () {
-//       var hex = vector2master
-//       var bip32 = new Bip32().fromSeed(Buffer.from(hex, 'hex'), 'mainnet')
-//       should.exist(bip32)
-//       bip32.toString().should.equal(vector2mPrivate)
-//       bip32
-//         .toPublic()
-//         .toString()
-//         .should.equal(vector2mPublic)
-//     })
-//   })
+    group('@fromRandom', () {
+      test('should not return the same one twice', () {
+        var bip32a = Bip32.fromRandom();
+        var bip32b = Bip32.fromRandom();
+        expect(bip32a.toString() != bip32b.toString(), true);
+      });
+    });
 
-//   group('@fromSeed', () {
-//     test('should initialize a new Bip32 correctly from test vector 1 seed', () {
-//       var hex = vector1master
-//       var bip32 = Bip32.fromSeed(Buffer.from(hex, 'hex'), 'mainnet')
-//       should.exist(bip32)
-//       bip32.toString().should.equal(vector1mPrivate)
-//       bip32
-//         .toPublic()
-//         .toString()
-//         .should.equal(vector1mPublic)
-//     })
+    group('#fromSeed', () {
+      test('should initialize a new Bip32 correctly from test vector 1 seed',
+          () {
+        var hexStr = vector1master;
+        var bip32 = new Bip32().fromSeed(hex.decode(hexStr));
+        // should.exist(bip32)
+        expect(bip32.toString(), vector1mPrivate);
+        expect(bip32.toPublic().toString(), vector1mPublic);
+      });
 
-//     test('should initialize a new Bip32 correctly from test vector 2 seed', () {
-//       var hex = vector2master
-//       var bip32 = Bip32.fromSeed(Buffer.from(hex, 'hex'), 'mainnet')
-//       should.exist(bip32)
-//       bip32.toString().should.equal(vector2mPrivate)
-//       bip32
-//         .toPublic()
-//         .toString()
-//         .should.equal(vector2mPublic)
-//     })
-//   })
+      test('should initialize a new Bip32 correctly from test vector 2 seed',
+          () {
+        var hexStr = vector2master;
+        var bip32 = new Bip32().fromSeed(hex.decode(hexStr));
+        // should.exist(bip32)
+        expect(bip32.toString(), vector2mPrivate);
+        expect(bip32.toPublic().toString(), vector2mPublic);
+      });
+    });
+
+    group('@fromSeed', () {
+      test('should initialize a new Bip32 correctly from test vector 1 seed',
+          () {
+        var hexStr = vector1master;
+        var bip32 = new Bip32.fromSeed(hex.decode(hexStr));
+        // should.exist(bip32)
+        expect(bip32.toString(), vector1mPrivate);
+        expect(bip32.toPublic().toString(), vector1mPublic);
+      });
+
+      test('should initialize a new Bip32 correctly from test vector 2 seed',
+          () {
+        var hexStr = vector2master;
+        var bip32 = new Bip32.fromSeed(hex.decode(hexStr));
+        // should.exist(bip32)
+        expect(bip32.toString(), vector2mPrivate);
+        expect(bip32.toPublic().toString(), vector2mPublic);
+      });
+    });
 
 //   group('#asyncFromSeed', () {
 //     test('should initialize a new Bip32 correctly from test vector 1 seed', async () {
@@ -571,69 +521,66 @@ void main() {
 //     })
 //   })
 
-//   group('#fromHex', () {
-//     test('should make a bip32 from a hex string', () {
-//       var str =
-//         'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
-//       var buf = Base58Check.decode(str)
-//       var hex = buf.toString('hex')
-//       var bip32 = new Bip32().fromHex(hex)
-//       should.exist(bip32)
-//       bip32.toString().should.equal(str)
-//       bip32 = bip32.toPublic()
-//       var xpub = bip32.toString()
-//       bip32 = new Bip32().fromHex(bip32.toHex())
-//       bip32.toString().should.equal(xpub)
-//     })
-//   })
+    group('#fromHex', () {
+      test('should make a bip32 from a hex string', () {
+        var str =
+            'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        var buf = Base58Check.decode(str);
+        var hex = buf.toHex();
+        var bip32 = new Bip32().fromHex(hex);
+        // should.exist(bip32)
+        expect(bip32.toString(), str);
+        bip32 = bip32.toPublic();
+        var xpub = bip32.toString();
+        bip32 = new Bip32().fromHex(bip32.toHex());
+        expect(bip32.toString(), xpub);
+      });
+    });
 
-//   group('#fromBuffer', () {
-//     test('should make a bip32 from a buffer', () {
-//       var str =
-//         'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
-//       var buf = Base58Check.decode(str)
-//       var bip32 = new Bip32().fromBuffer(buf)
-//       should.exist(bip32)
-//       bip32.toString().should.equal(str)
-//       bip32 = bip32.toPublic()
-//       var xpub = bip32.toString()
-//       bip32 = new Bip32().fromBuffer(bip32.toBuffer())
-//       bip32.toString().should.equal(xpub)
-//     })
-//   })
+    group('#fromBuffer', () {
+      test('should make a bip32 from a buffer', () {
+        var str =
+            'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        var buf = Base58Check.decode(str);
+        var bip32 = new Bip32().fromBuffer(buf);
+        // should.exist(bip32)
+        expect(bip32.toString(), str);
+        bip32 = bip32.toPublic();
+        var xpub = bip32.toString();
+        bip32 = new Bip32().fromBuffer(bip32.toBuffer());
+        expect(bip32.toString(), xpub);
+      });
+    });
 
-//   group('#toHex', () {
-//     test('should return a bip32 hex string', () {
-//       var str =
-//         'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
-//       var hex = Base58Check.decode(str).toString('hex')
-//       var bip32 = new Bip32().fromString(str)
-//       bip32.toHex().should.equal(hex)
-//     })
-//   })
+    group('#toHex', () {
+      test('should return a bip32 hex string', () {
+        var str =
+            'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        var hex = Base58Check.decode(str).toHex();
+        var bip32 = new Bip32().fromString(str);
+        expect(bip32.toHex(), hex);
+      });
+    });
 
-//   group('#toBuffer', () {
-//     test('should return a bip32 buffer', () {
-//       var str =
-//         'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
-//       var buf = Base58Check.decode(str)
-//       var bip32 = new Bip32().fromString(str)
-//       bip32
-//         .toBuffer()
-//         .toString('hex')
-//         .should.equal(buf.toString('hex'))
-//     })
-//   })
+    group('#toBuffer', () {
+      test('should return a bip32 buffer', () {
+        var str =
+            'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        var buf = Base58Check.decode(str);
+        var bip32 = new Bip32().fromString(str);
+        expect(bip32.toBuffer().toHex(), buf.toHex());
+      });
+    });
 
-//   group('#fromString', () {
-//     test('should make a bip32 from a string', () {
-//       var str =
-//         'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
-//       var bip32 = new Bip32().fromString(str)
-//       should.exist(bip32)
-//       bip32.toString().should.equal(str)
-//     })
-//   })
+    group('#fromString', () {
+      test('should make a bip32 from a string', () {
+        var str =
+            'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        var bip32 = new Bip32().fromString(str);
+        // should.exist(bip32)
+        expect(bip32.toString(), str);
+      });
+    });
 
 //   group('#asyncFromString', () {
 //     test('should make a bip32 from a string asynchronously', async () {
@@ -647,43 +594,29 @@ void main() {
 //     })
 //   })
 
-//   group('#toString', () {
-//     var bip32 = new Bip32()
-//     bip32.fromRandom()
-//     var tip32 = new Bip32.Testnet()
-//     tip32.fromRandom()
+    group('#toString', () {
+      var bip32 = new Bip32();
+      bip32.fromRandom();
+      var tip32 = new Bip32.Testnet();
+      tip32.fromRandom();
 
-//     test('should return an xprv string', () {
-//       bip32
-//         .toString()
-//         .slice(0, 4)
-//         .should.equal('xprv')
-//     })
+      test('should return an xprv string', () {
+        expect(bip32.toString().substring(0, 4), 'xprv');
+      });
 
-//     test('should return an xpub string', () {
-//       bip32
-//         .toPublic()
-//         .toString()
-//         .slice(0, 4)
-//         .should.equal('xpub')
-//     })
+      test('should return an xpub string', () {
+        expect(bip32.toPublic().toString().substring(0, 4), 'xpub');
+      });
 
-//     test('should return a tprv string', () {
-//       tip32
-//         .toString()
-//         .slice(0, 4)
-//         .should.equal('tprv')
-//       ;(tip32.privKey instanceof PrivKey.Testnet).should.equal(true)
-//     })
+      test('should return a tprv string', () {
+        expect(tip32.toString().substring(0, 4), 'tprv');
+        // ;(tip32.privKey instanceof PrivKey.Testnet) , true)
+      });
 
-//     test('should return a tpub string', () {
-//       tip32
-//         .toPublic()
-//         .toString()
-//         .slice(0, 4)
-//         .should.equal('tpub')
-//     })
-//   })
+      test('should return a tpub string', () {
+        expect(tip32.toPublic().toString().substring(0, 4), 'tpub');
+      });
+    });
 
 //   group('#asyncToString', () {
 //     test('should convert to a string same as toString', async () {
@@ -721,13 +654,13 @@ void main() {
 //     })
 //   })
 
-//   group('#isPrivate', () {
-//     test('should know if this bip32 is private', () {
-//       var bip32priv = new Bip32().fromRandom()
-//       var bip32pub = bip32priv.toPublic()
-//       bip32priv.isPrivate().should.equal(true)
-//       bip32pub.isPrivate().should.equal(false)
-//     })
-//   })
+    group('#isPrivate', () {
+      test('should know if this bip32 is private', () {
+        var bip32priv = new Bip32().fromRandom();
+        var bip32pub = bip32priv.toPublic();
+        expect(bip32priv.isPrivate(), true);
+        expect(bip32pub.isPrivate(), false);
+      });
+    });
   });
 }
