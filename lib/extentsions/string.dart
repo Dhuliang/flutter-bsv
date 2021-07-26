@@ -16,4 +16,39 @@ extension StringX on String {
   List<int> toBuffer() {
     return hex.decode(this);
   }
+
+  String slice(int start, [int end]) {
+    var s = this;
+    var sLen = s.length;
+    var startI = start;
+    var endI = sLen;
+
+    if (end != null) {
+      endI = end;
+    }
+    if (startI < 0) {
+      startI += sLen;
+      if (startI < 0) {
+        startI = 0;
+      }
+    } else {
+      if (startI > sLen) {
+        return '';
+      }
+    }
+    if (endI < 0) {
+      endI += sLen;
+      if (endI < 0) {
+        return '';
+      }
+    } else {
+      if (endI > sLen) {
+        endI = sLen;
+      }
+    }
+    if (endI <= startI) {
+      return '';
+    }
+    return this.substring(startI, endI);
+  }
 }
