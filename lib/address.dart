@@ -234,6 +234,19 @@ class Address {
   }
 
   // ignore: non_constant_identifier_names
+  factory Address.Regtest({
+    int versionByteNum,
+    List<int> hashBuf,
+  }) {
+    return Address(
+      versionByteNum: versionByteNum,
+      hashBuf: hashBuf,
+      pubKeyHash: Constants.Regtest.addressPubKeyHash,
+      payToScriptHash: Constants.Regtest.addressPayToScriptHash,
+    );
+  }
+
+  // ignore: non_constant_identifier_names
   factory Address.Mainnet({
     int versionByteNum,
     List<int> hashBuf,

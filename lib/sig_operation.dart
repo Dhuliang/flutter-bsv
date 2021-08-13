@@ -86,7 +86,7 @@ class SigOperations {
    * signature or public key.
    * @param {Number} nHashType Usually = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID
    */
-  setOne({
+  SigOperations setOne({
     List<int> txHashBuf,
     int txOutNum,
     int nScriptChunk,

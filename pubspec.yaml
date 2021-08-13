@@ -1,7 +1,7 @@
 name: bsv
-description: A new Flutter package project.
-version: 0.0.1
-author:
+description: Bitcoin SV (BSV) library.
+version: 0.1.0
+author: huliang <huliang0222@gmail.com>
 homepage: "https://github.com/Dhuliang"
 
 environment:

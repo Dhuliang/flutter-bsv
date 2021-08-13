@@ -71,6 +71,29 @@ class Bip32 {
   }
 
   // ignore: non_constant_identifier_names
+  factory Bip32.Regtest({
+    int versionBytesNum,
+    int depth,
+    Uint8List parentFingerPrint,
+    int childIndex,
+    Uint8List chainCode,
+    PrivKey privKey,
+    PubKey pubKey,
+  }) {
+    return Bip32(
+      versionBytesNum: versionBytesNum,
+      depth: depth,
+      parentFingerPrint: parentFingerPrint,
+      childIndex: childIndex,
+      chainCode: chainCode,
+      privKey: privKey,
+      pubKey: pubKey,
+      bip32PrivKey: Constants.Regtest.bip32PrivKey,
+      bip32PubKey: Constants.Regtest.bip32PubKey,
+    );
+  }
+
+  // ignore: non_constant_identifier_names
   factory Bip32.Mainnet({
     int versionBytesNum,
     int depth,
@@ -292,6 +315,8 @@ class Bip32 {
     ret.parentFingerPrint = pubKeyhash.slice(0, 4).asUint8List();
     ret.versionBytesNum = this.versionBytesNum;
     ret.depth = this.depth + 1;
+    ret.bip32PrivKey = this.bip32PrivKey;
+    ret.bip32PubKey = this.bip32PubKey;
 
     return ret;
   }

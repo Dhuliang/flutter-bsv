@@ -27,7 +27,7 @@ class KeyPair {
     this.pubKey = pubKey;
   }
 
-  factory KeyPair.fromPrivKey(privKey) {
+  factory KeyPair.fromPrivKey(PrivKey privKey) {
     return new KeyPair().fromPrivKey(privKey);
   }
 

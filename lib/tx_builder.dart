@@ -420,13 +420,17 @@ class TxBuilder {
       this.tx = new Tx();
       var outAmountBn = this.buildOutputs();
       var changeTxOut = TxOut.fromProperties(
-          valueBn: BigIntX.zero, script: this.changeScript);
+        valueBn: BigIntX.zero,
+        script: this.changeScript,
+      );
       this.tx.addTxOut(data: changeTxOut);
 
       var inAmountBn;
       try {
         inAmountBn = this.buildInputs(
-            outAmountBn: outAmountBn, extraInputsNum: extraInputsNum);
+          outAmountBn: outAmountBn,
+          extraInputsNum: extraInputsNum,
+        );
       } catch (err) {
         if (err.message.includes('not enough funds for outputs')) {
           throw ('unable to gather enough inputs for outputs and fee');
