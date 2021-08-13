@@ -1,12 +1,11 @@
 name: bsv
 description: Bitcoin SV (BSV) library.
-version: 0.1.0
-author: huliang <huliang0222@gmail.com>
+version: 0.0.1
 homepage: "https://github.com/Dhuliang"
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.17.0 <2.0.0"
+  flutter: ">=1.17.0"
 
 dependencies:
   flutter:
