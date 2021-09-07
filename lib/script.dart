@@ -189,7 +189,7 @@ class Script {
           opCodeNum: opCodeNum,
         ));
       } else if (opCodeNum == OpCode.OP_PUSHDATA4) {
-        print('OP_PUSHDATA4');
+        // print('OP_PUSHDATA4');
         try {
           len = br.readUInt32LE();
           buf = br.read(len);

@@ -416,14 +416,15 @@ class Sig {
     var derbuf = this.toDer();
     var buf = Uint8List(1);
     ByteData.view(buf.buffer).setUint8(0, this.nHashType);
-    return List<int>.from([
+    var list = List<int>.from([
       ...derbuf,
       ...buf,
     ]);
+    return list;
   }
 
   String toString() {
-    return hex.encode(this.toDer());
+    return this.toHex();
   }
 
   String toHex() {

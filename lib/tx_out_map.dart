@@ -45,6 +45,9 @@ class TxOutMap {
 
   dynamic get(List<int> txHashBuf, int txOutNum) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
+    // print("label====================");
+    // print(label);
+    // print("label====================");
     return this.map[label];
   }
 

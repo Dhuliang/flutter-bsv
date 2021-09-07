@@ -458,7 +458,7 @@ class Interp {
     }
 
     try {
-      print("${this.pc}${this.script.chunks.length}");
+      // print("${this.pc}${this.script.chunks.length}");
       while (this.pc < this.script.chunks.length) {
         var fSuccess = this.step();
         if (!fSuccess) {
@@ -481,7 +481,7 @@ class Interp {
         this.errStr = 'SCRIPT_ERR_UNKNOWN_ERROR: ${e.toString()}';
         yield false;
       } else {
-        print(e?.stackTrace);
+        // print(e?.stackTrace);
         throw e;
       }
     }
@@ -508,12 +508,12 @@ class Interp {
     //
     var chunk = this.script.chunks[this.pc];
     this.pc++;
-    print("pc============${this.pc}");
+    // print("pc============${this.pc}");
     var opCodeNum = chunk.opCodeNum;
     // chunk.opCodeNum.toRadixString(16);
     // print("%d")
-    var str = OpCode.str[opCodeNum];
-    print(str);
+    // var str = OpCode.str[opCodeNum];
+    // print(str);
     if (opCodeNum == null) {
       this.errStr = 'SCRIPT_ERR_BAD_OPCODE';
       return false;
@@ -539,7 +539,7 @@ class Interp {
     }
 
     if (fExec && opCodeNum >= 0 && opCodeNum <= OpCode.OP_PUSHDATA4) {
-      print('============');
+      // print('============');
       if (fRequireMinimal && !this.script.checkMinimalPush(this.pc - 1)) {
         this.errStr = 'SCRIPT_ERR_MINIMALDATA';
         return false;
@@ -1316,7 +1316,7 @@ class Interp {
               case OpCode.OP_MAX:
                 bn = bn1.gt(bn2) ? bn1 : bn2;
                 break;
-              // default:           assert(!"invalid opCode"); break;; //TODO: does this ever occur?
+              // default:           assert(!"invalid opCode"); break;; //TODOS: does this ever occur?
             }
             this.stack.removeLast();
             this.stack.removeLast();
@@ -1446,7 +1446,7 @@ class Interp {
             try {
               var sig = new Sig().fromTxFormat(bufSig);
               var pubKey = new PubKey().fromBuffer(bufPubKey, false);
-              print('verify');
+              // print('verify');
               fSuccess = this.tx.verify(
                     sig: sig,
                     pubKey: pubKey,
@@ -1457,7 +1457,7 @@ class Interp {
                     flags: this.flags,
                   );
             } catch (e) {
-              print(e);
+              // print(e);
               // invalid sig or pubKey
               fSuccess = false;
             }
@@ -1713,10 +1713,10 @@ class Interp {
 
     var result = true;
     await for (var success in results) {
-      print("one of results is $success");
+      // print("one of results is $success");
       if (!success) {
         // return false;
-        print(this.errStr);
+        // print(this.errStr);
         result = false;
         break;
       }

@@ -14,6 +14,7 @@ import 'package:bsv/tx_out.dart';
 import 'package:bsv/tx_out_map.dart';
 import 'package:bsv/var_int.dart';
 import 'package:bsv/extentsions/list.dart';
+import 'package:flutter/material.dart';
 
 // ignore: slash_for_doc_comments
 /**
@@ -519,9 +520,15 @@ class TxBuilder {
 
   TxBuilder fillSig({int nIn, int nScriptChunk, Sig sig}) {
     var txIn = this.tx.txIns[nIn];
-    txIn.script.chunks[nScriptChunk] =
-        new Script().writeBuffer(sig.toTxFormat().asUint8List()).chunks[0];
-    txIn.scriptVi = VarInt.fromNumber(txIn.script.toBuffer().length);
+    if (txIn.script.chunks.isNotEmpty) {
+      // print("sig hex, === ${sig.toHex()}");
+      // print(txIn.script.toHex());
+      var chunk =
+          new Script().writeBuffer(sig.toTxFormat().asUint8List()).chunks[0];
+      txIn.script.chunks[nScriptChunk] = chunk;
+      // print(txIn.script.toHex());
+      txIn.scriptVi = VarInt.fromNumber(txIn.script.toBuffer().length);
+    }
     return this;
   }
 
@@ -563,6 +570,51 @@ class TxBuilder {
           hashCache: this.hashCache,
         );
     return sig;
+  }
+
+  // ignore: slash_for_doc_comments
+  /**
+     * Sign an input, but do not fill the signature into the transaction. Return
+     * the signature.
+     *
+     * For a normal transaction, subScript is usually the scriptPubKey. If
+     * you're not normal because you're using OP_CODESEPARATORs, you know what
+     * to do.
+     */
+  TxBuilder getSigWithUnlockingScriptHexs({
+    KeyPair keyPair,
+    int nHashType,
+    int nIn,
+    Script subScript,
+    int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
+    @required List<String> unlockingScriptHexs,
+    BigIntX valueBn,
+  }) {
+    nHashType = nHashType ?? Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID;
+
+    var sig = this.tx.sign(
+          keyPair: keyPair,
+          nHashType: nHashType,
+          nIn: nIn,
+          subScript: subScript,
+          valueBn: valueBn,
+          flags: flags,
+          hashCache: this.hashCache,
+        );
+
+    var signatureSize = sig.toBuffer().length;
+    var scriptString = "${(signatureSize).toRadixString(16)}${sig.toHex()}";
+
+    var scriptStringFinal = unlockingScriptHexs.join(scriptString);
+
+    var s = Script.fromHex(scriptStringFinal);
+    // print(scriptStringFinal.length);
+
+    var txIn = this.tx.txIns[nIn];
+
+    txIn.setScript(s);
+
+    return this;
   }
 
   // /**

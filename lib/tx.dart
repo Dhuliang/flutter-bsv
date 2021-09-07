@@ -90,7 +90,8 @@ class Tx {
     var txInsNum = this.txInsVi.toNumber();
     this.txIns = [];
     for (var i = 0; i < txInsNum; i++) {
-      this.txIns.add(TxIn().fromBr(br));
+      var txIn = TxIn().fromBr(br);
+      this.txIns.add(txIn);
     }
     this.txOutsVi = VarInt(buf: br.readVarIntBuf());
     var txOutsNum = this.txOutsVi.toNumber();
@@ -324,7 +325,7 @@ class Tx {
         .write(txcopy.toBuffer().asUint8List())
         .writeInt32LE(nHashType)
         .toBuffer();
-    print(buf.toHex());
+    // print(buf.toHex());
     return buf;
   }
 
@@ -378,6 +379,12 @@ class Tx {
       flags: flags,
       hashCache: hashCache,
     );
+
+    // var hashStr = hashBuf.toHex();
+    // print(hashStr);
+
+    // var reversedHash = hex.encode(hashBuf.reversed.toList());
+    // print(reversedHash);
 
     var sig = Ecdsa.staticSign(
       hashBuf: hashBuf,

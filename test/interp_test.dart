@@ -213,7 +213,7 @@ void main() {
           nIn: 0,
           flags: flags,
         );
-        print(result);
+        // print(result);
 
         var debugString = interp.getDebugString();
         expect(debugString,
