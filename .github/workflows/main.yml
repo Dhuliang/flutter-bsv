@@ -35,3 +35,7 @@ jobs:
         with:
           token: ${{ secrets.SECRET_KEY }}
           file: coverage/lcov.info
+          flags: unittests # optional
+          name: codecov-umbrella # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
