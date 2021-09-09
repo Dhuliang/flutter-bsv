@@ -31,7 +31,7 @@ jobs:
       - run: flutter pub get
       - run: flutter test --no-pub --coverage
       - name: Upload coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v2.0.3
         with:
           token: ${{ secrets.SECRET_KEY }}
           file: coverage/lcov.info
