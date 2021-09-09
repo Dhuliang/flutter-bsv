@@ -1,5 +1,7 @@
 # bsv
 
+[![codecov](https://codecov.io/gh/Dhuliang/flutter-bsv/branch/master/graph/badge.svg?token=78D2HL935Z)](https://codecov.io/gh/Dhuliang/flutter-bsv)
+
 A new Flutter package project.
 
 ## Getting Started
