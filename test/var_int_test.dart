@@ -12,7 +12,7 @@ void main() {
       var buf = hex.decode('00');
       var varInt = new VarInt(buf: buf);
 
-      expect(varInt.buf.toHex(), ('00'));
+      expect(varInt.buf!.toHex(), ('00'));
 
       varInt = new VarInt(buf: buf);
 
@@ -23,10 +23,10 @@ void main() {
       );
 
       expect(
-        VarInt.fromNumber(0).toBuffer().toHex() ==
+        VarInt.fromNumber(0).toBuffer()!.toHex() ==
             VarInt()
                 .fromBuffer(List<int>.from([0xfd, 0, 0]))
-                .toBuffer()
+                .toBuffer()!
                 .toHex(),
         false,
       );
@@ -107,7 +107,7 @@ void main() {
       test('should return a buffer', () {
         var buf = new Bw().writeVarIntNum(5).toBuffer();
         var varInt = new VarInt(buf: buf);
-        expect(varInt.toBuffer().toHex(), buf.toHex());
+        expect(varInt.toBuffer()!.toHex(), buf.toHex());
       });
     });
 

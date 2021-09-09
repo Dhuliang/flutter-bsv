@@ -50,7 +50,7 @@ void main() {
 
         var data = utf8.encode('Hi There');
         var key = hex.decode('0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b');
-        final hash = Hash.sha1Hmac(data, key);
+        final hash = Hash.sha1Hmac(data as Uint8List, key as Uint8List);
 
         expect(hash.toHex, _hex);
       });
@@ -79,7 +79,7 @@ void main() {
         final key = utf8.encode('');
         final data = utf8.encode('');
 
-        var hash = Hash.sha256Hmac(data, key);
+        var hash = Hash.sha256Hmac(data as Uint8List, key as Uint8List);
         expect(hash.toHex,
             'b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad');
       });
@@ -87,7 +87,7 @@ void main() {
       test('should compute this known non-empty test vector correctly', () {
         final key = utf8.encode('key');
         final data = utf8.encode('The quick brown fox jumps over the lazy dog');
-        var hash = Hash.sha256Hmac(data, key);
+        var hash = Hash.sha256Hmac(data as Uint8List, key as Uint8List);
 
         expect(hash.toHex,
             'f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8');
@@ -158,50 +158,50 @@ void main() {
         final data = utf8.encode('test1');
         final key = utf8.encode('test2');
 
-        final hash = Hash.sha512Hmac(data, key);
+        final hash = Hash.sha512Hmac(data as Uint8List, key as Uint8List);
 
         expect(hash.toHex, _hex);
       });
     });
 
     group('vectors', () {
-      final sha1vectors = hashJson['sha1'];
+      final sha1vectors = hashJson['sha1']!;
       for (var i = 0; i < sha1vectors.length; i++) {
-        List<String> vector = sha1vectors[i];
+        List<String> vector = sha1vectors[i] as List<String>;
 
         test('should pass sjcl sha1 test vector $i', () {
           final data = utf8.encode(vector[0]);
-          final hash = Hash.sha1(data);
+          final hash = Hash.sha1(data as Uint8List);
 
           expect(hash.toHex, vector[1]);
         });
       }
 
-      final sha256vectors = hashJson['sha256'];
+      final sha256vectors = hashJson['sha256']!;
       for (var i = 0; i < sha256vectors.length; i++) {
-        List<String> vector = sha256vectors[i];
+        List<String> vector = sha256vectors[i] as List<String>;
 
         test('should pass sjcl sha256 test vector $i', () {
           final data = utf8.encode(vector[0]);
-          final hash = Hash.sha256(data);
+          final hash = Hash.sha256(data as Uint8List);
 
           expect(hash.toHex, vector[1]);
         });
       }
 
-      final sha512vectors = hashJson['sha512'];
+      final sha512vectors = hashJson['sha512']!;
       for (var i = 0; i < sha512vectors.length; i++) {
-        List<String> vector = sha512vectors[i];
+        List<String> vector = sha512vectors[i] as List<String>;
 
         test('should pass sjcl sha512 test vector $i', () {
           final data = utf8.encode(vector[0]);
-          final hash = Hash.sha512(data);
+          final hash = Hash.sha512(data as Uint8List);
 
           expect(hash.toHex, vector[1]);
         });
       }
 
-      final hmacvectors = hashJson['hmac'];
+      final hmacvectors = hashJson['hmac']!;
       for (var i = 0; i < hmacvectors.length; i++) {
         dynamic vector = hmacvectors[i];
 
@@ -209,7 +209,7 @@ void main() {
           final dataBuf = hex.decode(vector['data']);
           final keyBuf = hex.decode(vector['key']);
 
-          final sha256HmacHex = Hash.sha256Hmac(dataBuf, keyBuf).toHex;
+          final sha256HmacHex = Hash.sha256Hmac(dataBuf as Uint8List, keyBuf as Uint8List).toHex;
           final sha512HmacHex = Hash.sha512Hmac(dataBuf, keyBuf).toHex;
 
           expect(sha256HmacHex.substring(0, vector['sha256hmac'].length),

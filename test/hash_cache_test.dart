@@ -17,9 +17,9 @@ void main() {
     );
 
     test('should satisfy this basic API', () {
-      expect(hashCache.prevoutsHashBuf.length, 32);
-      expect(hashCache.sequenceHashBuf.length, 32);
-      expect(hashCache.outputsHashBuf.length, 32);
+      expect(hashCache.prevoutsHashBuf!.length, 32);
+      expect(hashCache.sequenceHashBuf!.length, 32);
+      expect(hashCache.outputsHashBuf!.length, 32);
     });
 
     group('#fromBuffer', () {

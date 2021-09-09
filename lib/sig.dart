@@ -32,18 +32,18 @@ class Sig {
   static const SIGHASH_FORKID = 0x00000040;
   static const SIGHASH_ANYONECANPAY = 0x00000080;
 
-  BigIntX r;
-  BigIntX s;
-  int nHashType;
-  int recovery;
-  bool compressed;
+  BigIntX? r;
+  BigIntX? s;
+  int? nHashType;
+  int? recovery;
+  bool? compressed;
 
   Sig({
-    BigIntX r,
-    BigIntX s,
-    int nHashType,
-    int recovery,
-    bool compressed,
+    BigIntX? r,
+    BigIntX? s,
+    int? nHashType,
+    int? recovery,
+    bool? compressed,
   }) {
     this.r = r ?? BigIntX.zero;
     this.s = s ?? BigIntX.zero;
@@ -60,7 +60,7 @@ class Sig {
     return new Sig().fromRS(rsbuf);
   }
 
-  factory Sig.fromDer(List<int> buf, [bool strict]) {
+  factory Sig.fromDer(List<int> buf, [bool strict = false]) {
     return new Sig().fromDer(buf, strict);
   }
 
@@ -132,7 +132,7 @@ class Sig {
   }
 
   // The format used in a tx, except without the nHashType at the end
-  Sig fromDer(List<int> buf, [bool strict]) {
+  Sig fromDer(List<int> buf, [bool? strict]) {
     var obj = Sig.parseDer(buf, strict);
     this.r = obj['r'];
     this.s = obj['s'];
@@ -167,7 +167,7 @@ class Sig {
   /**
      * In order to mimic the non-strict DER encoding of OpenSSL, set strict = false.
      */
-  static Map<String, dynamic> parseDer(List<int> buf, [bool strict]) {
+  static Map<String, dynamic> parseDer(List<int> buf, [bool? strict]) {
     if (strict == null) {
       strict = true;
     }
@@ -326,8 +326,8 @@ class Sig {
      * See also Bip 62, "low S values in signatures"
      */
   bool hasLowS() {
-    if (this.s.lt(1) ||
-        this.s.gt(BigIntX.fromBuffer(hex.decode(
+    if (this.s!.lt(1) ||
+        this.s!.gt(BigIntX.fromBuffer(hex.decode(
                 '7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0')
             //
             ))) {
@@ -342,8 +342,8 @@ class Sig {
      * Translated from bitcoind's IsDefinedHashtypeSignature
      */
   bool hasDefinedHashType() {
-    if (this.nHashType < Sig.SIGHASH_ALL ||
-        this.nHashType > Sig.SIGHASH_SINGLE) {
+    if (this.nHashType! < Sig.SIGHASH_ALL ||
+        this.nHashType! > Sig.SIGHASH_SINGLE) {
       return false;
     }
     return true;
@@ -362,8 +362,8 @@ class Sig {
       val = val - 4;
     }
     var b1 = List<int>.from([val]);
-    var b2 = this.r.toBuffer(size: 32);
-    var b3 = this.s.toBuffer(size: 32);
+    var b2 = this.r!.toBuffer(size: 32);
+    var b3 = this.s!.toBuffer(size: 32);
     return List<int>.from([
       ...b1,
       ...b2,
@@ -373,12 +373,12 @@ class Sig {
 
   List<int> toRS() {
     return List<int>.from(
-        [...this.r.toBuffer(size: 32), ...this.s.toBuffer(size: 32)]);
+        [...this.r!.toBuffer(size: 32), ...this.s!.toBuffer(size: 32)]);
   }
 
   List<int> toDer() {
-    var rnbuf = this.r.toBuffer();
-    var snbuf = this.s.toBuffer();
+    var rnbuf = this.r!.toBuffer();
+    var snbuf = this.s!.toBuffer();
 
     var rneg = rnbuf[0] & 0x80;
     var sneg = snbuf[0] & 0x80;
@@ -415,7 +415,7 @@ class Sig {
   List<int> toTxFormat() {
     var derbuf = this.toDer();
     var buf = Uint8List(1);
-    ByteData.view(buf.buffer).setUint8(0, this.nHashType);
+    ByteData.view(buf.buffer).setUint8(0, this.nHashType!);
     var list = List<int>.from([
       ...derbuf,
       ...buf,

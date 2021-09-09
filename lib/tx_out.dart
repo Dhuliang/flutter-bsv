@@ -8,6 +8,8 @@
  * out.)
  */
 
+import 'dart:typed_data';
+
 import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
@@ -17,14 +19,14 @@ import 'package:convert/convert.dart';
 import 'package:bsv/extentsions/list.dart';
 
 class TxOut {
-  BigIntX valueBn;
-  VarInt scriptVi;
-  Script script;
+  BigIntX? valueBn;
+  VarInt? scriptVi;
+  Script? script;
 
   TxOut({
-    BigIntX valueBn,
-    VarInt scriptVi,
-    Script script,
+    BigIntX? valueBn,
+    VarInt? scriptVi,
+    Script? script,
   }) {
     this.valueBn = valueBn;
     this.scriptVi = scriptVi;
@@ -32,8 +34,8 @@ class TxOut {
   }
 
   factory TxOut.fromProperties({
-    BigIntX valueBn,
-    Script script,
+    required BigIntX valueBn,
+    Script? script,
   }) {
     return new TxOut().fromProperties(
       valueBn: valueBn,
@@ -51,21 +53,21 @@ class TxOut {
 
   Map<String, String> toJSON() {
     return {
-      "valueBn": this.valueBn.toJSON(),
-      "scriptVi": this.scriptVi.toJSON(),
-      "script": this.script.toJSON()
+      "valueBn": this.valueBn!.toJSON(),
+      "scriptVi": this.scriptVi!.toJSON(),
+      "script": this.script!.toJSON()
     };
   }
 
-  TxOut setScript(Script script) {
-    this.scriptVi = VarInt.fromNumber(script.toBuffer().length);
+  TxOut setScript(Script? script) {
+    this.scriptVi = VarInt.fromNumber(script!.toBuffer().length);
     this.script = script;
     return this;
   }
 
   TxOut fromProperties({
-    BigIntX valueBn,
-    Script script,
+    required BigIntX valueBn,
+    Script? script,
   }) {
     var txOut = TxOut(
       valueBn: valueBn,
@@ -77,29 +79,29 @@ class TxOut {
   TxOut fromBr(Br br) {
     this.valueBn = br.readUInt64LEBn();
     this.scriptVi = VarInt.fromNumber(br.readVarIntNum());
-    this.script = new Script().fromBuffer(br.read(this.scriptVi.toNumber()));
+    this.script = new Script().fromBuffer(br.read(this.scriptVi!.toNumber()));
     return this;
   }
 
   TxOut fromHex(String str) {
-    return this.fromBr(Br(buf: hex.decode(str)));
+    return this.fromBr(Br(buf: hex.decode(str) as Uint8List?));
   }
 
   factory TxOut.fromHex(String str) {
-    return TxOut().fromBr(Br(buf: hex.decode(str)));
+    return TxOut().fromBr(Br(buf: hex.decode(str) as Uint8List?));
   }
 
   TxOut fromBuffer(List<int> buf) {
-    return this.fromBr(Br(buf: buf));
+    return this.fromBr(Br(buf: buf as Uint8List?));
   }
 
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
-    bw.writeUInt64LEBn(this.valueBn);
-    bw.write(this.scriptVi.buf.asUint8List());
-    bw.write(this.script.toBuffer().asUint8List());
+    bw.writeUInt64LEBn(this.valueBn!);
+    bw.write(this.scriptVi!.buf!.asUint8List());
+    bw.write(this.script!.toBuffer().asUint8List());
     return bw;
   }
 

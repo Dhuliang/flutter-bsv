@@ -53,7 +53,7 @@ void main() {
 
       test('should sign with a compressed pubKey', () {
         var keyPair = new KeyPair().fromRandom();
-        keyPair.pubKey.compressed = true;
+        keyPair.pubKey!.compressed = true;
         var sigstr = Bsm.staticSign(messageBuf: messageBuf, keyPair: keyPair);
         var sigbuf = base64Decode(sigstr);
         expect(sigbuf[0] > 27 + 4 - 1, true);
@@ -62,7 +62,7 @@ void main() {
 
       test('should sign with an uncompressed pubKey', () {
         var keyPair = new KeyPair().fromRandom();
-        keyPair.pubKey.compressed = false;
+        keyPair.pubKey!.compressed = false;
         var sigstr = Bsm.staticSign(messageBuf: messageBuf, keyPair: keyPair);
         var sigbuf = base64Decode(sigstr);
         expect(sigbuf[0] > 27 - 1, true);
@@ -87,7 +87,7 @@ void main() {
 
       test('should verify a signed message', () {
         var sigstr = Bsm.staticSign(messageBuf: messageBuf, keyPair: keyPair);
-        var addr = new Address().fromPubKey(keyPair.pubKey);
+        var addr = new Address().fromPubKey(keyPair.pubKey!);
         expect(
           Bsm.staticVerify(
             messageBuf: messageBuf,
@@ -146,7 +146,7 @@ void main() {
         var bsm = new Bsm();
         bsm.messageBuf = messageBuf;
         bsm.keyPair = keyPair;
-        bsm.address = new Address().fromPubKey(keyPair.pubKey);
+        bsm.address = new Address().fromPubKey(keyPair.pubKey!);
         bsm.sign();
         bsm.verify();
         expect(bsm.verified, true);

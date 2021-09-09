@@ -8,14 +8,14 @@ import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:convert/convert.dart';
 
 class PrivKey {
-  BigIntX bn;
-  bool compressed;
-  int privKeyVersionByteNum;
+  BigIntX? bn;
+  bool? compressed;
+  late int privKeyVersionByteNum;
 
   PrivKey({
-    BigIntX bn,
-    bool compressed,
-    int privKeyVersionByteNum,
+    BigIntX? bn,
+    bool? compressed,
+    int? privKeyVersionByteNum,
   }) {
     this.bn = bn;
     this.compressed = compressed;
@@ -34,7 +34,7 @@ class PrivKey {
       "Must specify whether the corresponding public key is compressed or not (true or false)";
 
   // ignore: non_constant_identifier_names
-  factory PrivKey.Testnet({BigIntX bn, bool compressed}) {
+  factory PrivKey.Testnet({required BigIntX bn, required bool compressed}) {
     return PrivKey(
       bn: bn,
       compressed: compressed,
@@ -43,7 +43,7 @@ class PrivKey {
   }
 
   // ignore: non_constant_identifier_names
-  factory PrivKey.Mainnet({BigIntX bn, bool compressed}) {
+  factory PrivKey.Mainnet({required BigIntX bn, required bool compressed}) {
     return PrivKey(
       bn: bn,
       compressed: compressed,
@@ -143,8 +143,8 @@ class PrivKey {
       compressed = true;
     }
 
-    var privBuf = this.bn.toBuffer(size: 32);
-    List<int> buf;
+    var privBuf = this.bn!.toBuffer(size: 32);
+    List<int> buf = [];
     if (compressed) {
       buf = [
         this.privKeyVersionByteNum,
@@ -170,12 +170,12 @@ class PrivKey {
     return hex.encode(this.toBuffer());
   }
 
-  BigIntX toBn() {
+  BigIntX? toBn() {
     return this.bn;
   }
 
   PrivKey validate() {
-    if (!this.bn.lt(PointWrapper.getN())) {
+    if (!this.bn!.lt(PointWrapper.getN())) {
       throw INVALID_NUMBER_N;
     }
     if (this.compressed == null) {

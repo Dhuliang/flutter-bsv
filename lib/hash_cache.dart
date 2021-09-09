@@ -12,9 +12,9 @@ import 'package:bsv/extentsions/list.dart';
  */
 
 class HashCache {
-  List<int> prevoutsHashBuf;
-  List<int> sequenceHashBuf;
-  List<int> outputsHashBuf;
+  List<int>? prevoutsHashBuf;
+  List<int>? sequenceHashBuf;
+  List<int>? outputsHashBuf;
 
   HashCache({
     this.prevoutsHashBuf,
@@ -47,11 +47,11 @@ class HashCache {
   Map<String, dynamic> toJSON() {
     return {
       "prevoutsHashBuf":
-          this.prevoutsHashBuf != null ? this.prevoutsHashBuf.toHex() : null,
+          this.prevoutsHashBuf != null ? this.prevoutsHashBuf!.toHex() : null,
       "sequenceHashBuf":
-          this.sequenceHashBuf != null ? this.sequenceHashBuf.toHex() : null,
+          this.sequenceHashBuf != null ? this.sequenceHashBuf!.toHex() : null,
       "outputsHashBuf":
-          this.outputsHashBuf != null ? this.outputsHashBuf.toHex() : null,
+          this.outputsHashBuf != null ? this.outputsHashBuf!.toHex() : null,
     };
   }
 

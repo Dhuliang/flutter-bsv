@@ -38,16 +38,16 @@ void main() {
       // make change address
       var privKey = new PrivKey().fromBn(BigIntX.fromNum(1));
       var keyPair = new KeyPair().fromPrivKey(privKey);
-      var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+      var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
       // make addresses to send from
       var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(2));
       var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-      var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+      var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
       var privKey2 = new PrivKey().fromBn(BigIntX.fromNum(3));
       var keyPair2 = new KeyPair().fromPrivKey(privKey2);
-      var addr2 = new Address().fromPubKey(keyPair2.pubKey);
+      var addr2 = new Address().fromPubKey(keyPair2.pubKey!);
 
       // make addresses to send to
       var saddr1 = addr1;
@@ -56,12 +56,12 @@ void main() {
 
       // pubKeyHash out
       var scriptout1 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-          addr1.hashBuf.toHex() +
+          addr1.hashBuf!.toHex() +
           ' OP_EQUALVERIFY OP_CHECKSIG');
 
       // pubKeyHash out
       var scriptout2 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-          addr2.hashBuf.toHex() +
+          addr2.hashBuf!.toHex() +
           ' OP_EQUALVERIFY OP_CHECKSIG');
 
       var txOut1 = TxOut.fromProperties(
@@ -198,7 +198,7 @@ void main() {
         txb.sendDustChangeToFees(true);
         txb.setDust(0);
         txb.build();
-        expect(txb.tx.txOuts.length, 2);
+        expect(txb.tx.txOuts!.length, 2);
       });
     });
 
@@ -264,6 +264,7 @@ void main() {
       test('should set tx', () {
         var tx = new Tx();
         var txb = new TxBuilder().importPartiallySignedTx(tx);
+        // ignore: unnecessary_null_comparison
         expect(txb.tx != null, true);
       });
 
@@ -271,7 +272,9 @@ void main() {
         var tx = new Tx();
         var uTxOutMap = new TxOutMap();
         var txb = new TxBuilder().importPartiallySignedTx(tx, uTxOutMap);
+        // ignore: unnecessary_null_comparison
         expect(txb.tx != null, true);
+        // ignore: unnecessary_null_comparison
         expect(txb.uTxOutMap != null, true);
       });
     });
@@ -296,27 +299,27 @@ void main() {
     });
 
     group('#build', () {
-      TxBuilder prepareTxBuilder([BigIntX outAmountBn]) {
+      TxBuilder prepareTxBuilder([BigIntX? outAmountBn]) {
         outAmountBn = outAmountBn ?? BigIntX.fromNum(1e8);
         var txb = new TxBuilder();
 
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(1));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from
         var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(2));
         var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-        var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+        var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
         var privKey2 = new PrivKey().fromBn(BigIntX.fromNum(3));
         var keyPair2 = new KeyPair().fromPrivKey(privKey2);
-        var addr2 = new Address().fromPubKey(keyPair2.pubKey);
+        var addr2 = new Address().fromPubKey(keyPair2.pubKey!);
 
         var privKey3 = new PrivKey().fromBn(BigIntX.fromNum(4));
         var keyPair3 = new KeyPair().fromPrivKey(privKey3);
-        var addr3 = new Address().fromPubKey(keyPair3.pubKey);
+        var addr3 = new Address().fromPubKey(keyPair3.pubKey!);
 
         var txOut1 = TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8), script: addr1.toTxOutScript());
@@ -361,7 +364,7 @@ void main() {
 
         txb.build();
 
-        expect(txb.tx.txIns.length, 2);
+        expect(txb.tx.txIns!.length, 2);
       });
 
       test('should build a tx where all inputs are required', () {
@@ -369,7 +372,7 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, 3);
+        expect(txb.tx.txIns!.length, 3);
       });
 
       test('should buld a tx with zero fees', () {
@@ -377,11 +380,11 @@ void main() {
 
         var changePrivKey = new PrivKey().fromBn(BigIntX.fromNum(1));
         var changeKeyPair = new KeyPair().fromPrivKey(changePrivKey);
-        var changeAddr = new Address().fromPubKey(changeKeyPair.pubKey);
+        var changeAddr = new Address().fromPubKey(changeKeyPair.pubKey!);
 
         var inputPrivKey = new PrivKey().fromBn(BigIntX.fromNum(2));
         var inputKeyPair = new KeyPair().fromPrivKey(inputPrivKey);
-        var inputAddress = new Address().fromPubKey(inputKeyPair.pubKey);
+        var inputAddress = new Address().fromPubKey(inputKeyPair.pubKey!);
 
         var txHashBuf = List<int>.filled(32, 1);
         var txOutNum = 0;
@@ -407,7 +410,7 @@ void main() {
         }
 
         var tx = txb.tx;
-        expect(tx.txOuts[0].valueBn.toString(), inputAmount.toString());
+        expect(tx.txOuts![0].valueBn.toString(), inputAmount.toString());
       });
     });
 
@@ -450,10 +453,10 @@ void main() {
     group('#inputFromScript', () {
       test('should add an input from a script', () {
         var keyPair = new KeyPair().fromRandom();
-        var address = new Address().fromPubKey(keyPair.pubKey);
+        var address = new Address().fromPubKey(keyPair.pubKey!);
         var txOut = TxOut.fromProperties(
           valueBn: BigIntX.fromNum(1000),
-          script: new Script().fromPubKeyHash(address.hashBuf.asUint8List()),
+          script: new Script().fromPubKeyHash(address.hashBuf!.asUint8List()),
         );
         var script = new Script().fromString('OP_RETURN');
         var txHashBuf = List.generate(32, (index) => 0);
@@ -469,10 +472,10 @@ void main() {
 
       test('should add an input from a script and set nSequence', () {
         var keyPair = new KeyPair().fromRandom();
-        var address = new Address().fromPubKey(keyPair.pubKey);
+        var address = new Address().fromPubKey(keyPair.pubKey!);
         var txOut = TxOut.fromProperties(
           valueBn: BigIntX.fromNum(1000),
-          script: new Script().fromPubKeyHash(address.hashBuf.asUint8List()),
+          script: new Script().fromPubKeyHash(address.hashBuf!.asUint8List()),
         );
         var script = new Script().fromString('OP_RETURN');
         var txHashBuf = List.generate(32, (index) => 0);
@@ -492,10 +495,10 @@ void main() {
     group('#inputFromPubKeyHash', () {
       test('should add an input from a pubKeyHash output', () {
         var keyPair = new KeyPair().fromRandom();
-        var address = new Address().fromPubKey(keyPair.pubKey);
+        var address = new Address().fromPubKey(keyPair.pubKey!);
         var txOut = TxOut.fromProperties(
           valueBn: BigIntX.fromNum(1000),
-          script: new Script().fromPubKeyHash(address.hashBuf.asUint8List()),
+          script: new Script().fromPubKeyHash(address.hashBuf!.asUint8List()),
         );
         var txHashBuf = List.generate(32, (index) => 0);
         var txOutNum = 0;
@@ -508,8 +511,8 @@ void main() {
 
         expect(
           listEquals(
-            txbuilder.txIns[0].script.chunks[1].buf,
-            keyPair.pubKey.toBuffer(),
+            txbuilder.txIns[0].script!.chunks[1].buf,
+            keyPair.pubKey!.toBuffer(),
           ),
           true,
         );
@@ -518,10 +521,10 @@ void main() {
       test('should add an input from a pubKeyHash output and set nSequence',
           () {
         var keyPair = new KeyPair().fromRandom();
-        var address = new Address().fromPubKey(keyPair.pubKey);
+        var address = new Address().fromPubKey(keyPair.pubKey!);
         var txOut = TxOut.fromProperties(
           valueBn: BigIntX.fromNum(1000),
-          script: new Script().fromPubKeyHash(address.hashBuf.asUint8List()),
+          script: new Script().fromPubKeyHash(address.hashBuf!.asUint8List()),
         );
         var txHashBuf = List.generate(32, (index) => 0);
         var txOutNum = 0;
@@ -534,8 +537,8 @@ void main() {
         );
         expect(
           listEquals(
-            txbuilder.txIns[0].script.chunks[1].buf,
-            keyPair.pubKey.toBuffer(),
+            txbuilder.txIns[0].script!.chunks[1].buf,
+            keyPair.pubKey!.toBuffer(),
           ),
           true,
         );
@@ -544,8 +547,8 @@ void main() {
     });
 
     group('#getSig', () {
-      TxBuilder txb;
-      KeyPair keyPair1;
+      TxBuilder? txb;
+      KeyPair? keyPair1;
       // TxOut txOut1;
       var obj = prepareAndBuildTxBuilder();
       txb = obj['txb'];
@@ -553,7 +556,7 @@ void main() {
       // txOut1 = obj['txOut1'];
 
       test('should sign and verify synchronously', () {
-        var sig = txb.getSig(
+        var sig = txb!.getSig(
           keyPair: keyPair1,
           nHashType: Sig.SIGHASH_ALL,
           nIn: 0,
@@ -568,8 +571,8 @@ void main() {
         // prepare
         var obj = prepareAndBuildTxBuilder();
         TxBuilder txb = obj['txb'];
-        KeyPair keyPair1 = obj['keyPair1'];
-        KeyPair keyPair2 = obj['keyPair2'];
+        KeyPair? keyPair1 = obj['keyPair1'];
+        KeyPair? keyPair2 = obj['keyPair2'];
         Address saddr1 = obj['saddr1'];
         Address changeaddr = obj['changeaddr'];
 
@@ -603,17 +606,17 @@ void main() {
         );
 
         expect(
-          txb.tx.txOuts[0].script.chunks[2].buf.toHex(),
-          saddr1.hashBuf.toHex(),
+          txb.tx.txOuts![0].script!.chunks[2].buf!.toHex(),
+          saddr1.hashBuf!.toHex(),
         );
-        expect(txb.tx.txOuts[0].valueBn.eq(1.5e8), true);
-        expect(txb.tx.txOuts[1].valueBn.gt(546), true);
-        expect(txb.tx.txOuts[1].valueBn.toNumber(), 49996250);
-        expect(txb.changeAmountBn.toNumber(), 49996250);
-        expect(txb.feeAmountBn.toNumber(), 3750);
+        expect(txb.tx.txOuts![0].valueBn!.eq(1.5e8), true);
+        expect(txb.tx.txOuts![1].valueBn!.gt(546), true);
+        expect(txb.tx.txOuts![1].valueBn!.toNumber(), 49996250);
+        expect(txb.changeAmountBn!.toNumber(), 49996250);
+        expect(txb.feeAmountBn!.toNumber(), 3750);
         expect(
-          txb.tx.txOuts[1].script.chunks[2].buf.toHex(),
-          changeaddr.hashBuf.toHex(),
+          txb.tx.txOuts![1].script!.chunks[2].buf!.toHex(),
+          changeaddr.hashBuf!.toHex(),
         );
 
         result = await TxVerifier.staticVerify(
@@ -628,8 +631,8 @@ void main() {
         // prepare
         var obj = prepareAndBuildTxBuilder();
         TxBuilder txb = obj['txb'];
-        KeyPair keyPair1 = obj['keyPair1'];
-        KeyPair keyPair2 = obj['keyPair2'];
+        KeyPair? keyPair1 = obj['keyPair1'];
+        KeyPair? keyPair2 = obj['keyPair2'];
         Address saddr1 = obj['saddr1'];
         Address changeaddr = obj['changeaddr'];
 
@@ -664,17 +667,17 @@ void main() {
         );
 
         expect(
-          txb.tx.txOuts[0].script.chunks[2].buf.toHex(),
-          saddr1.hashBuf.toHex(),
+          txb.tx.txOuts![0].script!.chunks[2].buf!.toHex(),
+          saddr1.hashBuf!.toHex(),
         );
-        expect(txb.tx.txOuts[0].valueBn.eq(1.5e8), true);
-        expect(txb.tx.txOuts[1].valueBn.gt(546), true);
-        expect(txb.tx.txOuts[1].valueBn.toNumber(), 49996250);
-        expect(txb.changeAmountBn.toNumber(), 49996250);
-        expect(txb.feeAmountBn.toNumber(), 3750);
+        expect(txb.tx.txOuts![0].valueBn!.eq(1.5e8), true);
+        expect(txb.tx.txOuts![1].valueBn!.gt(546), true);
+        expect(txb.tx.txOuts![1].valueBn!.toNumber(), 49996250);
+        expect(txb.changeAmountBn!.toNumber(), 49996250);
+        expect(txb.feeAmountBn!.toNumber(), 3750);
         expect(
-          txb.tx.txOuts[1].script.chunks[2].buf.toHex(),
-          changeaddr.hashBuf.toHex(),
+          txb.tx.txOuts![1].script!.chunks[2].buf!.toHex(),
+          changeaddr.hashBuf!.toHex(),
         );
 
         result = await TxVerifier.staticVerify(
@@ -812,8 +815,8 @@ void main() {
         // prepare
         var obj = prepareAndBuildTxBuilder();
         TxBuilder txb = obj['txb'];
-        KeyPair keyPair1 = obj['keyPair1'];
-        KeyPair keyPair2 = obj['keyPair2'];
+        KeyPair? keyPair1 = obj['keyPair1'];
+        KeyPair? keyPair2 = obj['keyPair2'];
         Address saddr1 = obj['saddr1'];
         Address changeaddr = obj['changeaddr'];
 
@@ -855,17 +858,17 @@ void main() {
         txb.signWithKeyPairs([keyPair2]);
 
         expect(
-          txb.tx.txOuts[0].script.chunks[2].buf.toHex(),
-          saddr1.hashBuf.toHex(),
+          txb.tx.txOuts![0].script!.chunks[2].buf!.toHex(),
+          saddr1.hashBuf!.toHex(),
         );
-        expect(txb.tx.txOuts[0].valueBn.eq(1.5e8), true);
-        expect(txb.tx.txOuts[1].valueBn.gt(546), true);
-        expect(txb.tx.txOuts[1].valueBn.toNumber(), 49996250);
-        expect(txb.changeAmountBn.toNumber(), 49996250);
-        expect(txb.feeAmountBn.toNumber(), 3750);
+        expect(txb.tx.txOuts![0].valueBn!.eq(1.5e8), true);
+        expect(txb.tx.txOuts![1].valueBn!.gt(546), true);
+        expect(txb.tx.txOuts![1].valueBn!.toNumber(), 49996250);
+        expect(txb.changeAmountBn!.toNumber(), 49996250);
+        expect(txb.feeAmountBn!.toNumber(), 3750);
         expect(
-          txb.tx.txOuts[1].script.chunks[2].buf.toHex(),
-          changeaddr.hashBuf.toHex(),
+          txb.tx.txOuts![1].script!.chunks[2].buf!.toHex(),
+          changeaddr.hashBuf!.toHex(),
         );
 
         expect(
@@ -891,16 +894,16 @@ void main() {
           // make change address
           var privKey = new PrivKey().fromBn(BigIntX.fromNum(1));
           var keyPair = new KeyPair().fromPrivKey(privKey);
-          var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+          var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
           // make addresses to send from
           var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(2));
           var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-          var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+          var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
           var privKey2 = new PrivKey().fromBn(BigIntX.fromNum(3));
           var keyPair2 = new KeyPair().fromPrivKey(privKey2);
-          var addr2 = new Address().fromPubKey(keyPair2.pubKey);
+          var addr2 = new Address().fromPubKey(keyPair2.pubKey!);
 
           // make addresses to send to
           var saddr1 = addr1;
@@ -909,12 +912,12 @@ void main() {
 
           // pubKeyHash out
           var scriptout1 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addr1.hashBuf.toHex() +
+              addr1.hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG');
 
           // pubKeyHash out
           var scriptout2 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addr2.hashBuf.toHex() +
+              addr2.hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG');
 
           var txOut1 = TxOut.fromProperties(
@@ -968,11 +971,11 @@ void main() {
 
         // prepare
         var obj = prepareAndBuildTxBuilder();
-        TxBuilder txb = obj['txb'];
-        KeyPair keyPair1 = obj['keyPair1'];
-        KeyPair keyPair2 = obj['keyPair2'];
-        Address saddr1 = obj['saddr1'];
-        Address changeaddr = obj['changeaddr'];
+        TxBuilder txb = obj['txb'] as TxBuilder;
+        KeyPair? keyPair1 = obj['keyPair1'] as KeyPair?;
+        KeyPair? keyPair2 = obj['keyPair2'] as KeyPair?;
+        Address saddr1 = obj['saddr1'] as Address;
+        Address changeaddr = obj['changeaddr'] as Address;
 
         // begin signing
         txb.signWithKeyPairs([keyPair1]);
@@ -1007,17 +1010,17 @@ void main() {
         txb.signWithKeyPairs([keyPair2]);
 
         expect(
-          txb.tx.txOuts[0].script.chunks[2].buf.toHex(),
-          saddr1.hashBuf.toHex(),
+          txb.tx.txOuts![0].script!.chunks[2].buf!.toHex(),
+          saddr1.hashBuf!.toHex(),
         );
-        expect(txb.tx.txOuts[0].valueBn.eq(1.5e8), true);
-        expect(txb.tx.txOuts[1].valueBn.gt(546), true);
-        expect(txb.tx.txOuts[1].valueBn.toNumber(), 49996250);
-        expect(txb.changeAmountBn.toNumber(), 49996250);
-        expect(txb.feeAmountBn.toNumber(), 3750);
+        expect(txb.tx.txOuts![0].valueBn!.eq(1.5e8), true);
+        expect(txb.tx.txOuts![1].valueBn!.gt(546), true);
+        expect(txb.tx.txOuts![1].valueBn!.toNumber(), 49996250);
+        expect(txb.changeAmountBn!.toNumber(), 49996250);
+        expect(txb.feeAmountBn!.toNumber(), 3750);
         expect(
-          txb.tx.txOuts[1].script.chunks[2].buf.toHex(),
-          changeaddr.hashBuf.toHex(),
+          txb.tx.txOuts![1].script!.chunks[2].buf!.toHex(),
+          changeaddr.hashBuf!.toHex(),
         );
 
         expect(
@@ -1039,15 +1042,15 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(1));
         var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-        var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+        var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
         var customScript = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr1.hashBuf.toHex() +
+            addr1.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
 
         var txOut1 = TxOut.fromProperties(
@@ -1076,86 +1079,86 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(1));
         var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-        var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+        var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
         var privKey2 = new PrivKey().fromBn(BigIntX.fromNum(2));
         var keyPair2 = new KeyPair().fromPrivKey(privKey2);
-        var addr2 = new Address().fromPubKey(keyPair2.pubKey);
+        var addr2 = new Address().fromPubKey(keyPair2.pubKey!);
 
         var privKey3 = new PrivKey().fromBn(BigIntX.fromNum(3));
         var keyPair3 = new KeyPair().fromPrivKey(privKey3);
-        var addr3 = new Address().fromPubKey(keyPair3.pubKey);
+        var addr3 = new Address().fromPubKey(keyPair3.pubKey!);
 
         var privKey4 = new PrivKey().fromBn(BigIntX.fromNum(4));
         var keyPair4 = new KeyPair().fromPrivKey(privKey4);
-        var addr4 = new Address().fromPubKey(keyPair4.pubKey);
+        var addr4 = new Address().fromPubKey(keyPair4.pubKey!);
 
         var privKey5 = new PrivKey().fromBn(BigIntX.fromNum(5));
         var keyPair5 = new KeyPair().fromPrivKey(privKey5);
-        var addr5 = new Address().fromPubKey(keyPair5.pubKey);
+        var addr5 = new Address().fromPubKey(keyPair5.pubKey!);
 
         var privKey6 = new PrivKey().fromBn(BigIntX.fromNum(6));
         var keyPair6 = new KeyPair().fromPrivKey(privKey6);
-        var addr6 = new Address().fromPubKey(keyPair6.pubKey);
+        var addr6 = new Address().fromPubKey(keyPair6.pubKey!);
 
         var privKey7 = new PrivKey().fromBn(BigIntX.fromNum(7));
         var keyPair7 = new KeyPair().fromPrivKey(privKey7);
-        var addr7 = new Address().fromPubKey(keyPair7.pubKey);
+        var addr7 = new Address().fromPubKey(keyPair7.pubKey!);
 
         var privKey8 = new PrivKey().fromBn(BigIntX.fromNum(8));
         var keyPair8 = new KeyPair().fromPrivKey(privKey8);
-        var addr8 = new Address().fromPubKey(keyPair8.pubKey);
+        var addr8 = new Address().fromPubKey(keyPair8.pubKey!);
 
         var privKey9 = new PrivKey().fromBn(BigIntX.fromNum(9));
         var keyPair9 = new KeyPair().fromPrivKey(privKey9);
-        var addr9 = new Address().fromPubKey(keyPair9.pubKey);
+        var addr9 = new Address().fromPubKey(keyPair9.pubKey!);
 
         var privKey10 = new PrivKey().fromBn(BigIntX.fromNum(10));
         var keyPair10 = new KeyPair().fromPrivKey(privKey10);
-        var addr10 = new Address().fromPubKey(keyPair10.pubKey);
+        var addr10 = new Address().fromPubKey(keyPair10.pubKey!);
 
         var privKey11 = new PrivKey().fromBn(BigIntX.fromNum(11));
         var keyPair11 = new KeyPair().fromPrivKey(privKey11);
-        var addr11 = new Address().fromPubKey(keyPair11.pubKey);
+        var addr11 = new Address().fromPubKey(keyPair11.pubKey!);
 
         // txOuts that we are spending
         var scriptout1 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr1.hashBuf.toHex() +
+            addr1.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout2 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr2.hashBuf.toHex() +
+            addr2.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout3 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr3.hashBuf.toHex() +
+            addr3.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout4 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr4.hashBuf.toHex() +
+            addr4.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout5 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr5.hashBuf.toHex() +
+            addr5.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout6 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr6.hashBuf.toHex() +
+            addr6.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout7 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr7.hashBuf.toHex() +
+            addr7.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout8 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr8.hashBuf.toHex() +
+            addr8.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout9 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr9.hashBuf.toHex() +
+            addr9.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout10 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr10.hashBuf.toHex() +
+            addr10.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout11 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr11.hashBuf.toHex() +
+            addr11.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
 
         var txOut1 = TxOut.fromProperties(
@@ -1290,37 +1293,37 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(1));
         var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-        var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+        var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
         var privKey2 = new PrivKey().fromBn(BigIntX.fromNum(2));
         var keyPair2 = new KeyPair().fromPrivKey(privKey2);
-        var addr2 = new Address().fromPubKey(keyPair2.pubKey);
+        var addr2 = new Address().fromPubKey(keyPair2.pubKey!);
 
         var privKey3 = new PrivKey().fromBn(BigIntX.fromNum(3));
         var keyPair3 = new KeyPair().fromPrivKey(privKey3);
-        var addr3 = new Address().fromPubKey(keyPair3.pubKey);
+        var addr3 = new Address().fromPubKey(keyPair3.pubKey!);
 
         var privKey4 = new PrivKey().fromBn(BigIntX.fromNum(4));
         var keyPair4 = new KeyPair().fromPrivKey(privKey4);
-        var addr4 = new Address().fromPubKey(keyPair4.pubKey);
+        var addr4 = new Address().fromPubKey(keyPair4.pubKey!);
 
         // txOuts that we are spending
         var scriptout1 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr1.hashBuf.toHex() +
+            addr1.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout2 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr2.hashBuf.toHex() +
+            addr2.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout3 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr3.hashBuf.toHex() +
+            addr3.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
         var scriptout4 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-            addr4.hashBuf.toHex() +
+            addr4.hashBuf!.toHex() +
             ' OP_EQUALVERIFY OP_CHECKSIG');
 
         var txOut1 = TxOut.fromProperties(
@@ -1385,16 +1388,16 @@ void main() {
           // make change address
           var privKey = new PrivKey().fromBn(BigIntX.fromNum(1));
           var keyPair = new KeyPair().fromPrivKey(privKey);
-          var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+          var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
           // make addresses to send from
           var privKey1 = new PrivKey().fromBn(BigIntX.fromNum(2));
           var keyPair1 = new KeyPair().fromPrivKey(privKey1);
-          var addr1 = new Address().fromPubKey(keyPair1.pubKey);
+          var addr1 = new Address().fromPubKey(keyPair1.pubKey!);
 
           var privKey2 = new PrivKey().fromBn(BigIntX.fromNum(3));
           var keyPair2 = new KeyPair().fromPrivKey(privKey2);
-          var addr2 = new Address().fromPubKey(keyPair2.pubKey);
+          var addr2 = new Address().fromPubKey(keyPair2.pubKey!);
 
           // make addresses to send to
           var saddr1 = addr1;
@@ -1403,12 +1406,12 @@ void main() {
 
           // pubKeyHash out
           var scriptout1 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addr1.hashBuf.toHex() +
+              addr1.hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG');
 
           // pubKeyHash out
           var scriptout2 = new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addr2.hashBuf.toHex() +
+              addr2.hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG');
 
           var txOut1 = TxOut.fromProperties(
@@ -1455,11 +1458,11 @@ void main() {
 
         // prepare
         var obj = prepareAndBuildTxBuilder();
-        TxBuilder txb = obj['txb'];
-        KeyPair keyPair1 = obj['keyPair1'];
-        KeyPair keyPair2 = obj['keyPair2'];
-        Address saddr1 = obj['saddr1'];
-        Address changeaddr = obj['changeaddr'];
+        TxBuilder txb = obj['txb'] as TxBuilder;
+        KeyPair? keyPair1 = obj['keyPair1'] as KeyPair?;
+        KeyPair? keyPair2 = obj['keyPair2'] as KeyPair?;
+        Address saddr1 = obj['saddr1'] as Address;
+        Address changeaddr = obj['changeaddr'] as Address;
 
         // begin signing
         txb.signWithKeyPairs([keyPair1]);
@@ -1494,17 +1497,17 @@ void main() {
         txb.signWithKeyPairs([keyPair2]);
 
         expect(
-          txb.tx.txOuts[0].script.chunks[2].buf.toHex(),
-          saddr1.hashBuf.toHex(),
+          txb.tx.txOuts![0].script!.chunks[2].buf!.toHex(),
+          saddr1.hashBuf!.toHex(),
         );
-        expect(txb.tx.txOuts[0].valueBn.eq(1.5e8), true);
-        expect(txb.tx.txOuts[1].valueBn.gt(546), true);
-        expect(txb.tx.txOuts[1].valueBn.toNumber(), 49996250);
-        expect(txb.changeAmountBn.toNumber(), 49996250);
-        expect(txb.feeAmountBn.toNumber(), 3750);
+        expect(txb.tx.txOuts![0].valueBn!.eq(1.5e8), true);
+        expect(txb.tx.txOuts![1].valueBn!.gt(546), true);
+        expect(txb.tx.txOuts![1].valueBn!.toNumber(), 49996250);
+        expect(txb.changeAmountBn!.toNumber(), 49996250);
+        expect(txb.feeAmountBn!.toNumber(), 3750);
         expect(
-          txb.tx.txOuts[1].script.chunks[2].buf.toHex(),
-          changeaddr.hashBuf.toHex(),
+          txb.tx.txOuts![1].script!.chunks[2].buf!.toHex(),
+          changeaddr.hashBuf!.toHex(),
         );
 
         expect(
@@ -1528,7 +1531,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -1537,7 +1540,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -1545,7 +1548,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
               valueBn: BigIntX.fromNum(1e8), script: scriptouts[i]));
@@ -1572,8 +1575,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // partially sign - deliberately resulting in invalid tx
         txb.signWithKeyPairs([keyPairs[0], keyPairs[1], keyPairs[2]]);
@@ -1600,7 +1603,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -1609,7 +1612,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -1617,7 +1620,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8 * (i + 1)),
@@ -1651,8 +1654,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -1684,7 +1687,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -1693,7 +1696,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -1701,7 +1704,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8 * (i + 1)),
@@ -1735,8 +1738,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -1766,7 +1769,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -1775,7 +1778,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -1783,7 +1786,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8),
@@ -1817,8 +1820,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -1840,7 +1843,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -1849,7 +1852,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -1857,7 +1860,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8),
@@ -1892,8 +1895,8 @@ void main() {
         txb.build(useAllInputs: true);
         txb.sort();
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -1915,7 +1918,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -1924,7 +1927,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -1932,7 +1935,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8 + i),
@@ -1968,8 +1971,8 @@ void main() {
         txb.build(useAllInputs: true);
         txb.sort();
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -1991,7 +1994,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -2000,7 +2003,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -2008,7 +2011,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1e8 + 10000 - i),
@@ -2044,8 +2047,8 @@ void main() {
         txb.build(useAllInputs: true);
         txb.sort();
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -2067,7 +2070,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -2076,7 +2079,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -2084,7 +2087,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(200),
@@ -2119,8 +2122,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -2142,7 +2145,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -2151,7 +2154,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -2159,7 +2162,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1000),
@@ -2193,8 +2196,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -2216,7 +2219,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -2225,7 +2228,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -2233,7 +2236,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1000),
@@ -2267,8 +2270,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -2290,7 +2293,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -2299,7 +2302,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -2307,7 +2310,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1499),
@@ -2341,8 +2344,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -2364,7 +2367,7 @@ void main() {
         // make change address
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(100));
         var keyPair = new KeyPair().fromPrivKey(privKey);
-        var changeaddr = new Address().fromPubKey(keyPair.pubKey);
+        var changeaddr = new Address().fromPubKey(keyPair.pubKey!);
 
         // make addresses to send from (and to)
         List<PrivKey> privKeys = [];
@@ -2373,7 +2376,7 @@ void main() {
         for (var i = 0; i < nIns; i++) {
           privKeys.add(new PrivKey().fromBn(BigIntX.fromNum(i + 1)));
           keyPairs.add(new KeyPair().fromPrivKey(privKeys[i]));
-          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey));
+          addrs.add(new Address().fromPubKey(keyPairs[i].pubKey!));
         }
 
         // txOuts that we are spending
@@ -2381,7 +2384,7 @@ void main() {
         var txOuts = [];
         for (var i = 0; i < nIns; i++) {
           scriptouts.add(new Script().fromString('OP_DUP OP_HASH160 20 0x' +
-              addrs[i].hashBuf.toHex() +
+              addrs[i].hashBuf!.toHex() +
               ' OP_EQUALVERIFY OP_CHECKSIG'));
           txOuts.add(TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1499),
@@ -2415,8 +2418,8 @@ void main() {
 
         txb.build(useAllInputs: true);
 
-        expect(txb.tx.txIns.length, nIns);
-        expect(txb.tx.txOuts.length, nOuts + 1);
+        expect(txb.tx.txIns!.length, nIns);
+        expect(txb.tx.txOuts!.length, nOuts + 1);
 
         // before signing, convert to/from JSON, simulating real-world walvar use-case
         txb = TxBuilder().fromJSON(txb.toJSON());
@@ -2465,12 +2468,12 @@ void main() {
 
         var txb2 = new TxBuilder();
         txb2.sendDustChangeToFees(true);
-        txb2.setChangeAddress(Address.fromTxOutScript(txb.changeScript));
+        txb2.setChangeAddress(Address.fromTxOutScript(txb.changeScript!));
         txb2.inputFromPubKeyHash(
           txHashBuf: txb.txIns[0].txHashBuf,
           txOutNum: txb.txIns[0].txOutNum,
           txOut: txb.uTxOutMap.get(
-            txb.txIns[0].txHashBuf,
+            txb.txIns[0].txHashBuf!,
             txb.txIns[0].txOutNum,
           ),
         );
@@ -2478,7 +2481,7 @@ void main() {
           txHashBuf: txb.txIns[1].txHashBuf,
           txOutNum: txb.txIns[1].txOutNum,
           txOut: txb.uTxOutMap.get(
-            txb.txIns[1].txHashBuf,
+            txb.txIns[1].txHashBuf!,
             txb.txIns[1].txOutNum,
           ),
         );
@@ -2486,7 +2489,7 @@ void main() {
           txHashBuf: txb.txIns[2].txHashBuf,
           txOutNum: txb.txIns[2].txOutNum,
           txOut: txb.uTxOutMap.get(
-            txb.txIns[2].txHashBuf,
+            txb.txIns[2].txHashBuf!,
             txb.txIns[2].txOutNum,
           ),
         );
@@ -2494,7 +2497,7 @@ void main() {
           txHashBuf: txb.txIns[3].txHashBuf,
           txOutNum: txb.txIns[3].txOutNum,
           txOut: txb.uTxOutMap.get(
-            txb.txIns[3].txHashBuf,
+            txb.txIns[3].txHashBuf!,
             txb.txIns[3].txOutNum,
           ),
         );
@@ -2502,7 +2505,7 @@ void main() {
           txHashBuf: txb.txIns[4].txHashBuf,
           txOutNum: txb.txIns[4].txOutNum,
           txOut: txb.uTxOutMap.get(
-            txb.txIns[4].txHashBuf,
+            txb.txIns[4].txHashBuf!,
             txb.txIns[4].txOutNum,
           ),
         );

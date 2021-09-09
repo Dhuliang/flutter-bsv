@@ -27,7 +27,7 @@ void main() {
     group('#fromHex', () {
       test('should parse this hex string containing an OP code', () {
         var buf = Uint8List(1);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromHex(hex.encode(buf));
         expect(script.chunks.length, 1);
         expect(script.chunks[0].opCodeNum, buf[0]);
@@ -37,7 +37,7 @@ void main() {
     group('#fromBuffer', () {
       test('should parse this buffer containing an OP code', () {
         var buf = Uint8List(1);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
@@ -46,7 +46,7 @@ void main() {
 
       test('should parse this buffer containing another OP code', () {
         var buf = Uint8List(1);
-        buf[0] = new OpCode().fromString('OP_CHECKMULTISIG').toNumber();
+        buf[0] = new OpCode.fromString('OP_CHECKMULTISIG').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
@@ -58,90 +58,90 @@ void main() {
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '010203');
+        expect(hex.encode(script.chunks[0].buf!), '010203');
       });
 
       test(
           'should parse this buffer containing OP_PUSHDATA1 and three bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0, 1, 2, 3]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA1').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA1').toNumber();
         ByteData.view(buf.buffer).setUint8(1, 3);
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '010203');
+        expect(hex.encode(script.chunks[0].buf!), '010203');
       });
 
       test(
           'should parse this buffer containing OP_PUSHDATA1 and zero bytes of data',
           () {
         var buf = Uint8List.fromList([0]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA1').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA1').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '');
+        expect(hex.encode(script.chunks[0].buf!), '');
       });
 
       test(
           'should parse this buffer containing OP_PUSHDATA2 and zero bytes of data',
           () {
         var buf = Uint8List.fromList([0]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA2').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA2').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '');
+        expect(hex.encode(script.chunks[0].buf!), '');
       });
 
       test(
           'should parse this buffer containing OP_PUSHDATA2 and three bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 1, 2, 3]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA2').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA2').toNumber();
         ByteData.view(buf.buffer).setUint16(1, 3, Endian.little);
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '010203');
+        expect(hex.encode(script.chunks[0].buf!), '010203');
       });
 
       test(
           'should parse this buffer containing OP_PUSHDATA4 and zero bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA4').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '');
+        expect(hex.encode(script.chunks[0].buf!), '');
       });
 
       test(
           'should parse this buffer containing OP_PUSHDATA4 and three bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 0, 0, 1, 2, 3]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA4').toNumber();
         ByteData.view(buf.buffer).setUint16(1, 3, Endian.little);
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(hex.encode(script.chunks[0].buf), '010203');
+        expect(hex.encode(script.chunks[0].buf!), '010203');
       });
 
       test('should parse this buffer an OP code, data, and another OP code',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 0, 0, 0, 1, 2, 3, 0]);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
-        buf[1] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
+        buf[1] = new OpCode.fromString('OP_PUSHDATA4').toNumber();
         ByteData.view(buf.buffer).setUint16(2, 3, Endian.little);
-        buf[buf.length - 1] = new OpCode().fromString('OP_0').toNumber();
+        buf[buf.length - 1] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 3);
         expect(script.chunks[0].opCodeNum, buf[0]);
-        expect(hex.encode(script.chunks[1].buf), '010203');
+        expect(hex.encode(script.chunks[1].buf!), '010203');
         expect(script.chunks[2].opCodeNum, buf[buf.length - 1]);
         expect(hex.encode(script.toBuffer()), hex.encode(buf));
       });
@@ -150,7 +150,7 @@ void main() {
     group('#toBuffer', () {
       test('should output this hex string containing an OP code', () {
         var buf = Uint8List(1);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromHex(buf.toHex());
 
         expect(script.chunks.length, 1);
@@ -161,7 +161,7 @@ void main() {
     group('#toBuffer', () {
       test('should output this buffer containing an OP code', () {
         var buf = Uint8List(1);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
@@ -171,7 +171,7 @@ void main() {
 
       test('should output this buffer containing another OP code', () {
         var buf = Uint8List(1);
-        buf[0] = new OpCode().fromString('OP_CHECKMULTISIG').toNumber();
+        buf[0] = new OpCode.fromString('OP_CHECKMULTISIG').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
@@ -184,7 +184,7 @@ void main() {
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(script.chunks[0].buf.toHex(), '010203');
+        expect(script.chunks[0].buf!.toHex(), '010203');
         expect(script.toHex(), buf.toHex());
       });
 
@@ -192,12 +192,12 @@ void main() {
           'should output this buffer containing OP_PUSHDATA1 and three bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0, 1, 2, 3]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA1').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA1').toNumber();
         ByteData.view(buf.buffer).setUint8(1, 3);
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(script.chunks[0].buf.toHex(), '010203');
+        expect(script.chunks[0].buf!.toHex(), '010203');
         expect(script.toHex(), buf.toHex());
       });
 
@@ -205,12 +205,12 @@ void main() {
           'should output this buffer containing OP_PUSHDATA2 and three bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 1, 2, 3]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA2').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA2').toNumber();
         ByteData.view(buf.buffer).setUint16(1, 3, Endian.little);
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(script.chunks[0].buf.toHex(), '010203');
+        expect(script.chunks[0].buf!.toHex(), '010203');
         expect(script.toHex(), buf.toHex());
       });
 
@@ -218,28 +218,28 @@ void main() {
           'should output this buffer containing OP_PUSHDATA4 and three bytes of data',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 0, 0, 1, 2, 3]);
-        buf[0] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        buf[0] = new OpCode.fromString('OP_PUSHDATA4').toNumber();
         ByteData.view(buf.buffer).setUint16(1, 3, Endian.little);
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 1);
-        expect(script.chunks[0].buf.toHex(), '010203');
+        expect(script.chunks[0].buf!.toHex(), '010203');
         expect(script.toHex(), buf.toHex());
       });
 
       test('should output this buffer an OP code, data, and another OP code',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 0, 0, 0, 1, 2, 3, 0]);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
-        buf[1] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
+        buf[1] = new OpCode.fromString('OP_PUSHDATA4').toNumber();
         ByteData.view(buf.buffer).setUint16(2, 3, Endian.little);
-        buf[buf.length - 1] = new OpCode().fromString('OP_0').toNumber();
+        buf[buf.length - 1] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromBuffer(buf);
 
         expect(script.chunks.length, 3);
         expect(script.chunks[0].opCodeNum, buf[0]);
         expect(script.chunks[0].opCodeNum, buf[0]);
-        expect(script.chunks[1].buf.toHex(), '010203');
+        expect(script.chunks[1].buf!.toHex(), '010203');
         expect(script.chunks[2].opCodeNum, buf[buf.length - 1]);
         expect(script.toHex(), buf.toHex());
       });
@@ -300,14 +300,14 @@ void main() {
       test('should output this buffer an OP code, data, and another OP code',
           () {
         var buf = Uint8List.fromList([0, 0, 0, 0, 0, 0, 1, 2, 3, 0]);
-        buf[0] = new OpCode().fromString('OP_0').toNumber();
-        buf[1] = new OpCode().fromString('OP_PUSHDATA4').toNumber();
+        buf[0] = new OpCode.fromString('OP_0').toNumber();
+        buf[1] = new OpCode.fromString('OP_PUSHDATA4').toNumber();
         ByteData.view(buf.buffer).setUint16(2, 3, Endian.little);
-        buf[buf.length - 1] = new OpCode().fromString('OP_0').toNumber();
+        buf[buf.length - 1] = new OpCode.fromString('OP_0').toNumber();
         var script = new Script().fromBuffer(buf);
         expect(script.chunks.length, 3);
         expect(script.chunks[0].opCodeNum, buf[0]);
-        expect(script.chunks[1].buf.toHex(), '010203');
+        expect(script.chunks[1].buf!.toHex(), '010203');
         expect(script.chunks[2].opCodeNum, buf[buf.length - 1]);
         expect(script.toString(), 'OP_0 OP_PUSHDATA4 3 0x010203 OP_0');
       });
@@ -389,7 +389,7 @@ void main() {
         expect(script.chunks[0].opCodeNum, (OpCode.OP_DUP));
         expect(script.chunks[1].opCodeNum, (OpCode.OP_HASH160));
         expect(script.chunks[2].opCodeNum, (20));
-        expect(script.chunks[2].buf.toHex(),
+        expect(script.chunks[2].buf!.toHex(),
             ('f4c03610e60ad15100929cc23da2f3a799af1725'));
         expect(script.chunks[3].opCodeNum, (OpCode.OP_EQUALVERIFY));
         expect(script.chunks[4].opCodeNum, (OpCode.OP_CHECKSIG));
@@ -408,7 +408,7 @@ void main() {
           errors++;
           var script = Script.fromAsmString(asm);
           expect(script.toAsmString(), (asm));
-        } catch (err) {
+        } on FormatException catch (err) {
           expect(err.message.toString().toLowerCase().contains('invalid hex'),
               true);
         }
@@ -432,7 +432,7 @@ void main() {
       });
 
       test('should parse this long PUSHDATA4 script in ASM', () {
-        var buf = Uint8List(pow(2, 17));
+        var buf = Uint8List(pow(2, 17) as int);
         var asm = 'OP_RETURN ' + buf.toHex();
         var script = Script.fromAsmString(asm);
         expect(script.chunks[1].opCodeNum, (OpCode.OP_PUSHDATA4));
@@ -524,8 +524,8 @@ void main() {
 
         expect(script.isSafeDataOut(), (true));
         var bufs = script.getData();
-        expect(utf8.decode(bufs[0]), ('yours bitcoin'));
-        expect(utf8.decode(bufs[1]), ('bsv'));
+        expect(utf8.decode(bufs[0]!), ('yours bitcoin'));
+        expect(utf8.decode(bufs[1]!), ('bsv'));
       });
     });
 
@@ -983,7 +983,7 @@ void main() {
         var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG);
         script.setChunkBn(0, BigIntX.fromNum(5000000000000000));
         expect(
-          script.chunks[0].buf.toHex(),
+          script.chunks[0].buf!.toHex(),
           BigIntX.fromNum(5000000000000000)
               .toBuffer(endian: Endian.little)
               .toHex(),
@@ -1001,7 +1001,7 @@ void main() {
         buf = Uint8List(256);
         expect(new Script().writeBuffer(buf).toString(),
             'OP_PUSHDATA2 256 0x' + buf.toHex());
-        buf = Uint8List(pow(2, 16));
+        buf = Uint8List(pow(2, 16) as int);
         expect(new Script().writeBuffer(buf).toString(),
             'OP_PUSHDATA4 ' + '${pow(2, 16)}' + ' 0x' + buf.toHex());
       });
@@ -1017,7 +1017,7 @@ void main() {
         buf = Uint8List(256);
         expect(Script.writeBuffer(buf).toString(),
             'OP_PUSHDATA2 256 0x' + buf.toHex());
-        buf = Uint8List(pow(2, 16));
+        buf = Uint8List(pow(2, 16) as int);
         expect(Script.writeBuffer(buf).toString(),
             'OP_PUSHDATA4 ' + '${pow(2, 16)}' + ' 0x' + buf.toHex());
       });
@@ -1027,8 +1027,8 @@ void main() {
       test('should set this buffer', () {
         var script = new Script().writeOpCode(OpCode.OP_CHECKMULTISIG);
         var buf = new BigIntX.fromNum(5000000000000000).toBuffer();
-        script.setChunkBuffer(0, buf);
-        expect(script.chunks[0].buf.toHex(), (buf.toHex()));
+        script.setChunkBuffer(0, buf as Uint8List);
+        expect(script.chunks[0].buf!.toHex(), (buf.toHex()));
       });
     });
 

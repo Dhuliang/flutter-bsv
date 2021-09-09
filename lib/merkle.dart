@@ -13,10 +13,10 @@ import 'package:bsv/extentsions/list.dart';
  */
 
 class Merkle {
-  List<int> hashBuf;
-  List<int> buf;
-  Merkle merkle1;
-  Merkle merkle2;
+  List<int>? hashBuf;
+  List<int>? buf;
+  Merkle? merkle1;
+  Merkle? merkle2;
 
   Merkle({
     this.hashBuf,
@@ -25,17 +25,17 @@ class Merkle {
     this.merkle2,
   });
 
-  List<int> hash() {
+  List<int>? hash() {
     if (this.hashBuf != null) {
       return this.hashBuf;
     }
     if (this.buf != null) {
-      return Hash.sha256Sha256(this.buf.asUint8List()).data.toList();
+      return Hash.sha256Sha256(this.buf!.asUint8List()).data!.toList();
     }
-    var hashBuf1 = this.merkle1.hash();
-    var hashBuf2 = this.merkle2.hash();
+    var hashBuf1 = this.merkle1!.hash()!;
+    var hashBuf2 = this.merkle2!.hash()!;
     this.buf = List<int>.from([...hashBuf1, ...hashBuf2]);
-    return Hash.sha256Sha256(this.buf.asUint8List()).data.toList();
+    return Hash.sha256Sha256(this.buf!.asUint8List()).data!.toList();
   }
 
   double logBase(num x, num base) => Math.log(x) / Math.log(base);
@@ -83,22 +83,23 @@ class Merkle {
       this.merkle2 = new Merkle(hashBuf: null, buf: bufs2[0]);
       return this;
     }
-    var bufs11 = bufs1.slice(0, bufs1.length ~/ 2);
-    var bufs12 = bufs1.slice(bufs1.length ~/ 2);
+    List<List<int>> bufs11 = bufs1.slice(0, bufs1.length ~/ 2);
+    List<List<int>> bufs12 = bufs1.slice(bufs1.length ~/ 2);
     this.merkle1 = new Merkle().fromBufferArrays(bufs11, bufs12);
-    var bufs21 = bufs2.slice(0, bufs2.length ~/ 2);
-    var bufs22 = bufs2.slice(bufs2.length ~/ 2);
+    List<List<int>> bufs21 = bufs2.slice(0, bufs2.length ~/ 2);
+    List<List<int>> bufs22 = bufs2.slice(bufs2.length ~/ 2);
     this.merkle2 = new Merkle().fromBufferArrays(bufs21, bufs22);
     return this;
   }
 
-  factory Merkle.fromBufferArrays(bufs1, bufs2) {
+  factory Merkle.fromBufferArrays(
+      List<List<int>> bufs1, List<List<int>> bufs2) {
     return new Merkle().fromBufferArrays(bufs1, bufs2);
   }
 
   int leavesNum() {
     if (this.merkle1 != null) {
-      return this.merkle1.leavesNum() + this.merkle2.leavesNum();
+      return this.merkle1!.leavesNum() + this.merkle2!.leavesNum();
     }
     if (this.buf != null) {
       return 1;

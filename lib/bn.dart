@@ -7,7 +7,7 @@ import "package:pointycastle/pointycastle.dart";
 var ec = new ECDomainParameters("secp256k1");
 
 List<int> reverseBuf(List<int> buf) {
-  var buf2 = List<int>(buf.length);
+  List<int> buf2 = List.filled(buf.length, 0);
   for (var i = 0; i < buf.length; i++) {
     buf2[i] = buf[buf.length - 1 - i];
   }
@@ -16,7 +16,7 @@ List<int> reverseBuf(List<int> buf) {
 
 /// Big number extension
 class BigIntX {
-  BigInt bn;
+  BigInt? bn;
 
   BigIntX({this.bn});
 
@@ -67,7 +67,7 @@ class BigIntX {
 
   factory BigIntX.fromBuffer(
     List<int> list, {
-    Endian endian = Endian.big,
+    Endian? endian = Endian.big,
   }) {
     if (endian == Endian.little) {
       list = reverseBuf(list);
@@ -93,9 +93,9 @@ class BigIntX {
   //在CHECKLOCKTIMEVERIFY中，数字的最大长度为5个字节。
   //我们允许在此处设置该变量以用于CHECKLOCKTIMEVERIFY。
   factory BigIntX.fromScriptNumBuffer({
-    List<int> buf,
+    required List<int> buf,
     bool fRequireMinimal = false,
-    int nMaxNumSize,
+    int? nMaxNumSize,
   }) {
     if (nMaxNumSize == null) {
       nMaxNumSize = 4;
@@ -125,16 +125,16 @@ class BigIntX {
     return BigIntX.fromSm(buf, endian: Endian.little);
   }
 
-  String toHex({int size, Endian endian = Endian.big}) {
+  String toHex({int? size, Endian endian = Endian.big}) {
     return hex.encode(this.toBuffer(size: size, endian: endian));
   }
 
-  List<int> toBuffer({int size, Endian endian = Endian.big}) {
+  List<int> toBuffer({int? size, Endian endian = Endian.big}) {
     // List<int> buf = hex.decode(hexStr);
-    List<int> buf;
+    List<int> buf = [];
 
     if (size != null) {
-      var hexStr = this.bn.toRadixString(16).padLeft0();
+      var hexStr = this.bn!.toRadixString(16).padLeft0();
       var natlen = hexStr.length ~/ 2;
       buf = hex.decode(hexStr);
 
@@ -143,7 +143,8 @@ class BigIntX {
       } else if (natlen > size) {
         buf = buf.getRange(natlen - buf.length, buf.length).toList();
       } else if (natlen < size) {
-        var rbuf = List<int>(size);
+        // var rbuf = List<int?>(size);
+        List<int> rbuf = List.filled(size, 0);
         for (var i = 0; i < buf.length; i++) {
           rbuf[rbuf.length - 1 - i] = buf[buf.length - 1 - i];
         }
@@ -156,7 +157,7 @@ class BigIntX {
       // return this.bn.toRadixString(16).padLeft(size);
     } else {
       // var hexStr = this.bn.toRadixString(16).padLeft(2, '0');
-      var hexStr = this.bn.toRadixString(16).padLeft0();
+      var hexStr = this.bn!.toRadixString(16).padLeft0();
       buf = hex.decode(hexStr);
     }
 
@@ -181,8 +182,8 @@ class BigIntX {
   /// fromBits(){}
 
   List<int> toSm({Endian endian = Endian.big}) {
-    List<int> buf;
-    if (this?.cmp(0) == -1) {
+    List<int> buf = [];
+    if (this.cmp(0) == -1) {
       buf = this.neg().toBuffer();
       if (buf[0] & 0x80 > 0) {
         // buf = Buffer.concat([Buffer.from([0x80]), buf])
@@ -210,24 +211,24 @@ class BigIntX {
   }
 
   int toInt() {
-    return this.bn.toInt();
+    return this.bn!.toInt();
   }
 
-  BigIntX umod(BigIntX other) => BigIntX(bn: bn % other.bn);
+  BigIntX umod(BigIntX other) => BigIntX(bn: bn! % other.bn!);
 
-  BigIntX invm(BigIntX other) => BigIntX(bn: bn.modInverse(other.bn));
+  BigIntX invm(BigIntX other) => BigIntX(bn: bn!.modInverse(other.bn!));
 
-  BigIntX neg() => BigIntX(bn: bn * BigInt.from(-1));
+  BigIntX neg() => BigIntX(bn: bn! * BigInt.from(-1));
 
-  BigIntX add(BigIntX other) => BigIntX(bn: bn + other.bn);
+  BigIntX add(BigIntX other) => BigIntX(bn: bn! + other.bn!);
 
-  BigIntX sub(BigIntX other) => BigIntX(bn: bn - other.bn);
+  BigIntX sub(BigIntX other) => BigIntX(bn: bn! - other.bn!);
 
-  BigIntX mul(BigIntX other) => BigIntX(bn: bn * other.bn);
+  BigIntX mul(BigIntX other) => BigIntX(bn: bn! * other.bn!);
 
-  BigIntX ushln(n) => BigIntX(bn: bn >> n);
+  BigIntX ushln(n) => BigIntX(bn: bn! >> n);
 
-  BigIntX ushrn(n) => BigIntX(bn: bn << n);
+  BigIntX ushrn(n) => BigIntX(bn: bn! << n);
 
   /// in dart -50%47=44 , in nodejs -50%47=3 , use remainder fix it
   BigIntX mod(BigIntX other) {
@@ -237,21 +238,21 @@ class BigIntX {
     //   return BigIntX(bn: (bn % other.bn));
     // }
     // return BigIntX(bn: bn % other.bn);
-    return BigIntX(bn: bn.remainder(other.bn));
+    return BigIntX(bn: bn!.remainder(other.bn!));
   }
 
-  BigIntX div(BigIntX other) => BigIntX(bn: bn ~/ other.bn);
+  BigIntX div(BigIntX other) => BigIntX(bn: bn! ~/ other.bn!);
 
   // int cmp(BigIntX other) => this.bn.compareTo(other.bn);
   int cmp(dynamic other) {
     if (other is BigIntX) {
-      return this.bn.compareTo(other.bn);
+      return this.bn!.compareTo(other.bn!);
     }
     if (other is num) {
-      return this.bn.compareTo(BigInt.from(other));
+      return this.bn!.compareTo(BigInt.from(other));
     }
     if (other is BigInt) {
-      return this.bn.compareTo(other);
+      return this.bn!.compareTo(other);
     }
     throw Exception("not support yet");
   }
@@ -281,7 +282,7 @@ class BigIntX {
   }
 
   String toString({int radix = 10}) {
-    return this.bn.toRadixString(radix);
+    return this.bn!.toRadixString(radix);
   }
 
   String toJSON() {
@@ -297,6 +298,6 @@ class BigIntX {
   }
 
   int toNumber() {
-    return this.bn.toInt();
+    return this.bn!.toInt();
   }
 }

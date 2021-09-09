@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/block_header.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
@@ -7,15 +9,21 @@ import 'package:bsv/extentsions/list.dart';
 
 void main() {
   group('BlockHeader', () {
-    var bh = new BlockHeader();
     var versionBytesNum = 1;
     var prevBlockHashBuf = List.generate(32, (index) => 5);
-    // prevBlockHashBuf.fill(5)
     var merkleRootBuf = List.generate(32, (index) => 9);
-    // merkleRootBuf.fill(9)
     var time = 2;
     var bits = 3;
     var nonce = 4;
+
+    var bh = new BlockHeader(
+      versionBytesNum: versionBytesNum,
+      prevBlockHashBuf: prevBlockHashBuf,
+      merkleRootBuf: merkleRootBuf,
+      time: time,
+      bits: bits,
+      nonce: nonce,
+    );
 
     bh = BlockHeader(
         versionBytesNum: versionBytesNum,
@@ -29,34 +37,34 @@ void main() {
     var bhbuf = hex.decode(bhhex);
 
     // test('should make a new blockHeader', () {
-    //   var blockHeader = new BlockHeader()
+    //   var blockHeader = new BlockHeader
     //   should.exist(blockHeader)
-    //   blockHeader = new BlockHeader()
+    //   blockHeader = new BlockHeader
     //   should.exist(blockHeader)
     // })
 
-    group('#fromObject', () {
-      test('should set all the variables', () {
-        // bh.fromObject({
-        //   versionBytesNum: versionBytesNum,
-        //   prevBlockHashBuf: prevBlockHashBuf,
-        //   merkleRootBuf: merkleRootBuf,
-        //   time: time,
-        //   bits: bits,
-        //   nonce: nonce
-        // })
-        expect(bh.versionBytesNum != null, true);
-        expect(bh.prevBlockHashBuf != null, true);
-        expect(bh.merkleRootBuf != null, true);
-        expect(bh.time != null, true);
-        expect(bh.bits != null, true);
-        expect(bh.nonce != null, true);
-      });
-    });
+    // group('#fromObject', () {
+    //   test('should set all the variables', () {
+    //     // bh.fromObject({
+    //     //   versionBytesNum: versionBytesNum,
+    //     //   prevBlockHashBuf: prevBlockHashBuf,
+    //     //   merkleRootBuf: merkleRootBuf,
+    //     //   time: time,
+    //     //   bits: bits,
+    //     //   nonce: nonce
+    //     // })
+    //     expect(bh.versionBytesNum != null, true);
+    //     expect(bh.prevBlockHashBuf != null, true);
+    //     expect(bh.merkleRootBuf != null, true);
+    //     expect(bh.time != null, true);
+    //     expect(bh.bits != null, true);
+    //     expect(bh.nonce != null, true);
+    //   });
+    // });
 
     group('#fromJSON', () {
       test('should set all the variables', () {
-        var bh = new BlockHeader().fromJSON({
+        var bh = new BlockHeader.fromJSON({
           "versionBytesNum": versionBytesNum,
           "prevBlockHashBuf": prevBlockHashBuf.toHex(),
           "merkleRootBuf": merkleRootBuf.toHex(),
@@ -64,11 +72,17 @@ void main() {
           "bits": bits,
           "nonce": nonce
         });
+        // ignore: unnecessary_null_comparison
         expect(bh.versionBytesNum != null, true);
+        // ignore: unnecessary_null_comparison
         expect(bh.prevBlockHashBuf != null, true);
+        // ignore: unnecessary_null_comparison
         expect(bh.merkleRootBuf != null, true);
+        // ignore: unnecessary_null_comparison
         expect(bh.time != null, true);
+        // ignore: unnecessary_null_comparison
         expect(bh.bits != null, true);
+        // ignore: unnecessary_null_comparison
         expect(bh.nonce != null, true);
       });
     });
@@ -87,42 +101,45 @@ void main() {
 
     group('#fromHex', () {
       test('should parse this known hex string', () {
-        expect(new BlockHeader().fromHex(bhhex).toBuffer().toHex(), bhhex);
+        expect(new BlockHeader.fromHex(bhhex).toBuffer().toHex(), bhhex);
       });
     });
 
     group('#fromBuffer', () {
       test('should parse this known buffer', () {
-        expect(new BlockHeader().fromBuffer(bhbuf).toBuffer().toHex(), bhhex);
+        expect(new BlockHeader.fromBuffer(bhbuf).toBuffer().toHex(), bhhex);
       });
     });
 
     group('#fromBr', () {
       test('should parse this known buffer', () {
-        expect(new BlockHeader().fromBr(new Br(buf: bhbuf)).toBuffer().toHex(),
+        expect(
+            new BlockHeader.fromBr(new Br(buf: bhbuf as Uint8List?))
+                .toBuffer()
+                .toHex(),
             bhhex);
       });
     });
 
     group('#toHex', () {
       test('should output this known hex string', () {
-        expect(new BlockHeader().fromBuffer(bhbuf).toHex(), bhhex);
+        expect(new BlockHeader.fromBuffer(bhbuf).toHex(), bhhex);
       });
     });
 
     group('#toBuffer', () {
       test('should output this known buffer', () {
-        expect(new BlockHeader().fromBuffer(bhbuf).toBuffer().toHex(), bhhex);
+        expect(new BlockHeader.fromBuffer(bhbuf).toBuffer().toHex(), bhhex);
       });
     });
 
     group('#toBw', () {
       test('should output this known buffer', () {
-        expect(new BlockHeader().fromBuffer(bhbuf).toBw().toBuffer().toHex(),
-            bhhex);
+        expect(
+            new BlockHeader.fromBuffer(bhbuf).toBw().toBuffer().toHex(), bhhex);
 
         var bw = new Bw();
-        new BlockHeader().fromBuffer(bhbuf).toBw(bw);
+        new BlockHeader.fromBuffer(bhbuf).toBw(bw);
         expect(bw.toBuffer().toHex(), bhhex);
       });
     });

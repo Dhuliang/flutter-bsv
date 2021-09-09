@@ -10,14 +10,14 @@ class Hash {
   //   "sha256": sha256,
   //   "sha512": sha512,
   // };
-  final Uint8List data;
+  final Uint8List? data;
   Hash({this.data});
 
-  String get toHex => hex.encode(this.data);
+  String get toHex => hex.encode(this.data!);
 
-  List<int> toBuffer() => this.data.toList();
+  List<int> toBuffer() => this.data!.toList();
 
-  ByteBuffer get buffer => this.data.buffer;
+  ByteBuffer get buffer => this.data!.buffer;
 
   static int sha1BlockSize = 512;
   static int sha256BlockSize = 512;
@@ -41,7 +41,7 @@ class Hash {
   }
 
   static Hash sha256Sha256(Uint8List data) {
-    return sha256(sha256(data).data);
+    return sha256(sha256(data).data!);
   }
 
   static Hash ripemd160(Uint8List data) {
@@ -50,7 +50,7 @@ class Hash {
   }
 
   static Hash sha256Ripemd160(Uint8List data) {
-    return ripemd160(sha256(data).data);
+    return ripemd160(sha256(data).data!);
   }
 
   static Hash sha512(Uint8List data) {

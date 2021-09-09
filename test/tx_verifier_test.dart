@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/interp.dart';
@@ -30,9 +32,9 @@ void main() {
     group('#getDebugObject', () {
       test('should get an object with these properties', () async {
         var vector = vectorsBitcoindTxInvalid[10];
-        List inputs = vector[0];
+        List inputs = vector[0] as List<dynamic>;
         var txhex = vector[1];
-        var flags = Interp.getFlags(vector[2]);
+        var flags = Interp.getFlags(vector[2] as String);
 
         var txOutMap = new TxOutMap();
         inputs.forEach((input) {
@@ -44,11 +46,12 @@ void main() {
             valueBn: BigIntX.zero,
             script: new Script().fromBitcoindString(input[2]),
           );
-          var txHashBuf = new Br(buf: hex.decode(input[0])).readReverse();
+          var txHashBuf =
+              new Br(buf: hex.decode(input[0]) as Uint8List?).readReverse();
           txOutMap.set(txHashBuf, txOutNum, txOut);
         });
 
-        var tx = new Tx().fromBuffer(hex.decode(txhex));
+        var tx = new Tx().fromBuffer(hex.decode(txhex as String));
         var txVerifier = new TxVerifier(tx: tx, txOutMap: txOutMap);
         var verified = await txVerifier.verify(flags);
         expect(verified, false);
@@ -61,9 +64,9 @@ void main() {
     group('#getDebugString', () {
       test('should get an object with these properties', () async {
         var vector = vectorsBitcoindTxInvalid[10];
-        List inputs = vector[0];
+        List inputs = vector[0] as List<dynamic>;
         var txhex = vector[1];
-        var flags = Interp.getFlags(vector[2]);
+        var flags = Interp.getFlags(vector[2] as String);
 
         var txOutMap = new TxOutMap();
         inputs.forEach((input) {
@@ -75,16 +78,17 @@ void main() {
             valueBn: BigIntX.zero,
             script: new Script().fromBitcoindString(input[2]),
           );
-          var txHashBuf = new Br(buf: hex.decode(input[0])).readReverse();
+          var txHashBuf =
+              new Br(buf: hex.decode(input[0]) as Uint8List?).readReverse();
           txOutMap.set(txHashBuf, txOutNum, txOut);
         });
 
-        var tx = new Tx().fromBuffer(hex.decode(txhex));
+        var tx = new Tx().fromBuffer(hex.decode(txhex as String));
         var txVerifier = new TxVerifier(tx: tx, txOutMap: txOutMap);
         var verified = await txVerifier.verify(flags);
         expect(verified, false);
         var debugString = txVerifier.getDebugString();
-        expect(debugString != null, true);
+        expect(debugString.isNotEmpty, true);
       });
     });
 
@@ -95,9 +99,9 @@ void main() {
         // OP_NOP2 but is now OP_CHECKLOCKTIMEVERIFY, so the
         // OP_CHECKLOCKTIMEVERIFY flag cannot be enabled to verify this tx.
         var flags = 0;
-        var tx = Tx.fromHex(coolestTxVector['tx']);
-        var intx0 = Tx.fromHex(coolestTxVector['intx0']);
-        var intx1 = Tx.fromHex(coolestTxVector['intx1']);
+        var tx = Tx.fromHex(coolestTxVector['tx']!);
+        var intx0 = Tx.fromHex(coolestTxVector['intx0']!);
+        var intx1 = Tx.fromHex(coolestTxVector['intx1']!);
         var txOutMap = new TxOutMap();
         txOutMap.setTx(intx0);
         txOutMap.setTx(intx1);
@@ -114,9 +118,9 @@ void main() {
         // written about the sighash single bug here:
         // https://lists.linuxfoundation.org/pipermail/bitcoin-dev/2014-November/006878.html
         var flags = 0;
-        var tx = Tx.fromHex(sighashSingleVector['tx']);
-        var intx0 = Tx.fromHex(sighashSingleVector['intx0']);
-        var intx1 = Tx.fromHex(sighashSingleVector['intx1']);
+        var tx = Tx.fromHex(sighashSingleVector['tx']!);
+        var intx0 = Tx.fromHex(sighashSingleVector['intx0']!);
+        var intx1 = Tx.fromHex(sighashSingleVector['intx1']!);
         var txOutMap = new TxOutMap();
         txOutMap.setTx(intx0);
         txOutMap.setTx(intx1);
@@ -133,9 +137,9 @@ void main() {
           continue;
         }
         test('should verify txValid vector $i', () async {
-          List inputs = vector[0];
+          List inputs = vector[0] as List<dynamic>;
           var txhex = vector[1];
-          var flags = Interp.getFlags(vector[2]);
+          var flags = Interp.getFlags(vector[2] as String);
 
           var txOutMap = new TxOutMap();
           inputs.forEach((input) {
@@ -147,11 +151,12 @@ void main() {
               valueBn: BigIntX.zero,
               script: new Script().fromBitcoindString(input[2]),
             );
-            var txHashBuf = new Br(buf: hex.decode(input[0])).readReverse();
+            var txHashBuf =
+                new Br(buf: hex.decode(input[0]) as Uint8List?).readReverse();
             txOutMap.set(txHashBuf, txOutNum, txOut);
           });
 
-          var tx = new Tx().fromBuffer(hex.decode(txhex));
+          var tx = new Tx().fromBuffer(hex.decode(txhex as String));
           var verified = await TxVerifier.staticVerify(
             tx: tx,
             txOutMap: txOutMap,
@@ -169,9 +174,9 @@ void main() {
         }
 
         test('should unverify txInvalid vector $i', () async {
-          List inputs = vector[0];
+          List inputs = vector[0] as List<dynamic>;
           var txhex = vector[1];
-          var flags = Interp.getFlags(vector[2]);
+          var flags = Interp.getFlags(vector[2] as String);
 
           var txOutMap = new TxOutMap();
           inputs.forEach((input) {
@@ -183,11 +188,12 @@ void main() {
               valueBn: BigIntX.zero,
               script: new Script().fromBitcoindString(input[2]),
             );
-            var txHashBuf = new Br(buf: hex.decode(input[0])).readReverse();
+            var txHashBuf =
+                new Br(buf: hex.decode(input[0]) as Uint8List?).readReverse();
             txOutMap.set(txHashBuf, txOutNum, txOut);
           });
 
-          var tx = new Tx().fromBuffer(hex.decode(txhex));
+          var tx = new Tx().fromBuffer(hex.decode(txhex as String));
 
           var verified = await TxVerifier.staticVerify(
             tx: tx,

@@ -7,10 +7,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('PubKey', () {
-    test('should create a blank public key', () {
-      var pk = new PubKey();
-      expect(pk != null, true);
-    });
+    // test('should create a blank public key', () {
+    //   var pk = new PubKey();
+    //   expect(pk != null, true);
+    // });
 
     test('should create a public key with a point', () {
       var p = new PointWrapper();
@@ -39,12 +39,12 @@ void main() {
         );
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -77,13 +77,15 @@ void main() {
     group('#fromPrivKey', () {
       test('should make a public key from a privKey', () {
         expect(
-            new PubKey().fromPrivKey(new PrivKey().fromRandom()) != null, true);
+            new PubKey().fromPrivKey(new PrivKey().fromRandom()).point != null,
+            true);
       });
     });
 
     group('@fromPrivKey', () {
       test('should make a public key from a privKey', () {
-        expect(PubKey.fromPrivKey(new PrivKey().fromRandom()) != null, true);
+        expect(
+            PubKey.fromPrivKey(new PrivKey().fromRandom()).point != null, true);
       });
     });
 
@@ -146,12 +148,12 @@ void main() {
             '041ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341'));
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -162,12 +164,12 @@ void main() {
             '031ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a'));
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -207,7 +209,7 @@ void main() {
             '01041ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341'));
 
         expect(
-          pubKey.point.getX().toString(radix: 16),
+          pubKey.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
       });
@@ -221,12 +223,12 @@ void main() {
         ));
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -238,12 +240,12 @@ void main() {
         ));
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -265,12 +267,12 @@ void main() {
             '041ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341'));
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -281,12 +283,12 @@ void main() {
         ));
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -307,12 +309,12 @@ void main() {
             '041ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341');
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -327,12 +329,12 @@ void main() {
         pk.fromX(isOdd: true, x: x.bn);
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -347,12 +349,12 @@ void main() {
         pk.fromX(isOdd: true, x: x.bn);
 
         expect(
-          pk.point.getX().toString(radix: 16),
+          pk.point!.getX().toString(radix: 16),
           '1ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a',
         );
 
         expect(
-          pk.point.getY().toString(radix: 16),
+          pk.point!.getY().toString(radix: 16),
           '7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         );
       });
@@ -445,7 +447,7 @@ void main() {
             '031ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a';
         var pk = new PubKey();
         pk.fromString(hex);
-        expect(pk.validate() != null, true);
+        expect(pk.validate().point != null, true);
       });
 
       test('should not throw an error if pubKey is invalid', () {
@@ -462,14 +464,13 @@ void main() {
 
       test('should throw an error if pubKey is infinity', () {
         var pk = new PubKey();
-        var errm = '';
+        String errm = '';
         try {
           pk.point = PointWrapper.getG().mul(PointWrapper.getN());
         } catch (err) {
-          errm = err.message;
           print(errm);
         }
-        expect(pk.point.isInfinity, true);
+        expect(pk.point!.isInfinity, true);
         // errm.should.equal('point mul out of range');
       });
     });

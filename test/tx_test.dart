@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/interp.dart';
@@ -51,10 +53,10 @@ void main() {
 
       // should set known defaults
       expect(tx.versionBytesNum, (1));
-      expect(tx.txInsVi.toNumber(), (0));
-      expect(tx.txIns.length, (0));
-      expect(tx.txOutsVi.toNumber(), (0));
-      expect(tx.txOuts.length, (0));
+      expect(tx.txInsVi!.toNumber(), (0));
+      expect(tx.txIns!.length, (0));
+      expect(tx.txOutsVi!.toNumber(), (0));
+      expect(tx.txOuts!.length, (0));
       expect(tx.nLockTime, (0));
     });
 
@@ -62,10 +64,10 @@ void main() {
       test('should set these known defaults', () {
         var tx = new Tx();
         expect(tx.versionBytesNum, (1));
-        expect(tx.txInsVi.toNumber(), (0));
-        expect(tx.txIns.length, (0));
-        expect(tx.txOutsVi.toNumber(), (0));
-        expect(tx.txOuts.length, (0));
+        expect(tx.txInsVi!.toNumber(), (0));
+        expect(tx.txIns!.length, (0));
+        expect(tx.txOutsVi!.toNumber(), (0));
+        expect(tx.txOuts!.length, (0));
         expect(tx.nLockTime, (0));
       });
     });
@@ -160,7 +162,12 @@ void main() {
 
     group('#fromBr', () {
       test('should recover from this known tx', () {
-        expect(new Tx().fromBr(new Br(buf: txbuf)).toBuffer().toHex(), txhex);
+        expect(
+            new Tx()
+                .fromBr(new Br(buf: txbuf as Uint8List?))
+                .toBuffer()
+                .toHex(),
+            txhex);
       });
     });
 
@@ -190,7 +197,7 @@ void main() {
 
       test('should return 1 for the SIGHASH_SINGLE bug', () {
         var tx = Tx.fromBuffer(tx2buf);
-        tx.txOuts.length = 1;
+        tx.txOuts!.length = 1;
         tx.txOutsVi = VarInt.fromNumber(1);
         expect(
           tx
@@ -233,6 +240,7 @@ void main() {
           nIn: 0,
           subScript: new Script(),
         );
+        // ignore: unnecessary_null_comparison
         expect(sig1 != null, true);
         var sig2 = tx.sign(
           keyPair: keyPair,
@@ -319,7 +327,7 @@ void main() {
           hex.decode(tx2idhex).reversed.toList(),
         );
 
-        expect(tx.hash().data.toList().toHex(), txHashBuf.toHex());
+        expect(tx.hash().data!.toList().toHex(), txHashBuf.toHex());
       });
     });
 
@@ -353,10 +361,10 @@ void main() {
       test('should add an input', () {
         var txIn = new TxIn();
         var tx = new Tx();
-        expect(tx.txInsVi.toNumber(), 0);
+        expect(tx.txInsVi!.toNumber(), 0);
         tx.addTxIn(data: txIn);
-        expect(tx.txInsVi.toNumber(), 1);
-        expect(tx.txIns.length, 1);
+        expect(tx.txInsVi!.toNumber(), 1);
+        expect(tx.txIns!.length, 1);
       });
     });
 
@@ -364,10 +372,10 @@ void main() {
       test('should add an output', () {
         var txOut = new TxOut();
         var tx = new Tx();
-        expect(tx.txOutsVi.toNumber(), 0);
+        expect(tx.txOutsVi!.toNumber(), 0);
         tx.addTxOut(data: txOut);
-        expect(tx.txOutsVi.toNumber(), 1);
-        expect(tx.txOuts.length, 1);
+        expect(tx.txOutsVi!.toNumber(), 1);
+        expect(tx.txOuts!.length, 1);
       });
     });
 
@@ -379,11 +387,11 @@ void main() {
         });
       }
 
-      var inputs = bip69JSON['inputs'];
+      var inputs = bip69JSON['inputs']!;
 
       for (var i = 0; i < inputs.length; i++) {
         var inputSet = inputs[i];
-        test(inputSet['description'], () {
+        test(inputSet['description']!, () {
           var tx = new Tx();
           var list = inputSet['inputs'] as List<dynamic>;
           var txIns = list.map((input) {
@@ -400,18 +408,18 @@ void main() {
           tx.txIns = [...txIns];
           tx.sort();
           expect(
-            getIndexOrder(txIns, tx.txIns).toList().toString(),
+            getIndexOrder(txIns, tx.txIns!).toList().toString(),
             inputSet['expected'].toString(),
           );
           // getIndexOrder(txIns, tx.txIns).toString().should.equal(inputSet.expected.toString())
         });
       }
 
-      var outputs = bip69JSON['outputs'];
+      var outputs = bip69JSON['outputs']!;
 
       for (var i = 0; i < outputs.length; i++) {
         var outputSet = outputs[i];
-        test(outputSet['description'], () {
+        test(outputSet['description']!, () {
           var tx = new Tx();
           var list = outputSet['outputs'] as List<dynamic>;
 
@@ -426,7 +434,7 @@ void main() {
           tx.sort();
 
           expect(
-            getIndexOrder(txOuts, tx.txOuts).toList().toString(),
+            getIndexOrder(txOuts, tx.txOuts!).toList().toString(),
             outputSet['expected'].toString(),
           );
         });
@@ -438,7 +446,7 @@ void main() {
           'should find the correct id of this (valid, on the blockchain) 1 mb transaction',
           () {
         var txidhex = largesttxvector['txidhex'];
-        var txhex = largesttxvector['txhex'];
+        var txhex = largesttxvector['txhex']!;
         var tx = Tx.fromHex(txhex);
         var txid = tx.id();
         expect(txid, txidhex);
@@ -455,12 +463,12 @@ void main() {
         var vector = vectorsBitcoindSighash[i];
 
         test('should pass bitcoind sighash test vector $i', () {
-          var txbuf = hex.decode(vector[0]);
-          var scriptbuf = hex.decode(vector[1]);
-          var subScript = new Script().fromBuffer(scriptbuf);
+          var txbuf = hex.decode(vector[0] as String);
+          var scriptbuf = hex.decode(vector[1] as String);
+          var subScript = new Script().fromBuffer(scriptbuf as Uint8List?);
           var nIn = vector[2];
           var nHashType = vector[3];
-          var sighashBuf = hex.decode(vector[4]);
+          var sighashBuf = hex.decode(vector[4] as String);
           var tx = Tx.fromBuffer(txbuf);
 
           // make sure transacion to/from buffer is isomorphic
@@ -470,8 +478,8 @@ void main() {
           expect(
             tx
                 .sighash(
-                  nHashType: nHashType,
-                  nIn: nIn,
+                  nHashType: nHashType as int,
+                  nIn: nIn as int?,
                   subScript: subScript,
                 )
                 .toHex(),
@@ -492,12 +500,12 @@ void main() {
           if (vector[0] == 'Test vectors for SIGHASH_FORKID') {
             return;
           }
-          var txbuf = hex.decode(vector[0]);
-          var scriptbuf = hex.decode(vector[1]);
-          var subScript = new Script().fromBuffer(scriptbuf);
+          var txbuf = hex.decode(vector[0] as String);
+          var scriptbuf = hex.decode(vector[1] as String);
+          var subScript = new Script().fromBuffer(scriptbuf as Uint8List?);
           var nIn = vector[2];
           var nHashType = vector[3] as int;
-          var sighashBuf = hex.decode(vector[4]);
+          var sighashBuf = hex.decode(vector[4] as String);
           var tx = Tx.fromBuffer(txbuf);
 
           // make sure transacion to/from buffer is isomorphic
@@ -513,7 +521,7 @@ void main() {
             tx
                 .sighash(
                   nHashType: nHashType,
-                  nIn: nIn,
+                  nIn: nIn as int?,
                   subScript: subScript,
                   valueBn: valueBn,
                   flags: flags,
@@ -532,7 +540,7 @@ void main() {
         test('should correctly serialized/deserialize tx_valid test vector $i',
             () {
           var txhex = vector[1];
-          var txbuf = hex.decode(vector[1]);
+          var txbuf = hex.decode(vector[1] as String);
           var tx = Tx.fromBuffer(txbuf);
           expect(tx.toBuffer().toHex(), txhex);
         });
@@ -547,7 +555,7 @@ void main() {
             'should correctly serialized/deserialize tx_invalid test vector $i',
             () {
           var txhex = vector[1];
-          var txbuf = hex.decode(vector[1]);
+          var txbuf = hex.decode(vector[1] as String);
           var tx = Tx.fromBuffer(txbuf);
           expect(tx.toBuffer().toHex(), txhex);
         });

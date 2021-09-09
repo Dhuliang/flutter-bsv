@@ -8,6 +8,8 @@
  * out.)
  */
 
+import 'dart:typed_data';
+
 import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
 import 'package:bsv/op_code.dart';
@@ -19,10 +21,10 @@ import 'package:bsv/extentsions/list.dart';
 import 'package:convert/convert.dart';
 
 class TxIn {
-  List<int> txHashBuf;
-  int txOutNum;
-  VarInt scriptVi;
-  Script script;
+  List<int>? txHashBuf;
+  int? txOutNum;
+  VarInt? scriptVi;
+  Script? script;
   int nSequence = 0xffffffff;
 
   static const LOCKTIME_VERIFY_SEQUENCE = 1 << 0;
@@ -38,11 +40,11 @@ class TxIn {
   static const SEQUENCE_LOCKTIME_GRANULARITY = 9;
 
   TxIn({
-    List<int> txHashBuf,
-    int txOutNum,
-    VarInt scriptVi,
-    Script script,
-    int nSequence,
+    List<int>? txHashBuf,
+    int? txOutNum,
+    VarInt? scriptVi,
+    Script? script,
+    int? nSequence,
   }) {
     this.txHashBuf = txHashBuf;
     this.txOutNum = txOutNum;
@@ -52,10 +54,10 @@ class TxIn {
   }
 
   factory TxIn.fromProperties({
-    List<int> txHashBuf,
-    int txOutNum,
-    Script script,
-    int nSequence,
+    List<int>? txHashBuf,
+    int? txOutNum,
+    Script? script,
+    int? nSequence,
   }) {
     return new TxIn().fromProperties(
       txHashBuf: txHashBuf,
@@ -79,25 +81,25 @@ class TxIn {
 
   Map<String, dynamic> toJSON() {
     return {
-      "txHashBuf": this.txHashBuf != null ? this.txHashBuf.toHex() : null,
+      "txHashBuf": this.txHashBuf != null ? this.txHashBuf!.toHex() : null,
       "txOutNum": this.txOutNum,
-      "scriptVi": this.scriptVi != null ? this.scriptVi.toJSON() : null,
-      "script": this.script != null ? this.script.toJSON() : null,
+      "scriptVi": this.scriptVi != null ? this.scriptVi!.toJSON() : null,
+      "script": this.script != null ? this.script!.toJSON() : null,
       "nSequence": this.nSequence
     };
   }
 
-  TxIn setScript(Script s) {
-    this.scriptVi = VarInt.fromNumber(s.toBuffer().length);
+  TxIn setScript(Script? s) {
+    this.scriptVi = VarInt.fromNumber(s!.toBuffer().length);
     this.script = s;
     return this;
   }
 
   TxIn fromProperties({
-    List<int> txHashBuf,
-    int txOutNum,
-    Script script,
-    int nSequence,
+    List<int>? txHashBuf,
+    int? txOutNum,
+    Script? script,
+    int? nSequence,
   }) {
     var txIn = TxIn(
       txHashBuf: txHashBuf,
@@ -112,19 +114,19 @@ class TxIn {
     this.txHashBuf = br.read(32);
     this.txOutNum = br.readUInt32LE();
     this.scriptVi = VarInt.fromBuffer(br.readVarIntBuf());
-    this.script = Script.fromBuffer(br.read(this.scriptVi.toNumber()));
+    this.script = Script.fromBuffer(br.read(this.scriptVi!.toNumber()));
     this.nSequence = br.readUInt32LE();
     return this;
   }
 
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
-    bw.write(this.txHashBuf.asUint8List());
-    bw.writeUInt32LE(this.txOutNum);
-    bw.write(this.scriptVi.buf.asUint8List());
-    bw.write(this.script.toBuffer().asUint8List());
+    bw.write(this.txHashBuf!.asUint8List());
+    bw.writeUInt32LE(this.txOutNum!);
+    bw.write(this.scriptVi!.buf!.asUint8List());
+    bw.write(this.script!.toBuffer().asUint8List());
     bw.writeUInt32LE(this.nSequence);
     return bw;
   }
@@ -137,13 +139,13 @@ class TxIn {
      * know what it is.
      */
   TxIn fromPubKeyHashTxOut({
-    List<int> txHashBuf,
-    int txOutNum,
-    TxOut txOut,
-    PubKey pubKey,
+    List<int>? txHashBuf,
+    int? txOutNum,
+    required TxOut txOut,
+    PubKey? pubKey,
   }) {
     var script = new Script();
-    if (txOut.script.isPubKeyHashOut()) {
+    if (txOut.script!.isPubKeyHashOut()) {
       script.writeOpCode(OpCode.OP_0); // blank signature
       if (pubKey != null) {
         script.writeBuffer(pubKey.toBuffer().asUint8List());
@@ -160,7 +162,7 @@ class TxIn {
   }
 
   bool hasNullInput() {
-    var hexStr = this.txHashBuf.toHex();
+    var hexStr = this.txHashBuf!.toHex();
     if (hexStr ==
             '0000000000000000000000000000000000000000000000000000000000000000' &&
         this.txOutNum == 0xffffffff) {
@@ -175,11 +177,11 @@ class TxIn {
   }
 
   factory TxIn.fromHex(String str) {
-    return TxIn().fromBr(Br(buf: hex.decode(str)));
+    return TxIn().fromBr(Br(buf: hex.decode(str) as Uint8List?));
   }
 
   TxIn fromHex(String str) {
-    return this.fromBr(Br(buf: hex.decode(str)));
+    return this.fromBr(Br(buf: hex.decode(str) as Uint8List?));
   }
 
   TxIn fromBuffer(List<int> buf) {

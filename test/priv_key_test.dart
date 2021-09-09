@@ -15,6 +15,8 @@ void main() {
     var encmainnet = 'L2Gkw3kKJ6N24QcDuH4XDqt9cTqsKTVNDGz1CRZhk9cq4auDUbJy';
     var encmu = '5JxgQaFM1FMd38cd14e3mbdxsdSa9iM2BV6DHBYsvGzxkTNQ7Un';
 
+    var testnetPriv = PrivKey.Testnet(bn: BigIntX.zero, compressed: true);
+
     test('should satisfy these basic API features', () {
       // let privKey = new PrivKey()
       // should.exist(privKey)
@@ -26,8 +28,8 @@ void main() {
       //   new PrivKey.Testnet().constructor
       // )
 
-      print(PrivKey.Testnet().privKeyVersionByteNum);
-      expect(PrivKey.Testnet().fromRandom().toString()[0], 'c');
+      print(testnetPriv.privKeyVersionByteNum);
+      expect(testnetPriv.fromRandom().toString()[0], 'c');
     });
 
     test('should create a 0 private key with this convenience method', () {
@@ -80,8 +82,8 @@ void main() {
     group('#fromRandom', () {
       test('should set bn gt 0 and lt n, and should be compressed', () {
         var privKey = PrivKey().fromRandom();
-        expect(privKey.bn.gt(0), true);
-        expect(privKey.bn.lt(PointWrapper.getN()), true);
+        expect(privKey.bn!.gt(0), true);
+        expect(privKey.bn!.lt(PointWrapper.getN()), true);
         expect(privKey.compressed, true);
       });
     });
@@ -89,8 +91,8 @@ void main() {
     group('@fromRandom', () {
       test('should set bn gt 0 and lt n, and should be compressed', () {
         var privKey = PrivKey.fromRandom();
-        expect(privKey.bn.gt(0), true);
-        expect(privKey.bn.lt(PointWrapper.getN()), true);
+        expect(privKey.bn!.gt(0), true);
+        expect(privKey.bn!.lt(PointWrapper.getN()), true);
         expect(privKey.compressed, true);
       });
     });
@@ -174,21 +176,21 @@ void main() {
     group('#toBn', () {
       test('should return a bn', () {
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
-        expect(privKey.toBn().eq(5), true);
+        expect(privKey.toBn()!.eq(5), true);
       });
     });
 
     group('#fromBn', () {
       test('should create a privKey from a bignum', () {
         var privKey = new PrivKey.fromBn(BigIntX.fromNum(5));
-        expect(privKey.toBn().eq(5), true);
+        expect(privKey.toBn()!.eq(5), true);
       });
     });
 
     group('@fromBn', () {
       test('should create a privKey from a bignum', () {
         var privKey = new PrivKey().fromBn(BigIntX.fromNum(5));
-        expect(privKey.toBn().eq(5), true);
+        expect(privKey.toBn()!.eq(5), true);
       });
     });
 
@@ -203,7 +205,7 @@ void main() {
           throwsA(PrivKey.INVALID_NUMBER_N),
         );
 
-        privKey.bn = privKey.bn.sub(BigIntX.one);
+        privKey.bn = privKey.bn!.sub(BigIntX.one);
         privKey.compressed = null;
 
         expect(
@@ -232,7 +234,7 @@ void main() {
 
     group('#toWif', () {
       test('should parse this compressed testnet address correctly', () {
-        var privKey = new PrivKey.Testnet();
+        var privKey = new PrivKey.Testnet(bn: BigIntX.zero, compressed: true);
         privKey.fromWif(enctestnet);
         expect(privKey.toWif(), enctestnet);
       });
@@ -240,7 +242,7 @@ void main() {
 
     group('#fromString', () {
       test('should parse this uncompressed testnet address correctly', () {
-        var privKey = new PrivKey.Testnet();
+        var privKey = new PrivKey.Testnet(bn: BigIntX.zero, compressed: true);
         privKey.fromString(enctu);
         expect(privKey.toWif(), enctu);
       });

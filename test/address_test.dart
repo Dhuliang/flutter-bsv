@@ -203,7 +203,7 @@ void main() {
 
     group('#fromPrivKey', () {
       test('should make this address from a compressed pubKey', () {
-        var privKey = new PrivKey().fromRandom();
+        var privKey = PrivKey.fromRandom();
         var pubKey = new PubKey().fromPrivKey(privKey);
         var address = new Address().fromPrivKey(privKey);
         var address2 = new Address().fromPubKey(pubKey);
@@ -215,7 +215,7 @@ void main() {
       test(
           'should make this address from a compressed pubKey using static method',
           () {
-        var privKey = new PrivKey().fromRandom();
+        var privKey = PrivKey.fromRandom();
         var pubKey = new PubKey().fromPrivKey(privKey);
         var address = Address.fromPrivKey(privKey);
         var address2 = Address.fromPubKey(pubKey);
@@ -442,7 +442,7 @@ void main() {
       test('should not throw an error on this valid address', () {
         var address = new Address();
         address.fromString(str);
-        expect(address.validate() != null, true);
+        expect(address.validate() is Address, true);
       });
 
       test('should throw an error on this invalid versionByteNum', () {
@@ -459,7 +459,7 @@ void main() {
         var address = new Address();
         address.fromString(str);
         address.hashBuf = List<int>.from([
-          ...address.hashBuf,
+          ...address.hashBuf!,
           ...([0])
         ]);
         expect(

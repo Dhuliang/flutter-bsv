@@ -19,10 +19,10 @@ import 'package:bsv/extentsions/list.dart';
  */
 
 class KeyPair {
-  PrivKey privKey;
-  PubKey pubKey;
+  PrivKey? privKey;
+  PubKey? pubKey;
 
-  KeyPair({PrivKey privKey, PubKey pubKey}) {
+  KeyPair({PrivKey? privKey, PubKey? pubKey}) {
     this.privKey = privKey;
     this.pubKey = pubKey;
   }
@@ -48,7 +48,7 @@ class KeyPair {
   KeyPair fromBr(Br br) {
     var buflen1 = br.readUInt8();
     if (buflen1 > 0) {
-      this.privKey = new PrivKey().fromBuffer(br.read(buflen1));
+      this.privKey = new PrivKey.fromBuffer(br.read(buflen1));
     }
     var buflen2 = br.readUInt8();
     if (buflen2 > 0) {
@@ -57,19 +57,19 @@ class KeyPair {
     return this;
   }
 
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
     if (this.privKey != null) {
-      var privKeybuf = this.privKey.toBuffer();
+      var privKeybuf = this.privKey!.toBuffer();
       bw.writeUInt8(privKeybuf.length);
       bw.write(privKeybuf.asUint8List());
     } else {
       bw.writeUInt8(0);
     }
     if (this.pubKey != null) {
-      var pubKeybuf = this.pubKey.toFastBuffer();
+      var pubKeybuf = this.pubKey!.toFastBuffer();
       bw.writeUInt8(pubKeybuf.length);
       bw.write(pubKeybuf.asUint8List());
     } else {
@@ -97,8 +97,8 @@ class KeyPair {
 
   Map<String, String> toJSON() {
     return {
-      "privKey": privKey.toJSON(),
-      "pubKey": pubKey.toJSON(),
+      "privKey": privKey!.toJSON(),
+      "pubKey": pubKey!.toJSON(),
     };
   }
 
@@ -115,8 +115,8 @@ class KeyPair {
   }
 
   KeyPair fromRandom() {
-    this.privKey = new PrivKey().fromRandom();
-    this.pubKey = new PubKey().fromPrivKey(this.privKey);
+    this.privKey = new PrivKey.fromRandom();
+    this.pubKey = new PubKey().fromPrivKey(this.privKey!);
     return this;
   }
 }

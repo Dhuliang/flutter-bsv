@@ -14,16 +14,16 @@ import 'package:pointycastle/export.dart';
 import "package:unorm_dart/unorm_dart.dart" as unorm;
 
 class Bip39 {
-  Uint8List seed;
-  String mnemonic;
-  List<String> worldList;
-  String worldListSpace;
+  Uint8List? seed;
+  String? mnemonic;
+  late List<String> worldList;
+  late String worldListSpace;
 
   Bip39({
-    Uint8List seed,
-    String mnemonic,
-    List<String> worldList,
-    String worldListSpace,
+    Uint8List? seed,
+    String? mnemonic,
+    List<String>? worldList,
+    String? worldListSpace,
   }) {
     this.seed = seed;
     this.mnemonic = mnemonic;
@@ -31,19 +31,19 @@ class Bip39 {
     this.worldListSpace = worldListSpace ?? ' ';
   }
 
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
     if (this.mnemonic != null) {
-      var buf = utf8.encode(this.mnemonic);
+      var buf = utf8.encode(this.mnemonic!);
       bw.writeVarIntNum(buf.length);
-      bw.write(buf);
+      bw.write(buf as Uint8List?);
     } else {
       bw.writeVarIntNum(0);
     }
     if (this.seed != null) {
-      bw.writeVarIntNum(this.seed.length);
+      bw.writeVarIntNum(this.seed!.length);
       bw.write(this.seed);
     } else {
       bw.writeVarIntNum(0);
@@ -67,7 +67,7 @@ class Bip39 {
   /**
      * Generate a random new mnemonic from the wordlist.
      */
-  Bip39 fromRandom([int bits]) {
+  Bip39 fromRandom([int? bits]) {
     if (bits == null) {
       bits = 128;
     }
@@ -84,7 +84,7 @@ class Bip39 {
     return this;
   }
 
-  factory Bip39.fromRandom([int bits]) {
+  factory Bip39.fromRandom([int? bits]) {
     return new Bip39().fromRandom(bits);
   }
 
@@ -107,10 +107,10 @@ class Bip39 {
   }
 
   String toString() {
-    return this.mnemonic;
+    return this.mnemonic!;
   }
 
-  Uint8List toSeed([String passphrase]) {
+  Uint8List? toSeed([String? passphrase]) {
     this.mnemonic2Seed(passphrase);
     return this.seed;
   }
@@ -125,7 +125,7 @@ class Bip39 {
       throw ('Entropy is less than 128 bits. It must be 128 bits or more.');
     }
 
-    var hash = Hash.sha256(buf).data;
+    var hash = Hash.sha256(buf).data!;
     var bin = '';
     var bits = buf.length * 8;
     for (var i = 0; i < buf.length; i++) {
@@ -144,7 +144,7 @@ class Bip39 {
       if (mnemonic != '') {
         mnemonic = mnemonic + this.worldListSpace;
       }
-      var wi = int.tryParse(bin.slice(i * 11, (i + 1) * 11), radix: 2);
+      var wi = int.tryParse(bin.slice(i * 11, (i + 1) * 11), radix: 2)!;
       mnemonic = mnemonic + this.worldList[wi];
     }
 
@@ -158,7 +158,7 @@ class Bip39 {
      * whitespace, no invalid words, and the checksum should match.
      */
   bool check() {
-    var mnemonic = this.mnemonic;
+    var mnemonic = this.mnemonic!;
 
     // confirm no invalid words
     var words = mnemonic.split(this.worldListSpace);
@@ -182,10 +182,10 @@ class Bip39 {
     var buf = Uint8List(nonhashBits.length ~/ 8);
     for (var i = 0; i < nonhashBits.length / 8; i++) {
       ByteData.view(buf.buffer)
-          .setUint8(i, int.tryParse(bin.slice(i * 8, (i + 1) * 8), radix: 2));
+          .setUint8(i, int.tryParse(bin.slice(i * 8, (i + 1) * 8), radix: 2)!);
       // buf.writeUInt8( int.tryParse (bin.slice(i * 8, (i + 1) * 8), radix:2), i);
     }
-    var hash = Hash.sha256(buf).data;
+    var hash = Hash.sha256(buf).data!;
     var expectedHashBits = hash[0].toRadixString(2);
     expectedHashBits = ('00000000' + expectedHashBits).slice(-8).slice(0, cs);
 
@@ -197,9 +197,9 @@ class Bip39 {
      * Convert a mnemonic to a seed. Does not check for validity of the mnemonic -
      * for that, you should manually run check() first.
      */
-  Bip39 mnemonic2Seed([String passphrase]) {
+  Bip39 mnemonic2Seed([String? passphrase]) {
     passphrase = passphrase ?? '';
-    var mnemonic = this.mnemonic;
+    var mnemonic = this.mnemonic!;
     if (!this.check()) {
       throw ('Mnemonic does not pass the check - was the mnemonic typed incorrectly? Are there extra spaces?');
     }
@@ -231,11 +231,12 @@ class Bip39 {
     return this;
   }
 
-  bool isValid([String passphrase]) {
+  bool isValid([String? passphrase]) {
     passphrase = passphrase ?? '';
     bool isValid;
     try {
-      isValid = (this.mnemonic2Seed(passphrase) != null);
+      this.mnemonic2Seed(passphrase);
+      isValid = true;
     } catch (err) {
       isValid = false;
     }
@@ -282,8 +283,8 @@ class Bip39 {
 
 class Bip39En extends Bip39 {
   Bip39En({
-    Uint8List seed,
-    String mnemonic,
+    Uint8List? seed,
+    String? mnemonic,
   }) : super(seed: seed, mnemonic: mnemonic) {
     this.worldList = bip39EnWorldlist;
     this.worldListSpace = bip39EnWorldSpace;
@@ -292,8 +293,8 @@ class Bip39En extends Bip39 {
 
 class Bip39Cn extends Bip39 {
   Bip39Cn({
-    Uint8List seed,
-    String mnemonic,
+    Uint8List? seed,
+    String? mnemonic,
   }) : super(seed: seed, mnemonic: mnemonic) {
     this.worldList = bip39CnWorldlist;
     this.worldListSpace = bip39CnWorldSpace;
@@ -302,8 +303,8 @@ class Bip39Cn extends Bip39 {
 
 class Bip39Jp extends Bip39 {
   Bip39Jp({
-    Uint8List seed,
-    String mnemonic,
+    Uint8List? seed,
+    String? mnemonic,
   }) : super(seed: seed, mnemonic: mnemonic) {
     this.worldList = bip39JpWorldlist;
     this.worldListSpace = bip39JpWorldSpace;

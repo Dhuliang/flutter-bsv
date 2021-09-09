@@ -47,8 +47,8 @@ void main() {
         ]);
         var sig = new Sig();
         sig.fromHex(compressed.toHex());
-        expect(sig.r.cmp(0), (0));
-        expect(sig.s.cmp(0), (0));
+        expect(sig.r!.cmp(0), (0));
+        expect(sig.s!.cmp(0), (0));
       });
 
       test('should parse this DER format signature', () {
@@ -58,12 +58,12 @@ void main() {
         var sig = new Sig();
         sig.fromHex(buf.toHex());
         expect(
-          sig.r.toBuffer(size: 32).toHex(),
+          sig.r!.toBuffer(size: 32).toHex(),
           '75fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e6277',
         );
 
         expect(
-          sig.s.toBuffer(size: 32).toHex(),
+          sig.s!.toBuffer(size: 32).toHex(),
           '729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2',
         );
       });
@@ -88,8 +88,8 @@ void main() {
 
         var sig = new Sig();
         sig.fromBuffer(compressed);
-        expect(sig.r.cmp(0), (0));
-        expect(sig.s.cmp(0), (0));
+        expect(sig.r!.cmp(0), (0));
+        expect(sig.s!.cmp(0), (0));
       });
 
       test('should parse this DER format signature', () {
@@ -99,12 +99,12 @@ void main() {
         var sig = new Sig();
         sig.fromBuffer(buf);
         expect(
-          sig.r.toBuffer(size: 32).toHex(),
+          sig.r!.toBuffer(size: 32).toHex(),
           '75fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e6277',
         );
 
         expect(
-          sig.s.toBuffer(size: 32).toHex(),
+          sig.s!.toBuffer(size: 32).toHex(),
           '729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2',
         );
       });
@@ -131,8 +131,8 @@ void main() {
         var sig = new Sig();
         sig.fromCompact(compact);
         expect(sig.compressed, (true));
-        expect(sig.r.cmp(0), (0));
-        expect(sig.s.cmp(0), (0));
+        expect(sig.r!.cmp(0), (0));
+        expect(sig.s!.cmp(0), (0));
       });
     });
 
@@ -148,8 +148,8 @@ void main() {
 
         var sig = Sig.fromCompact(compact);
         expect(sig.compressed, (true));
-        expect(sig.r.cmp(0), (0));
-        expect(sig.s.cmp(0), (0));
+        expect(sig.r!.cmp(0), (0));
+        expect(sig.s!.cmp(0), (0));
       });
     });
 
@@ -163,12 +163,12 @@ void main() {
         sig.fromDer(buf);
 
         expect(
-          sig.r.toBuffer(size: 32).toHex(),
+          sig.r!.toBuffer(size: 32).toHex(),
           '75fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e6277',
         );
 
         expect(
-          sig.s.toBuffer(size: 32).toHex(),
+          sig.s!.toBuffer(size: 32).toHex(),
           '729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2',
         );
       });
@@ -183,12 +183,12 @@ void main() {
         var sig = Sig.fromDer(buf);
 
         expect(
-          sig.r.toBuffer(size: 32).toHex(),
+          sig.r!.toBuffer(size: 32).toHex(),
           '75fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e6277',
         );
 
         expect(
-          sig.s.toBuffer(size: 32).toHex(),
+          sig.s!.toBuffer(size: 32).toHex(),
           '729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2',
         );
       });
@@ -262,12 +262,12 @@ void main() {
         sig.fromString(buf.toHex());
 
         expect(
-          sig.r.toBuffer(size: 32).toHex(),
+          sig.r!.toBuffer(size: 32).toHex(),
           '75fc517e541bd54769c080b64397e32161c850f6c1b2b67a5c433affbb3e6277',
         );
 
         expect(
-          sig.s.toBuffer(size: 32).toHex(),
+          sig.s!.toBuffer(size: 32).toHex(),
           '729e85cc46ffab881065ec07694220e71d4df9b2b8c8fd12c3122cf3a5efbcf2',
         );
       });
@@ -615,7 +615,7 @@ void main() {
     });
 
     group('vectors', () {
-      // TODO: These vectors were taken from BitcoinJS-lib during a debugging
+      // TODOS: These vectors were taken from BitcoinJS-lib during a debugging
       // expedition. I only took a subset relevant for the stuff I wanted to
       // test, but it would be valuable to revisit these test vectors and make
       // sure all of them pass.

@@ -34,12 +34,12 @@ import 'package:convert/convert.dart';
  */
 
 class Ecdsa {
-  Sig sig;
-  KeyPair keyPair;
-  List<int> hashBuf;
-  BigIntX k;
-  Endian endian;
-  bool verified;
+  Sig? sig;
+  KeyPair? keyPair;
+  List<int>? hashBuf;
+  BigIntX? k;
+  Endian? endian;
+  bool? verified;
 
   Ecdsa({
     this.sig,
@@ -53,8 +53,8 @@ class Ecdsa {
   Map<String, dynamic> toJSON() {
     return {
       "sig": this.sig != null ? this.sig.toString() : null,
-      "keyPair": this.keyPair != null ? this.keyPair.toBuffer().toHex() : null,
-      "hashBuf": this.hashBuf != null ? this.hashBuf.toHex() : null,
+      "keyPair": this.keyPair != null ? this.keyPair!.toBuffer().toHex() : null,
+      "hashBuf": this.hashBuf != null ? this.hashBuf!.toHex() : null,
       "k": this.k != null ? this.k.toString() : null,
       "endian": this.endian,
       "verified": this.verified
@@ -88,7 +88,7 @@ class Ecdsa {
     for (var recovery = 0; recovery < 4; recovery++) {
       // ignore: non_constant_identifier_names
       PubKey Qprime;
-      this.sig.recovery = recovery;
+      this.sig!.recovery = recovery;
       try {
         Qprime = this.sig2PubKey();
       } catch (e) {
@@ -96,15 +96,15 @@ class Ecdsa {
       }
 
       // if (Qprime.point.eq(this.keyPair.pubKey.point)) {
-      if (Qprime.point == this.keyPair.pubKey.point) {
-        var compressed = this.keyPair.pubKey.compressed;
-        this.sig.compressed =
-            this.keyPair.pubKey.compressed == null ? true : compressed;
+      if (Qprime.point == this.keyPair!.pubKey!.point) {
+        var compressed = this.keyPair!.pubKey!.compressed;
+        this.sig!.compressed =
+            this.keyPair!.pubKey!.compressed == null ? true : compressed;
         return this;
       }
     }
 
-    this.sig.recovery = null;
+    this.sig!.recovery = null;
     throw ('Unable to find valid recovery factor');
   }
 
@@ -114,10 +114,10 @@ class Ecdsa {
    * the recovery factor and the "compressed" variable. Throws an exception on
    * failure.
    */
-  static Sig staticCalcrecovery({
-    Sig sig,
-    PubKey pubKey,
-    List<int> hashBuf,
+  static Sig? staticCalcrecovery({
+    Sig? sig,
+    PubKey? pubKey,
+    List<int>? hashBuf,
   }) {
     var ecdsa = new Ecdsa(
       sig: sig,
@@ -169,32 +169,32 @@ class Ecdsa {
      *
      * https://tools.ietf.org/html/rfc6979#section-3.2
      */
-  Ecdsa deterministicK([int badrs]) {
+  Ecdsa deterministicK([int? badrs]) {
     var v = List.generate(32, (index) => 0x01).asUint8List();
     var k = List.generate(32, (index) => 0x00).asUint8List();
-    var x = this.keyPair.privKey.bn.toBuffer(size: 32).asUint8List();
+    var x = this.keyPair!.privKey!.bn!.toBuffer(size: 32).asUint8List();
     k = Hash.sha256Hmac(
       Uint8List.fromList([
         ...v,
         ...[0x00],
         ...x,
-        ...this.hashBuf
+        ...this.hashBuf as Iterable<int>
       ]),
       k,
-    ).data;
+    ).data!;
 
-    v = Hash.sha256Hmac(v, k).data;
+    v = Hash.sha256Hmac(v, k).data!;
     k = Hash.sha256Hmac(
       Uint8List.fromList([
         ...v,
         ...[0x01],
         ...x,
-        ...this.hashBuf
+        ...this.hashBuf as Iterable<int>
       ]),
       k,
-    ).data;
-    v = Hash.sha256Hmac(v, k).data;
-    v = Hash.sha256Hmac(v, k).data;
+    ).data!;
+    v = Hash.sha256Hmac(v, k).data!;
+    v = Hash.sha256Hmac(v, k).data!;
     var T = new BigIntX.fromBuffer(v);
     var N = PointWrapper.getN();
 
@@ -213,9 +213,9 @@ class Ecdsa {
           ...([0x00])
         ]),
         k,
-      ).data;
-      v = Hash.sha256Hmac(v, k).data;
-      v = Hash.sha256Hmac(v, k).data;
+      ).data!;
+      v = Hash.sha256Hmac(v, k).data!;
+      v = Hash.sha256Hmac(v, k).data!;
       T = new BigIntX.fromBuffer(v);
     }
 
@@ -224,14 +224,14 @@ class Ecdsa {
   }
 
   PubKey sig2PubKey() {
-    var recovery = this.sig.recovery;
+    var recovery = this.sig!.recovery!;
     if (!(recovery == 0 || recovery == 1 || recovery == 2 || recovery == 3)) {
       throw ('i must be equal to 0, 1, 2, or 3');
     }
 
-    var e = new BigIntX.fromBuffer(this.hashBuf);
-    var r = this.sig.r;
-    var s = this.sig.s;
+    var e = new BigIntX.fromBuffer(this.hashBuf!);
+    var r = this.sig!.r!;
+    var s = this.sig!.s!;
 
     // A set LSB signifies that the y-coordinate is odd
     var isYOdd = recovery & 1;
@@ -277,44 +277,44 @@ class Ecdsa {
     var Q = R.mul(s).add(G.mul(eNeg)).mul(rInv);
 
     var pubKey = new PubKey(point: Q);
-    pubKey.compressed = this.sig.compressed;
+    pubKey.compressed = this.sig!.compressed;
     pubKey.validate();
 
     return pubKey;
   }
 
-  static PubKey staticSig2PubKey({Sig sig, List<int> hashBuf}) {
+  static PubKey staticSig2PubKey({Sig? sig, List<int>? hashBuf}) {
     var ecdsa = new Ecdsa(sig: sig, hashBuf: hashBuf);
     return ecdsa.sig2PubKey();
   }
 
-  dynamic verifyStr([bool enforceLowS]) {
+  dynamic verifyStr([bool? enforceLowS]) {
     enforceLowS = enforceLowS ?? true;
-    if (!(this.hashBuf is List<int>) || this.hashBuf.length != 32) {
+    if (!(this.hashBuf is List<int>) || this.hashBuf!.length != 32) {
       return 'hashBuf must be a 32 byte buffer';
     }
 
     try {
-      this.keyPair.pubKey.validate();
+      this.keyPair!.pubKey!.validate();
     } catch (e) {
       return 'Invalid pubKey: ${e.toString()}';
     }
 
-    var r = this.sig.r;
-    var s = this.sig.s;
+    var r = this.sig!.r!;
+    var s = this.sig!.s;
     if (!(r.gt(0) && r.lt(PointWrapper.getN())) ||
-        !(s.gt(0) && s.lt(PointWrapper.getN()))) {
+        !(s!.gt(0) && s.lt(PointWrapper.getN()))) {
       return 'r and s not in range';
     }
 
     if (enforceLowS) {
-      if (!this.sig.hasLowS()) {
+      if (!this.sig!.hasLowS()) {
         return 's is too high and does not satisfy low s contraint - see bip 62';
       }
     }
 
     var e = new BigIntX.fromBuffer(
-      this.hashBuf,
+      this.hashBuf!,
       endian: this.endian != null ? this.endian : null,
     );
     var n = PointWrapper.getN();
@@ -322,7 +322,7 @@ class Ecdsa {
     var u1 = sinv.mul(e).mod(n);
     var u2 = sinv.mul(r).mod(n);
 
-    var p = PointWrapper.getG().mulAdd(u1, this.keyPair.pubKey.point, u2);
+    var p = PointWrapper.getG().mulAdd(u1, this.keyPair!.pubKey!.point!, u2);
     // var p = Point.getG().mulAdd(u1, this.keyPair.pubKey.point, u2)
     if (p.isInfinity) {
       return 'p is infinity';
@@ -337,12 +337,12 @@ class Ecdsa {
 
   Ecdsa sign() {
     var hashBuf = this.endian == Endian.little
-        ? new Br(buf: this.hashBuf.asUint8List()).readReverse()
+        ? new Br(buf: this.hashBuf!.asUint8List()).readReverse()
         : this.hashBuf;
 
-    var privKey = this.keyPair.privKey;
+    var privKey = this.keyPair?.privKey;
 
-    var d = privKey.bn;
+    var d = privKey?.bn;
 
     if (hashBuf == null || privKey == null || d == null) {
       throw 'invalid parameters';
@@ -379,7 +379,7 @@ class Ecdsa {
     this.sig = Sig(
       r: r,
       s: s,
-      compressed: this.keyPair.pubKey.compressed,
+      compressed: this.keyPair!.pubKey!.compressed,
     );
     return this;
   }
@@ -392,7 +392,7 @@ class Ecdsa {
   String toString() {
     var obj = {};
     if (this.hashBuf != null) {
-      obj['hashBuf'] = this.hashBuf.toHex();
+      obj['hashBuf'] = this.hashBuf!.toHex();
     }
     if (this.keyPair != null) {
       obj['keyPair'] = this.keyPair.toString();
@@ -406,10 +406,10 @@ class Ecdsa {
     return json.encode(obj);
   }
 
-  Ecdsa verify([bool enforceLowS]) {
+  Ecdsa verify([bool? enforceLowS]) {
     enforceLowS = enforceLowS ?? true;
     var result = this.verifyStr(enforceLowS);
-    var verified;
+    late var verified;
     if (result is bool) {
       verified = result;
     }
@@ -425,10 +425,10 @@ class Ecdsa {
     return this;
   }
 
-  static Sig staticSign({
-    List<int> hashBuf,
-    KeyPair keyPair,
-    Endian endian,
+  static Sig? staticSign({
+    List<int>? hashBuf,
+    KeyPair? keyPair,
+    Endian? endian,
   }) {
     return new Ecdsa(
       hashBuf: hashBuf,
@@ -437,11 +437,11 @@ class Ecdsa {
     ).sign().sig;
   }
 
-  static bool staticVerify({
-    List<int> hashBuf,
-    Sig sig,
-    PubKey pubKey,
-    Endian endian,
+  static bool? staticVerify({
+    List<int>? hashBuf,
+    Sig? sig,
+    PubKey? pubKey,
+    Endian? endian,
     bool enforceLowS = true,
   }) {
     return Ecdsa(

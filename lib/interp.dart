@@ -56,34 +56,34 @@ class Interp {
   static const defaultFlags =
       Interp.SCRIPT_VERIFY_P2SH | Interp.SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY;
 
-  Script script;
-  Tx tx;
-  int nIn;
+  Script? script;
+  Tx? tx;
+  int? nIn;
   List<List<int>> stack = [];
   List<List<int>> altStack = [];
   // List<String> stack;
   // List<String> altStack;
   int pc = 0;
-  int pBeginCodeHash = 0;
+  int? pBeginCodeHash = 0;
   int nOpCount = 0;
   List<bool> ifStack = [];
-  String errStr = '';
-  int flags = Interp.defaultFlags;
-  BigIntX valueBn = BigIntX.zero;
+  String? errStr = '';
+  int? flags = Interp.defaultFlags;
+  BigIntX? valueBn = BigIntX.zero;
 
   Interp({
-    Script script,
-    Tx tx,
-    int nIn,
-    List<List<int>> stack,
-    List<List<int>> altStack,
+    Script? script,
+    Tx? tx,
+    int? nIn,
+    List<List<int>>? stack,
+    List<List<int>>? altStack,
     int pc = 0,
     int pBeginCodeHash = 0,
     int nOpCount = 0,
-    List<bool> ifStack,
+    List<bool>? ifStack,
     String errStr = '',
-    int flags,
-    BigIntX valueBn,
+    int? flags,
+    BigIntX? valueBn,
   }) {
     this.script = script;
     this.tx = tx;
@@ -94,7 +94,7 @@ class Interp {
     this.pBeginCodeHash = pBeginCodeHash;
     this.nOpCount = nOpCount;
     this.ifStack = ifStack ?? [];
-    this.errStr = errStr ?? '';
+    this.errStr = errStr;
     this.flags = flags ?? Interp.defaultFlags;
     this.valueBn = valueBn ?? BigIntX.zero;
   }
@@ -114,11 +114,11 @@ class Interp {
   }
 
   Interp fromHex(String str) {
-    return this.fromBr(Br(buf: hex.decode(str)));
+    return this.fromBr(Br(buf: hex.decode(str) as Uint8List?));
   }
 
   factory Interp.fromHex(String str) {
-    return Interp().fromBr(Br(buf: hex.decode(str)));
+    return Interp().fromBr(Br(buf: hex.decode(str) as Uint8List?));
   }
 
   Interp fromBuffer(List<int> buf) {
@@ -183,7 +183,7 @@ class Interp {
 
   Map<String, dynamic> toJSON() {
     var json = this.toJSONNoTx();
-    json['tx'] = this.tx != null ? this.tx.toJSON() : null;
+    json['tx'] = this.tx != null ? this.tx!.toJSON() : null;
     return json;
   }
 
@@ -200,7 +200,7 @@ class Interp {
       altStack.add(hex.encode(buf));
     });
     return {
-      "script": this.script != null ? this.script.toJSON() : null,
+      "script": this.script != null ? this.script!.toJSON() : null,
       "nIn": this.nIn,
       "stack": stack,
       "altStack": altStack,
@@ -213,15 +213,15 @@ class Interp {
     };
   }
 
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
     var jsonNoTxBuf = utf8.encode(json.encode(this.toJSONNoTx()));
     bw.writeVarIntNum(jsonNoTxBuf.length);
-    bw.write(jsonNoTxBuf);
+    bw.write(jsonNoTxBuf as Uint8List?);
     if (this.tx != null) {
-      var txbuf = this.tx.toBuffer();
+      var txbuf = this.tx!.toBuffer();
       bw.writeVarIntNum(txbuf.length);
       bw.write(txbuf.asUint8List());
     } else {
@@ -280,7 +280,7 @@ class Interp {
     return flags;
   }
 
-  static bool castToBool(List<int> buf) {
+  static bool castToBool(List<int?> buf) {
     for (var i = 0; i < buf.length; i++) {
       if (buf[i] != 0) {
         // can be negative zero
@@ -313,7 +313,7 @@ class Interp {
     // (this.flags & (Interp.SCRIPT_VERIFY_DERSIG |Interp.SCRIPT_VERIFY_LOW_S | Interp.SCRIPT_VERIFY_STRICTENC)) !=0
     // print(a);
 
-    if ((this.flags &
+    if ((this.flags! &
                 (Interp.SCRIPT_VERIFY_DERSIG |
                     Interp.SCRIPT_VERIFY_LOW_S |
                     Interp.SCRIPT_VERIFY_STRICTENC)) !=
@@ -321,13 +321,13 @@ class Interp {
         !Sig.IsTxDer(buf)) {
       this.errStr = 'SCRIPT_ERR_SIG_DER';
       return false;
-    } else if ((this.flags & Interp.SCRIPT_VERIFY_LOW_S) != 0) {
+    } else if ((this.flags! & Interp.SCRIPT_VERIFY_LOW_S) != 0) {
       var sig = new Sig().fromTxFormat(buf);
       if (!sig.hasLowS()) {
         this.errStr = 'SCRIPT_ERR_SIG_DER';
         return false;
       }
-    } else if ((this.flags & Interp.SCRIPT_VERIFY_STRICTENC) != 0) {
+    } else if ((this.flags! & Interp.SCRIPT_VERIFY_STRICTENC) != 0) {
       var sig = new Sig().fromTxFormat(buf);
       if (!sig.hasDefinedHashType()) {
         this.errStr = 'SCRIPT_ERR_SIG_HASHTYPE';
@@ -342,7 +342,7 @@ class Interp {
    * Translated from bitcoin core's CheckPubKeyEncoding
    */
   bool checkPubKeyEncoding(buf) {
-    if ((this.flags & Interp.SCRIPT_VERIFY_STRICTENC) != 0 &&
+    if ((this.flags! & Interp.SCRIPT_VERIFY_STRICTENC) != 0 &&
         !PubKey.isCompressedOrUncompressed(buf)) {
       this.errStr = 'SCRIPT_ERR_PUBKEYTYPE';
       return false;
@@ -362,16 +362,16 @@ class Interp {
     // We want to compare apples to apples, so fail the script
     // unless the type of nLockTime being tested is the same as
     // the nLockTime in the transaction.
-    if (!((this.tx.nLockTime < Interp.LOCKTIME_THRESHOLD &&
+    if (!((this.tx!.nLockTime! < Interp.LOCKTIME_THRESHOLD &&
             nLockTime < Interp.LOCKTIME_THRESHOLD) ||
-        (this.tx.nLockTime >= Interp.LOCKTIME_THRESHOLD &&
+        (this.tx!.nLockTime! >= Interp.LOCKTIME_THRESHOLD &&
             nLockTime >= Interp.LOCKTIME_THRESHOLD))) {
       return false;
     }
 
     // Now that we know we're comparing apples-to-apples, the
     // comparison is a simple numeric one.
-    if (nLockTime > this.tx.nLockTime) {
+    if (nLockTime > this.tx!.nLockTime!) {
       return false;
     }
 
@@ -385,7 +385,7 @@ class Interp {
     // prevent this condition. Alternatively we could test all
     // inputs, but testing just this input minimizes the data
     // required to prove correct CHECKLOCKTIMEVERIFY execution.
-    if (TxIn.SEQUENCE_FINAL == this.tx.txIns[this.nIn].nSequence) {
+    if (TxIn.SEQUENCE_FINAL == this.tx!.txIns![this.nIn!].nSequence) {
       return false;
     }
 
@@ -399,11 +399,11 @@ class Interp {
   bool checkSequence(nSequence) {
     // Relative lock times are supported by comparing the passed
     // in operand to the sequence number of the input.
-    var txToSequence = this.tx.txIns[this.nIn].nSequence;
+    var txToSequence = this.tx!.txIns![this.nIn!].nSequence;
 
     // Fail if the transaction's version number is not set high
     // enough to trigger Bip 68 rules.
-    if (this.tx.versionBytesNum < 2) {
+    if (this.tx!.versionBytesNum! < 2) {
       return false;
     }
 
@@ -452,14 +452,14 @@ class Interp {
    * bitcoin core commit: b5d1b1092998bc95313856d535c632ea5a8f9104
    */
   Stream<bool> eval() async* {
-    if (this.script.toBuffer().length > 10000) {
+    if (this.script!.toBuffer().length > 10000) {
       this.errStr = 'SCRIPT_ERR_SCRIPT_SIZE';
       yield false;
     }
 
     try {
       // print("${this.pc}${this.script.chunks.length}");
-      while (this.pc < this.script.chunks.length) {
+      while (this.pc < this.script!.chunks.length) {
         var fSuccess = this.step();
         if (!fSuccess) {
           yield false;
@@ -499,14 +499,14 @@ class Interp {
    * Based on the inner loop of bitcoin core's EvalScript
    */
   bool step() {
-    var fRequireMinimal = (this.flags & Interp.SCRIPT_VERIFY_MINIMALDATA) != 0;
+    var fRequireMinimal = (this.flags! & Interp.SCRIPT_VERIFY_MINIMALDATA) != 0;
 
     var fExec = !((this.ifStack.indexOf(false) + 1) != 0);
 
     //
     // Read instruction
     //
-    var chunk = this.script.chunks[this.pc];
+    var chunk = this.script!.chunks[this.pc];
     this.pc++;
     // print("pc============${this.pc}");
     var opCodeNum = chunk.opCodeNum;
@@ -519,7 +519,7 @@ class Interp {
       return false;
     }
     if (chunk.buf != null &&
-        chunk.buf.length > Interp.MAX_SCRIPT_ELEMENT_SIZE) {
+        chunk.buf!.length > Interp.MAX_SCRIPT_ELEMENT_SIZE) {
       this.errStr = 'SCRIPT_ERR_PUSH_SIZE';
       return false;
     }
@@ -540,16 +540,16 @@ class Interp {
 
     if (fExec && opCodeNum >= 0 && opCodeNum <= OpCode.OP_PUSHDATA4) {
       // print('============');
-      if (fRequireMinimal && !this.script.checkMinimalPush(this.pc - 1)) {
+      if (fRequireMinimal && !this.script!.checkMinimalPush(this.pc - 1)) {
         this.errStr = 'SCRIPT_ERR_MINIMALDATA';
         return false;
       }
       if (chunk.buf == null) {
         this.stack.add(Interp.FALSE);
-      } else if (chunk.len != chunk.buf.length) {
+      } else if (chunk.len != chunk.buf!.length) {
         throw ('LEngth of push value not equal to length of data');
       } else {
-        this.stack.add(chunk.buf);
+        this.stack.add(chunk.buf as Uint8List);
       }
     } else if (fExec ||
         (OpCode.OP_IF <= opCodeNum && opCodeNum <= OpCode.OP_ENDIF)) {
@@ -593,9 +593,10 @@ class Interp {
 
         case OpCode.OP_CHECKLOCKTIMEVERIFY:
           {
-            if (!(this.flags & Interp.SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY != 0)) {
+            if (!(this.flags! & Interp.SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY !=
+                0)) {
               // not enabled; treat as a NOP2
-              if (this.flags &
+              if (this.flags! &
                       Interp.SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS !=
                   0) {
                 this.errStr = 'SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS';
@@ -649,9 +650,10 @@ class Interp {
 
         case OpCode.OP_CHECKSEQUENCEVERIFY:
           {
-            if (!(this.flags & Interp.SCRIPT_VERIFY_CHECKSEQUENCEVERIFY != 0)) {
+            if (!(this.flags! & Interp.SCRIPT_VERIFY_CHECKSEQUENCEVERIFY !=
+                0)) {
               // not enabled; treat as a NOP3
-              if (this.flags &
+              if (this.flags! &
                       Interp.SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS !=
                   0) {
                 this.errStr = 'SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS';
@@ -708,7 +710,7 @@ class Interp {
         case OpCode.OP_NOP8:
         case OpCode.OP_NOP9:
         case OpCode.OP_NOP10:
-          if (this.flags & Interp.SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS !=
+          if (this.flags! & Interp.SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS !=
               0) {
             this.errStr = 'SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS';
             return false;
@@ -1195,7 +1197,7 @@ class Interp {
                 int v = bn.neq(0) ? 1 : 0;
                 bn = new BigIntX.fromNum(v + 0);
                 break;
-              // default:      assert(!"invalid opCode"); break;; // TODO: does this ever occur?
+              // default:      assert(!"invalid opCode"); break;; // TODOS: does this ever occur?
             }
             this.stack.removeLast();
             this.stack.add(bn.toScriptNumBuffer());
@@ -1380,15 +1382,15 @@ class Interp {
             // valtype vchnew Hash((opCode == OpCode.OP_RIPEMD160 || opCode == OpCode.OP_SHA1 || opCode == OpCode.OP_HASH160) ? 20 : 32)
             var bufHash;
             if (opCodeNum == OpCode.OP_RIPEMD160) {
-              bufHash = Hash.ripemd160(buf.asUint8List()).data.toList();
+              bufHash = Hash.ripemd160(buf.asUint8List()).data!.toList();
             } else if (opCodeNum == OpCode.OP_SHA1) {
-              bufHash = Hash.sha1(buf.asUint8List()).data.toList();
+              bufHash = Hash.sha1(buf.asUint8List()).data!.toList();
             } else if (opCodeNum == OpCode.OP_SHA256) {
-              bufHash = Hash.sha256(buf.asUint8List()).data.toList();
+              bufHash = Hash.sha256(buf.asUint8List()).data!.toList();
             } else if (opCodeNum == OpCode.OP_HASH160) {
-              bufHash = Hash.sha256Ripemd160(buf.asUint8List()).data.toList();
+              bufHash = Hash.sha256Ripemd160(buf.asUint8List()).data!.toList();
             } else if (opCodeNum == OpCode.OP_HASH256) {
-              bufHash = Hash.sha256Sha256(buf.asUint8List()).data.toList();
+              bufHash = Hash.sha256Sha256(buf.asUint8List()).data!.toList();
             }
             this.stack.removeLast();
             this.stack.add(bufHash);
@@ -1415,7 +1417,7 @@ class Interp {
             // Subset of script starting at the most recent codeseparator
             // CScript scriptCode(pBeginCodeHash, pend)
             var subScript = new Script(
-              chunks: this.script.chunks.slice(this.pBeginCodeHash),
+              chunks: this.script!.chunks.slice(this.pBeginCodeHash),
             );
 
             // https://github.com/Bitcoin-UAHF/spec/blob/master/replay-protected-sighash.md
@@ -1427,7 +1429,7 @@ class Interp {
                         .getUint8(bufSig.length - 1)
                     : 0;
             if (nHashType & Sig.SIGHASH_FORKID != 0) {
-              if (!(this.flags & Interp.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
+              if (!(this.flags! & Interp.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
                 this.errStr = 'SCRIPT_ERR_ILLEGAL_FORKID';
                 return false;
               }
@@ -1447,12 +1449,13 @@ class Interp {
               var sig = new Sig().fromTxFormat(bufSig);
               var pubKey = new PubKey().fromBuffer(bufPubKey, false);
               // print('verify');
-              fSuccess = this.tx.verify(
+              fSuccess = this.tx!.verify(
                     sig: sig,
                     pubKey: pubKey,
                     nIn: this.nIn,
                     subScript: subScript,
-                    enforceLowS: (this.flags & Interp.SCRIPT_VERIFY_LOW_S) != 0,
+                    enforceLowS:
+                        (this.flags! & Interp.SCRIPT_VERIFY_LOW_S) != 0,
                     valueBn: this.valueBn,
                     flags: this.flags,
                   );
@@ -1529,7 +1532,7 @@ class Interp {
 
             // Subset of script starting at the most recent codeseparator
             var subScript = new Script(
-                chunks: this.script.chunks.slice(this.pBeginCodeHash));
+                chunks: this.script!.chunks.slice(this.pBeginCodeHash));
 
             for (var k = 0; k < nSigsCount; k++) {
               var bufSig = this.stack[this.stack.length - isig - k];
@@ -1540,7 +1543,7 @@ class Interp {
                       .getUint8(bufSig.length - 1)
                   : 0;
               if (nHashType & Sig.SIGHASH_FORKID != 0) {
-                if (!(this.flags & Interp.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
+                if (!(this.flags! & Interp.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
                   this.errStr = 'SCRIPT_ERR_ILLEGAL_FORKID';
                   return false;
                 }
@@ -1568,13 +1571,13 @@ class Interp {
               try {
                 var sig = new Sig().fromTxFormat(bufSig);
                 var pubKey = new PubKey().fromBuffer(bufPubKey, false);
-                fOk = this.tx.verify(
+                fOk = this.tx!.verify(
                       sig: sig,
                       pubKey: pubKey,
                       nIn: this.nIn,
                       subScript: subScript,
                       enforceLowS:
-                          (this.flags & Interp.SCRIPT_VERIFY_LOW_S) != 0,
+                          (this.flags! & Interp.SCRIPT_VERIFY_LOW_S) != 0,
                       valueBn: this.valueBn,
                       flags: this.flags,
                     );
@@ -1612,7 +1615,7 @@ class Interp {
               this.errStr = 'SCRIPT_ERR_INVALID_STACK_OPERATION';
               return false;
             }
-            if ((this.flags & Interp.SCRIPT_VERIFY_NULLDUMMY != 0) &&
+            if ((this.flags! & Interp.SCRIPT_VERIFY_NULLDUMMY != 0) &&
                 (this.stack[this.stack.length - 1].length != 0)) {
               this.errStr = 'SCRIPT_ERR_SIG_NULLDUMMY';
               return false;
@@ -1695,12 +1698,12 @@ class Interp {
   //  */
   // verify (scriptSig, scriptPubKey, tx, nIn, flags, valueBn) {
   Future<bool> verify({
-    Script scriptSig,
-    Script scriptPubKey,
-    Tx tx,
-    int nIn,
-    int flags,
-    BigIntX valueBn,
+    Script? scriptSig,
+    Script? scriptPubKey,
+    Tx? tx,
+    int? nIn,
+    int? flags,
+    BigIntX? valueBn,
   }) async {
     var results = this.results(
       scriptSig: scriptSig,
@@ -1741,14 +1744,14 @@ class Interp {
    * automatically return true or false, use the verify method.
    */
   Stream<bool> results({
-    Script scriptSig,
-    Script scriptPubKey,
-    Tx tx,
-    int nIn,
-    int flags,
-    BigIntX valueBn,
+    Script? scriptSig,
+    Script? scriptPubKey,
+    Tx? tx,
+    int? nIn,
+    int? flags,
+    BigIntX? valueBn,
   }) async* {
-    List<List<int>> stackCopy;
+    List<List<int>> stackCopy = [];
 
     this.script = scriptSig ?? this.script;
     this.tx = tx ?? this.tx;
@@ -1757,9 +1760,9 @@ class Interp {
     this.valueBn = valueBn ?? this.valueBn;
 
     if (((flags ?? 0) & Interp.SCRIPT_VERIFY_SIGPUSHONLY) != 0 &&
-        !scriptSig.isPushOnly()) {
+        !scriptSig!.isPushOnly()) {
       this.errStr =
-          this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_SIG_PUSHONLY';
+          this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_SIG_PUSHONLY';
       yield false;
     }
 
@@ -1772,7 +1775,8 @@ class Interp {
     var stack = this.stack;
     this.initialize();
     this.script = scriptPubKey ?? this.script;
-    this.stack = [...stack] ?? this.stack;
+    // this.stack = [...stack] ?? this.stack;
+    this.stack = [...stack];
     this.tx = tx ?? this.tx;
     this.nIn = nIn ?? this.nIn;
     this.flags = flags ?? this.flags;
@@ -1782,7 +1786,7 @@ class Interp {
 
     if (this.stack.length == 0) {
       this.errStr =
-          this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
+          this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
       yield false;
       return;
     }
@@ -1791,17 +1795,17 @@ class Interp {
     var buf = this.stack.last;
     if (!Interp.castToBool(buf)) {
       this.errStr =
-          this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
+          this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
       yield false;
     }
 
     // Additional validation for spend-to-script-hash transactions:
     if (((flags ?? 0) & Interp.SCRIPT_VERIFY_P2SH != 0) &&
-        scriptPubKey.isScriptHashOut()) {
+        scriptPubKey!.isScriptHashOut()) {
       // scriptSig must be literals-only or validation fails
-      if (!scriptSig.isPushOnly()) {
+      if (!scriptSig!.isPushOnly()) {
         this.errStr =
-            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_SIG_PUSHONLY';
+            this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_SIG_PUSHONLY';
         yield false;
       }
 
@@ -1818,7 +1822,8 @@ class Interp {
       }
 
       var pubKeySerialized = stack[stack.length - 1];
-      var scriptPubKey2 = new Script().fromBuffer(pubKeySerialized);
+      var scriptPubKey2 =
+          new Script().fromBuffer(pubKeySerialized as Uint8List?);
       stack.removeLast();
 
       this.initialize();
@@ -1835,13 +1840,13 @@ class Interp {
 
       if (stack.length == 0) {
         this.errStr =
-            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
+            this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
         yield false;
       }
 
       if (!Interp.castToBool(stack[stack.length - 1])) {
         this.errStr =
-            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
+            this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_EVAL_FALSE';
         yield false;
       } else {
         yield true;
@@ -1860,7 +1865,7 @@ class Interp {
       }
       if (this.stack.length != 1) {
         this.errStr =
-            this.errStr.isNotEmpty ? this.errStr : 'SCRIPT_ERR_CLEANSTACK';
+            this.errStr!.isNotEmpty ? this.errStr : 'SCRIPT_ERR_CLEANSTACK';
         yield false;
       }
     }
@@ -1875,7 +1880,7 @@ class Interp {
    * JSON-compatible object so it can be easily stringified. pc refers to the
    * currently executing opcode.
    */
-  Map<String, Object> getDebugObject() {
+  Map<String, Object?> getDebugObject() {
     var pc = this.pc - 1; // pc is incremented immediately after getting
     return {
       "errStr": this.errStr,
@@ -1885,7 +1890,7 @@ class Interp {
       "stack": this.stack.map((buf) => hex.encode(buf)).toList(),
       "altStack": this.altStack.map((buf) => hex.encode(buf)).toList(),
       "opCodeStr": this.script != null
-          ? OpCode.fromNumber(this.script.chunks[pc].opCodeNum).toString()
+          ? OpCode.fromNumber(this.script!.chunks[pc].opCodeNum!).toString()
           : 'no script found'
     };
   }

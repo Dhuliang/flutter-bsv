@@ -14,7 +14,7 @@ void main() {
     var privKey = PrivKey.fromString(
         'L3uCzo4TtW3FX5b5L9S5dKDu21ypeRofiiNnVuYnxGs5YRQrUFP2');
     var keyPair = KeyPair.fromPrivKey(privKey);
-    var pubKey = keyPair.pubKey;
+    var pubKey = keyPair.pubKey!;
     var addressStr = Address.fromPubKey(pubKey).toString();
     var type = SigOperations.SigType;
 
@@ -131,7 +131,7 @@ void main() {
 
         var nScriptChunk2 = 2;
         var addressStr2 =
-            Address.fromPubKey(KeyPair.fromRandom().pubKey).toString();
+            Address.fromPubKey(KeyPair.fromRandom().pubKey!).toString();
         sigOperations.addOne(
           txHashBuf: txHashBuf,
           txOutNum: txOutNum,
@@ -163,7 +163,7 @@ void main() {
 
         var nScriptChunk2 = 2;
         var addressStr2 =
-            Address.fromPubKey(KeyPair.fromRandom().pubKey).toString();
+            Address.fromPubKey(KeyPair.fromRandom().pubKey!).toString();
         sigOperations.addOne(
           txHashBuf: txHashBuf,
           txOutNum: txOutNum,
@@ -198,7 +198,7 @@ void main() {
         var txOutNum2 = 9;
         var nScriptChunk2 = 2;
         var addressStr2 =
-            Address.fromPubKey(KeyPair.fromRandom().pubKey).toString();
+            Address.fromPubKey(KeyPair.fromRandom().pubKey!).toString();
         sigOperations.setOne(
           txHashBuf: txHashBuf2,
           txOutNum: txOutNum2,

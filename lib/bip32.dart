@@ -14,27 +14,27 @@ import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:bsv/extentsions/list.dart';
 
 class Bip32 {
-  int versionBytesNum;
-  int depth;
-  Uint8List parentFingerPrint;
-  int childIndex;
-  Uint8List chainCode;
-  PrivKey privKey;
-  PubKey pubKey;
+  int? versionBytesNum;
+  int? depth;
+  Uint8List? parentFingerPrint;
+  int? childIndex;
+  Uint8List? chainCode;
+  PrivKey? privKey;
+  PubKey? pubKey;
 
-  int bip32PrivKey;
-  int bip32PubKey;
+  int? bip32PrivKey;
+  int? bip32PubKey;
 
   Bip32({
-    int versionBytesNum,
-    int depth,
-    Uint8List parentFingerPrint,
-    int childIndex,
-    Uint8List chainCode,
-    PrivKey privKey,
-    PubKey pubKey,
-    int bip32PrivKey,
-    int bip32PubKey,
+    int? versionBytesNum,
+    int? depth,
+    Uint8List? parentFingerPrint,
+    int? childIndex,
+    Uint8List? chainCode,
+    PrivKey? privKey,
+    PubKey? pubKey,
+    int? bip32PrivKey,
+    int? bip32PubKey,
   }) {
     this.versionBytesNum = versionBytesNum;
     this.depth = depth;
@@ -49,13 +49,13 @@ class Bip32 {
 
   // ignore: non_constant_identifier_names
   factory Bip32.Testnet({
-    int versionBytesNum,
-    int depth,
-    Uint8List parentFingerPrint,
-    int childIndex,
-    Uint8List chainCode,
-    PrivKey privKey,
-    PubKey pubKey,
+    int? versionBytesNum,
+    int? depth,
+    Uint8List? parentFingerPrint,
+    int? childIndex,
+    Uint8List? chainCode,
+    PrivKey? privKey,
+    PubKey? pubKey,
   }) {
     return Bip32(
       versionBytesNum: versionBytesNum,
@@ -72,13 +72,13 @@ class Bip32 {
 
   // ignore: non_constant_identifier_names
   factory Bip32.Regtest({
-    int versionBytesNum,
-    int depth,
-    Uint8List parentFingerPrint,
-    int childIndex,
-    Uint8List chainCode,
-    PrivKey privKey,
-    PubKey pubKey,
+    int? versionBytesNum,
+    int? depth,
+    Uint8List? parentFingerPrint,
+    int? childIndex,
+    Uint8List? chainCode,
+    PrivKey? privKey,
+    PubKey? pubKey,
   }) {
     return Bip32(
       versionBytesNum: versionBytesNum,
@@ -95,13 +95,13 @@ class Bip32 {
 
   // ignore: non_constant_identifier_names
   factory Bip32.Mainnet({
-    int versionBytesNum,
-    int depth,
-    Uint8List parentFingerPrint,
-    int childIndex,
-    Uint8List chainCode,
-    PrivKey privKey,
-    PubKey pubKey,
+    int? versionBytesNum,
+    int? depth,
+    Uint8List? parentFingerPrint,
+    int? childIndex,
+    Uint8List? chainCode,
+    PrivKey? privKey,
+    PubKey? pubKey,
   }) {
     return Bip32(
       versionBytesNum: versionBytesNum,
@@ -122,8 +122,8 @@ class Bip32 {
     this.parentFingerPrint = Uint8List.fromList([0, 0, 0, 0]);
     this.childIndex = 0;
     this.chainCode = RandomBytes.getRandomBuffer(32);
-    this.privKey = new PrivKey().fromRandom();
-    this.pubKey = new PubKey().fromPrivKey(this.privKey);
+    this.privKey = new PrivKey.fromRandom();
+    this.pubKey = new PubKey().fromPrivKey(this.privKey!);
     return this;
   }
 
@@ -135,7 +135,7 @@ class Bip32 {
     return this.fromBuffer(Base58Check.decode(str));
   }
 
-  Bip32 fromSeed(List<int> bytes) {
+  Bip32 fromSeed(List<int>? bytes) {
     if (!(bytes is List<int>)) {
       throw ('bytes must be a buffer');
     }
@@ -145,17 +145,17 @@ class Bip32 {
     if (bytes.length > 512 / 8) {
       throw ('More than 512 bits of entropy is nonstandard');
     }
-    var hash =
-        Hash.sha512Hmac(bytes, Uint8List.fromList(utf8.encode('Bitcoin seed')))
-            .data;
+    var hash = Hash.sha512Hmac(
+            bytes as Uint8List, Uint8List.fromList(utf8.encode('Bitcoin seed')))
+        .data!;
 
     this.depth = 0x00;
     this.parentFingerPrint = Uint8List.fromList([0, 0, 0, 0]);
     this.childIndex = 0;
     this.chainCode = hash.slice(32, 64).asUint8List();
     this.versionBytesNum = this.bip32PrivKey;
-    this.privKey = PrivKey().fromBn(BigIntX.fromBuffer(hash.slice(0, 32)));
-    this.pubKey = PubKey().fromPrivKey(this.privKey);
+    this.privKey = PrivKey.fromBn(BigIntX.fromBuffer(hash.slice(0, 32)));
+    this.pubKey = PubKey().fromPrivKey(this.privKey!);
 
     return this;
   }
@@ -189,9 +189,8 @@ class Bip32 {
     var isPublic = this.versionBytesNum == this.bip32PubKey;
 
     if (isPrivate && keyBytes[0] == 0) {
-      this.privKey =
-          new PrivKey().fromBn(BigIntX.fromBuffer(keyBytes.slice(1, 33)));
-      this.pubKey = new PubKey().fromPrivKey(this.privKey);
+      this.privKey = PrivKey.fromBn(BigIntX.fromBuffer(keyBytes.slice(1, 33)));
+      this.pubKey = new PubKey().fromPrivKey(this.privKey!);
     } else if (isPublic && (keyBytes[0] == 0x02 || keyBytes[0] == 0x03)) {
       this.pubKey = new PubKey().fromDer(keyBytes);
     } else {
@@ -208,7 +207,7 @@ class Bip32 {
       return this;
     }
 
-    var bip32 = this;
+    Bip32 bip32 = this;
 
     for (var i = 0; i < e.length; i++) {
       var c = e[i];
@@ -227,7 +226,7 @@ class Bip32 {
 
       var usePrivate = c.length > 1 && c[c.length - 1] == "'";
       var childIndex =
-          int.tryParse(usePrivate ? c.substring(0, c.length - 1) : c) &
+          int.tryParse(usePrivate ? c.substring(0, c.length - 1) : c)! &
               0x7fffffff;
 
       if (usePrivate) {
@@ -245,7 +244,7 @@ class Bip32 {
       throw ('i must be a number');
     }
 
-    var ib = [];
+    List<int> ib = [];
     ib.add((i >> 24) & 0xff);
     ib.add((i >> 16) & 0xff);
     ib.add((i >> 8) & 0xff);
@@ -267,37 +266,41 @@ class Bip32 {
       if (usePrivate) {
         data = Uint8List.fromList([
           ...[0],
-          ...this.privKey.bn.toBuffer(size: 32),
+          ...this.privKey!.bn!.toBuffer(size: 32),
           ...ib,
         ]);
       } else {
         // data =  List<int>.from([this.pubKey.toBuffer( size: 32 ), ib]);
-        data = Uint8List.fromList([...this.pubKey.toBuffer(), ...ib]);
+        data = Uint8List.fromList([
+          ...this.pubKey!.toBuffer(),
+          ...ib,
+        ]);
       }
 
-      var hash = Hash.sha512Hmac(Uint8List.fromList(data), this.chainCode).data;
+      var hash =
+          Hash.sha512Hmac(Uint8List.fromList(data), this.chainCode!).data!;
       // var il = BigIntX.fromBuffer(hash.slice(0, 32), { size: 32 })
       var il = BigIntX.fromBuffer(hash.slice(0, 32));
       var ir = hash.slice(32, 64).asUint8List();
 
       // ki = IL + kpar (mod n).
-      var k = il.add(this.privKey.bn).mod(PointWrapper.getN());
+      var k = il.add(this.privKey!.bn!).mod(PointWrapper.getN());
 
       ret = new Bip32();
       ret.chainCode = ir;
 
-      ret.privKey = new PrivKey().fromBn(k);
-      ret.pubKey = new PubKey().fromPrivKey(ret.privKey);
+      ret.privKey = PrivKey.fromBn(k);
+      ret.pubKey = new PubKey().fromPrivKey(ret.privKey!);
     } else {
-      var data = Uint8List.fromList([...this.pubKey.toBuffer(), ...ib]);
-      var hash = Hash.sha512Hmac(data, this.chainCode).data;
+      var data = Uint8List.fromList([...this.pubKey!.toBuffer(), ...ib]);
+      var hash = Hash.sha512Hmac(data, this.chainCode!).data!;
       var il = BigIntX.fromBuffer(hash.slice(0, 32));
       var ir = hash.slice(32, 64).asUint8List();
 
       // Ki = (IL + kpar)*G = IL*G + Kpar
       var ilG = PointWrapper.getG().mul(il);
       // ignore: non_constant_identifier_names
-      var Kpar = this.pubKey.point;
+      var Kpar = this.pubKey!.point!;
       // ignore: non_constant_identifier_names
       var Ki = ilG.add(Kpar);
       var newpub = new PubKey();
@@ -311,10 +314,10 @@ class Bip32 {
 
     ret.childIndex = i;
     var pubKeyhash =
-        Hash.sha256Ripemd160(this.pubKey.toBuffer().asUint8List()).data;
+        Hash.sha256Ripemd160(this.pubKey!.toBuffer().asUint8List()).data!;
     ret.parentFingerPrint = pubKeyhash.slice(0, 4).asUint8List();
     ret.versionBytesNum = this.versionBytesNum;
-    ret.depth = this.depth + 1;
+    ret.depth = this.depth! + 1;
     ret.bip32PrivKey = this.bip32PrivKey;
     ret.bip32PubKey = this.bip32PubKey;
 
@@ -343,25 +346,25 @@ class Bip32 {
     var isPublic = this.versionBytesNum == this.bip32PubKey;
     if (isPrivate) {
       return new Bw()
-          .writeUInt32BE(this.versionBytesNum)
-          .writeUInt8(this.depth)
+          .writeUInt32BE(this.versionBytesNum!)
+          .writeUInt8(this.depth!)
           .write(this.parentFingerPrint)
-          .writeUInt32BE(this.childIndex)
+          .writeUInt32BE(this.childIndex!)
           .write(this.chainCode)
           .writeUInt8(0)
-          .write(this.privKey.bn.toBuffer(size: 32).asUint8List())
+          .write(this.privKey!.bn!.toBuffer(size: 32).asUint8List())
           .toBuffer();
     } else if (isPublic) {
-      if (this.pubKey.compressed == false) {
+      if (this.pubKey!.compressed == false) {
         throw ('cannot convert bip32 to buffer if pubKey is not compressed');
       }
       return new Bw()
-          .writeUInt32BE(this.versionBytesNum)
-          .writeUInt8(this.depth)
+          .writeUInt32BE(this.versionBytesNum!)
+          .writeUInt8(this.depth!)
           .write(this.parentFingerPrint)
-          .writeUInt32BE(this.childIndex)
+          .writeUInt32BE(this.childIndex!)
           .write(this.chainCode)
-          .write(this.pubKey.toBuffer().asUint8List())
+          .write(this.pubKey!.toBuffer().asUint8List())
           .toBuffer();
     } else {
       throw ('bip32: invalid versionBytesNum byte');

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/script.dart';
@@ -47,7 +49,7 @@ void main() {
           txOut2
               .setScript(
                   new Script().fromString('OP_RETURN OP_RETURN OP_RETURN'))
-              .scriptVi
+              .scriptVi!
               .toNumber(),
           3,
         );
@@ -60,7 +62,7 @@ void main() {
         var script = Script.fromString('OP_RETURN');
         var txOut =
             new TxOut().fromProperties(valueBn: valueBn, script: script);
-        expect(txOut.scriptVi.toNumber(), 1);
+        expect(txOut.scriptVi!.toNumber(), 1);
       });
     });
 
@@ -70,7 +72,7 @@ void main() {
         var script = Script.fromString('OP_RETURN');
         var txOut = TxOut.fromProperties(valueBn: valueBn, script: script);
 
-        expect(txOut.scriptVi.toNumber(), 1);
+        expect(txOut.scriptVi!.toNumber(), 1);
       });
     });
 
@@ -127,16 +129,16 @@ void main() {
 
     group('#fromBr', () {
       test('should make this txIn from this known buffer', () {
-        var txOut =
-            new TxOut().fromBr(Br(buf: hex.decode('050000000000000001ae')));
+        var txOut = new TxOut()
+            .fromBr(Br(buf: hex.decode('050000000000000001ae') as Uint8List?));
         expect(txOut.toBuffer().toHex(), '050000000000000001ae');
       });
     });
 
     group('#toBuffer', () {
       test('should output this known buffer', () {
-        var txOut =
-            new TxOut().fromBr(Br(buf: hex.decode('050000000000000001ae')));
+        var txOut = new TxOut()
+            .fromBr(Br(buf: hex.decode('050000000000000001ae') as Uint8List?));
 
         expect(txOut.toBuffer().toHex(), '050000000000000001ae');
       });
@@ -144,8 +146,8 @@ void main() {
 
     group('#toBw', () {
       test('should output this known buffer', () {
-        var txOut =
-            new TxOut().fromBr(Br(buf: hex.decode('050000000000000001ae')));
+        var txOut = new TxOut()
+            .fromBr(Br(buf: hex.decode('050000000000000001ae') as Uint8List?));
 
         expect(txOut.toBw().toBuffer().toHex(), '050000000000000001ae');
       });

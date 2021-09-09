@@ -17,7 +17,7 @@ extension StringX on String {
     return hex.decode(this);
   }
 
-  String slice(int start, [int end]) {
+  String slice(int start, [int? end]) {
     var s = this;
     var sLen = s.length;
     var startI = start;

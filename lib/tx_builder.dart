@@ -14,7 +14,6 @@ import 'package:bsv/tx_out.dart';
 import 'package:bsv/tx_out_map.dart';
 import 'package:bsv/var_int.dart';
 import 'package:bsv/extentsions/list.dart';
-import 'package:flutter/material.dart';
 
 // ignore: slash_for_doc_comments
 /**
@@ -27,9 +26,9 @@ class TxBuilder {
   List<TxOut> txOuts = [];
   TxOutMap uTxOutMap = new TxOutMap();
   SigOperations sigOperations = new SigOperations();
-  Script changeScript;
-  BigIntX changeAmountBn;
-  BigIntX feeAmountBn;
+  Script? changeScript;
+  BigIntX? changeAmountBn;
+  BigIntX? feeAmountBn;
   num feePerKbNum = Constants.Mainnet.txBuilderFeePerKbNum;
   int nLockTime = 0;
   int versionBytesNum = 1;
@@ -39,21 +38,21 @@ class TxBuilder {
   HashCache hashCache = new HashCache();
 
   TxBuilder({
-    Tx tx,
-    List<TxIn> txIns,
-    List<TxOut> txOuts,
-    TxOutMap uTxOutMap,
-    SigOperations sigOperations,
-    Script changeScript,
-    BigIntX changeAmountBn,
-    BigIntX feeAmountBn,
-    num feePerKbNum,
-    int nLockTime,
-    int versionBytesNum,
-    int sigsPerInput,
-    int dust,
-    bool dustChangeToFees,
-    HashCache hashCache,
+    Tx? tx,
+    List<TxIn>? txIns,
+    List<TxOut>? txOuts,
+    TxOutMap? uTxOutMap,
+    SigOperations? sigOperations,
+    Script? changeScript,
+    BigIntX? changeAmountBn,
+    BigIntX? feeAmountBn,
+    num? feePerKbNum,
+    int? nLockTime,
+    int? versionBytesNum,
+    int? sigsPerInput,
+    int? dust,
+    bool? dustChangeToFees,
+    HashCache? hashCache,
   }) {
     this.tx = tx ?? new Tx();
     this.txIns = txIns ?? [];
@@ -80,11 +79,11 @@ class TxBuilder {
     json['uTxOutMap'] = this.uTxOutMap.toJSON();
     json['sigOperations'] = this.sigOperations.toJSON();
     json['changeScript'] =
-        this.changeScript != null ? this.changeScript.toHex() : null;
+        this.changeScript != null ? this.changeScript!.toHex() : null;
     json['changeAmountBn'] =
-        this.changeAmountBn != null ? this.changeAmountBn.toNumber() : null;
+        this.changeAmountBn != null ? this.changeAmountBn!.toNumber() : null;
     json['feeAmountBn'] =
-        this.feeAmountBn != null ? this.feeAmountBn.toNumber() : null;
+        this.feeAmountBn != null ? this.feeAmountBn!.toNumber() : null;
     json['feePerKbNum'] = this.feePerKbNum;
     json['sigsPerInput'] = this.sigsPerInput;
     json['dust'] = this.dust;
@@ -156,7 +155,7 @@ class TxBuilder {
      * dust. Values less than dust cannot be broadcast. If you are OK with
      * sending dust amounts to fees, then set this value to true.
      */
-  TxBuilder setDust([int dust]) {
+  TxBuilder setDust([int? dust]) {
     this.dust = dust ?? Constants.Mainnet.txBuilderDust;
     return this;
   }
@@ -186,8 +185,8 @@ class TxBuilder {
      */
   TxBuilder importPartiallySignedTx(
     Tx tx, [
-    TxOutMap uTxOutMap,
-    SigOperations sigOperations,
+    TxOutMap? uTxOutMap,
+    SigOperations? sigOperations,
   ]) {
     this.tx = tx;
     this.uTxOutMap = uTxOutMap ?? this.uTxOutMap;
@@ -200,11 +199,11 @@ class TxBuilder {
      * Pay "from" a script - in other words, add an input to the transaction.
      */
   TxBuilder inputFromScript({
-    List<int> txHashBuf,
-    int txOutNum,
-    TxOut txOut,
-    Script script,
-    int nSequence,
+    List<int>? txHashBuf,
+    int? txOutNum,
+    TxOut? txOut,
+    Script? script,
+    int? nSequence,
   }) {
     if (!(txHashBuf is List<int>) ||
         !(txOutNum is int) ||
@@ -222,12 +221,12 @@ class TxBuilder {
   }
 
   TxBuilder addSigOperation({
-    List<int> txHashBuf,
-    int txOutNum,
-    int nScriptChunk,
-    String type,
-    String addressStr,
-    int nHashType,
+    required List<int> txHashBuf,
+    int? txOutNum,
+    int? nScriptChunk,
+    String? type,
+    String? addressStr,
+    int? nHashType,
   }) {
     this.sigOperations.addOne(
           txHashBuf: txHashBuf,
@@ -246,12 +245,12 @@ class TxBuilder {
      * transaction.
      */
   TxBuilder inputFromPubKeyHash({
-    List<int> txHashBuf,
-    int txOutNum,
-    TxOut txOut,
-    PubKey pubKey,
-    int nSequence,
-    int nHashType,
+    List<int>? txHashBuf,
+    int? txOutNum,
+    TxOut? txOut,
+    PubKey? pubKey,
+    int? nSequence,
+    int? nHashType,
   }) {
     if (!(txHashBuf is List<int>) || !(txOutNum is int) || !(txOut is TxOut)) {
       throw ('invalid one of: txHashBuf, txOutNum, txOut');
@@ -265,7 +264,7 @@ class TxBuilder {
     );
     this.txIns.add(txIn);
     this.uTxOutMap.set(txHashBuf, txOutNum, txOut);
-    var addressStr = Address.fromTxOutScript(txOut.script).toString();
+    var addressStr = Address.fromTxOutScript(txOut.script!).toString();
     this.addSigOperation(
       txHashBuf: txHashBuf,
       txOutNum: txOutNum,
@@ -291,11 +290,11 @@ class TxBuilder {
      * An address to send funds to, along with the amount. The amount should be
      * denominated in satoshis, not bitcoins.
      */
-  TxBuilder outputToAddress({BigIntX valueBn, Address addr}) {
+  TxBuilder outputToAddress({BigIntX? valueBn, Address? addr}) {
     if (!(addr is Address) || !(valueBn is BigIntX)) {
       throw ('addr must be an Address, and valueBn must be a Bn');
     }
-    var script = new Script().fromPubKeyHash(addr.hashBuf.asUint8List());
+    var script = new Script().fromPubKeyHash(addr.hashBuf!.asUint8List());
     this.outputToScript(valueBn: valueBn, script: script);
     return this;
   }
@@ -305,7 +304,7 @@ class TxBuilder {
      * A script to send funds to, along with the amount. The amount should be
      * denominated in satoshis, not bitcoins.
      */
-  TxBuilder outputToScript({BigIntX valueBn, Script script}) {
+  TxBuilder outputToScript({BigIntX? valueBn, Script? script}) {
     if (!(script is Script) || !(valueBn is BigIntX)) {
       throw ('script must be a Script, and valueBn must be a Bn');
     }
@@ -317,22 +316,22 @@ class TxBuilder {
   BigIntX buildOutputs() {
     var outAmountBn = BigIntX.zero;
     this.txOuts.forEach((txOut) {
-      if (txOut.valueBn.lt(this.dust) &&
-          !txOut.script.isOpReturn() &&
-          !txOut.script.isSafeDataOut()) {
+      if (txOut.valueBn!.lt(this.dust) &&
+          !txOut.script!.isOpReturn() &&
+          !txOut.script!.isSafeDataOut()) {
         throw ('cannot create output lesser than dust');
       }
-      outAmountBn = outAmountBn.add(txOut.valueBn);
+      outAmountBn = outAmountBn.add(txOut.valueBn!);
       this.tx.addTxOut(data: txOut);
     });
     return outAmountBn;
   }
 
-  BigIntX buildInputs({BigIntX outAmountBn, int extraInputsNum = 0}) {
+  BigIntX buildInputs({BigIntX? outAmountBn, int extraInputsNum = 0}) {
     var inAmountBn = BigIntX.zero;
 
     for (var txIn in this.txIns) {
-      var txOut = this.uTxOutMap.get(txIn.txHashBuf, txIn.txOutNum);
+      var txOut = this.uTxOutMap.get(txIn.txHashBuf!, txIn.txOutNum);
       inAmountBn = inAmountBn.add(txOut.valueBn);
       this.tx.addTxIn(data: txIn);
       if (inAmountBn.geq(outAmountBn)) {
@@ -343,7 +342,7 @@ class TxBuilder {
       }
     }
     if (inAmountBn.lt(outAmountBn)) {
-      throw ('not enough funds for outputs: inAmountBn ${inAmountBn.toNumber()} outAmountBn ${outAmountBn.toNumber()}');
+      throw ('not enough funds for outputs: inAmountBn ${inAmountBn.toNumber()} outAmountBn ${outAmountBn!.toNumber()}');
     }
     return inAmountBn;
   }
@@ -360,14 +359,14 @@ class TxBuilder {
 
     var size = this.tx.toBuffer().length;
 
-    this.tx.txIns.forEach((txIn) {
-      var txHashBuf = txIn.txHashBuf;
+    this.tx.txIns!.forEach((txIn) {
+      var txHashBuf = txIn.txHashBuf!;
       var txOutNum = txIn.txOutNum;
       var sigOperations = this.sigOperations.get(txHashBuf, txOutNum);
       sigOperations.forEach((obj) {
         var nScriptChunk = obj['nScriptChunk'];
         var type = obj['type'];
-        var script = new Script(chunks: [txIn.script.chunks[nScriptChunk]]);
+        var script = new Script(chunks: [txIn.script!.chunks[nScriptChunk]]);
         var scriptSize = script.toBuffer().length;
         size -= scriptSize;
         if (type == SigOperations.SigType) {
@@ -385,7 +384,7 @@ class TxBuilder {
     return size.round();
   }
 
-  BigIntX estimateFee([BigIntX extraFeeAmount]) {
+  BigIntX estimateFee([BigIntX? extraFeeAmount]) {
     // old style rounding up per kb - pays too high fees:
     // var fee = Math.ceil(this.estimateSize() / 1000) * this.feePerKbNum
 
@@ -433,7 +432,7 @@ class TxBuilder {
           extraInputsNum: extraInputsNum,
         );
       } catch (err) {
-        if (err.message.includes('not enough funds for outputs')) {
+        if (err is String && err.contains('not enough funds for outputs')) {
           throw ('unable to gather enough inputs for outputs and fee');
         } else {
           throw err;
@@ -445,24 +444,25 @@ class TxBuilder {
       changeTxOut.valueBn = this.changeAmountBn;
 
       minFeeAmountBn = this.estimateFee();
-      if (this.changeAmountBn.geq(minFeeAmountBn) &&
-          this.changeAmountBn.sub(minFeeAmountBn).gt(this.dust)) {
+      if (this.changeAmountBn!.geq(minFeeAmountBn) &&
+          this.changeAmountBn!.sub(minFeeAmountBn).gt(this.dust)) {
         break;
       }
     }
-    if (this.changeAmountBn.geq(minFeeAmountBn)) {
+    if (this.changeAmountBn!.geq(minFeeAmountBn)) {
       // Subtract fee from change
       this.feeAmountBn = minFeeAmountBn;
-      this.changeAmountBn = this.changeAmountBn.sub(this.feeAmountBn);
-      this.tx.txOuts[this.tx.txOuts.length - 1].valueBn = this.changeAmountBn;
+      this.changeAmountBn = this.changeAmountBn!.sub(this.feeAmountBn!);
+      this.tx.txOuts![this.tx.txOuts!.length - 1].valueBn = this.changeAmountBn;
 
-      if (this.changeAmountBn.lt(this.dust)) {
+      if (this.changeAmountBn!.lt(this.dust)) {
         if (this.dustChangeToFees) {
           // Remove the change amount since it is less than dust and the
           // builder has requested dust be sent to fees.
-          this.tx.txOuts.removeLast();
-          this.tx.txOutsVi = VarInt.fromNumber(this.tx.txOutsVi.toNumber() - 1);
-          this.feeAmountBn = this.feeAmountBn.add(this.changeAmountBn);
+          this.tx.txOuts!.removeLast();
+          this.tx.txOutsVi =
+              VarInt.fromNumber(this.tx.txOutsVi!.toNumber()! - 1);
+          this.feeAmountBn = this.feeAmountBn!.add(this.changeAmountBn!);
           this.changeAmountBn = BigIntX.zero;
         } else {
           throw ('unable to create change amount greater than dust');
@@ -471,7 +471,7 @@ class TxBuilder {
 
       this.tx.nLockTime = this.nLockTime;
       this.tx.versionBytesNum = this.versionBytesNum;
-      if (this.tx.txOuts.length == 0) {
+      if (this.tx.txOuts!.length == 0) {
         throw ('outputs length is zero - unable to create any outputs greater than dust');
       }
       return this;
@@ -518,16 +518,16 @@ class TxBuilder {
     return script;
   }
 
-  TxBuilder fillSig({int nIn, int nScriptChunk, Sig sig}) {
-    var txIn = this.tx.txIns[nIn];
-    if (txIn.script.chunks.isNotEmpty) {
+  TxBuilder fillSig({required int nIn, int? nScriptChunk, Sig? sig}) {
+    var txIn = this.tx.txIns![nIn];
+    if (txIn.script!.chunks.isNotEmpty) {
       // print("sig hex, === ${sig.toHex()}");
       // print(txIn.script.toHex());
       var chunk =
-          new Script().writeBuffer(sig.toTxFormat().asUint8List()).chunks[0];
-      txIn.script.chunks[nScriptChunk] = chunk;
+          new Script().writeBuffer(sig!.toTxFormat().asUint8List()).chunks[0];
+      txIn.script!.chunks[nScriptChunk!] = chunk;
       // print(txIn.script.toHex());
-      txIn.scriptVi = VarInt.fromNumber(txIn.script.toBuffer().length);
+      txIn.scriptVi = VarInt.fromNumber(txIn.script!.toBuffer().length);
     }
     return this;
   }
@@ -542,18 +542,18 @@ class TxBuilder {
      * to do.
      */
   Sig getSig({
-    KeyPair keyPair,
-    int nHashType,
-    int nIn,
-    Script subScript,
+    KeyPair? keyPair,
+    int? nHashType,
+    int? nIn,
+    Script? subScript,
     int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
   }) {
-    BigIntX valueBn;
+    BigIntX? valueBn;
     nHashType = nHashType ?? Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID;
     if ((nHashType & Sig.SIGHASH_FORKID != 0) &&
         (flags & Tx.SCRIPT_ENABLE_SIGHASH_FORKID != 0)) {
-      var txHashBuf = this.tx.txIns[nIn].txHashBuf;
-      var txOutNum = this.tx.txIns[nIn].txOutNum;
+      var txHashBuf = this.tx.txIns![nIn!].txHashBuf!;
+      var txOutNum = this.tx.txIns![nIn].txOutNum;
       var txOut = this.uTxOutMap.get(txHashBuf, txOutNum);
       if (txOut == null) {
         throw ('for SIGHASH_FORKID must provide UTXOs');
@@ -582,13 +582,13 @@ class TxBuilder {
      * to do.
      */
   TxBuilder getSigWithUnlockingScriptHexs({
-    KeyPair keyPair,
-    int nHashType,
-    int nIn,
-    Script subScript,
+    KeyPair? keyPair,
+    int? nHashType,
+    required int nIn,
+    Script? subScript,
     int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
-    @required List<String> unlockingScriptHexs,
-    BigIntX valueBn,
+    required List<String> unlockingScriptHexs,
+    BigIntX? valueBn,
   }) {
     nHashType = nHashType ?? Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID;
 
@@ -610,7 +610,7 @@ class TxBuilder {
     var s = Script.fromHex(scriptStringFinal);
     // print(scriptStringFinal.length);
 
-    var txIn = this.tx.txIns[nIn];
+    var txIn = this.tx.txIns![nIn];
 
     txIn.setScript(s);
 
@@ -653,16 +653,16 @@ class TxBuilder {
      * non-standard transaction types, use getSig.
      */
   TxBuilder signTxIn({
-    int nIn,
-    KeyPair keyPair,
-    TxOut txOut,
-    int nScriptChunk,
-    int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
+    required int nIn,
+    KeyPair? keyPair,
+    TxOut? txOut,
+    int? nScriptChunk,
+    int? nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
     int flags = Tx.SCRIPT_ENABLE_SIGHASH_FORKID,
   }) {
-    var txIn = this.tx.txIns[nIn];
+    var txIn = this.tx.txIns![nIn];
     var script = txIn.script;
-    if (nScriptChunk == null && script.isPubKeyHashIn()) {
+    if (nScriptChunk == null && script!.isPubKeyHashIn()) {
       nScriptChunk = 0;
     }
     if (nScriptChunk == null) {
@@ -671,9 +671,9 @@ class TxBuilder {
     var txHashBuf = txIn.txHashBuf;
     var txOutNum = txIn.txOutNum;
     if (txOut == null) {
-      txOut = this.uTxOutMap.get(txHashBuf, txOutNum);
+      txOut = this.uTxOutMap.get(txHashBuf!, txOutNum);
     }
-    var outScript = txOut.script;
+    var outScript = txOut!.script;
     var subScript = outScript; // true for standard script types
     var sig = this.getSig(
       keyPair: keyPair,
@@ -713,33 +713,33 @@ class TxBuilder {
   //   return this
   // }
 
-  TxBuilder signWithKeyPairs(List<KeyPair> keyPairs) {
+  TxBuilder signWithKeyPairs(List<KeyPair?> keyPairs) {
     // produce map of addresses to private keys
     var addressStrMap = {};
     for (var keyPair in keyPairs) {
-      var addressStr = Address.fromPubKey(keyPair.pubKey).toString();
+      var addressStr = Address.fromPubKey(keyPair!.pubKey!).toString();
       addressStrMap[addressStr] = keyPair;
     }
 
     // loop through all inputs
 
-    for (var nIn = 0; nIn < this.tx.txIns.length; nIn++) {
-      var txIn = this.tx.txIns[nIn];
+    for (var nIn = 0; nIn < this.tx.txIns!.length; nIn++) {
+      var txIn = this.tx.txIns![nIn];
       // for each input, use sigOperations to get list of signatures and pubkeys
       // to be produced and inserted
-      var arr = this.sigOperations.get(txIn.txHashBuf, txIn.txOutNum);
+      var arr = this.sigOperations.get(txIn.txHashBuf!, txIn.txOutNum);
       for (var obj in arr) {
         // for each pubkey, get the privkey from the privkey map and sign the input
         var nScriptChunk = obj['nScriptChunk'];
         var type = obj['type'];
         var addressStr = obj['addressStr'];
         var nHashType = obj['nHashType'];
-        KeyPair keyPair = addressStrMap[addressStr];
+        KeyPair? keyPair = addressStrMap[addressStr];
         if (keyPair == null) {
           obj['log'] = 'cannot find keyPair for addressStr $addressStr';
           continue;
         }
-        var txOut = this.uTxOutMap.get(txIn.txHashBuf, txIn.txOutNum);
+        var txOut = this.uTxOutMap.get(txIn.txHashBuf!, txIn.txOutNum);
         if (type == SigOperations.SigType) {
           this.signTxIn(
             nIn: nIn,
@@ -750,10 +750,10 @@ class TxBuilder {
           );
           obj['log'] = 'successfully inserted signature';
         } else if (type == SigOperations.PubKeyType) {
-          var buf = keyPair.pubKey.toBuffer().asUint8List();
-          txIn.script.chunks[nScriptChunk] =
+          var buf = keyPair.pubKey!.toBuffer().asUint8List();
+          txIn.script!.chunks[nScriptChunk] =
               new Script().writeBuffer(buf).chunks[0];
-          txIn.setScript(txIn.script);
+          txIn.setScript(txIn.script!);
           obj['log'] = 'successfully inserted public key';
         } else {
           obj['log'] = 'cannot perform operation of type $type';

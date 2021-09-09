@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/block_header.dart';
 import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
@@ -30,33 +32,65 @@ class Block {
   List<Tx> txs;
 
   Block({
-    this.blockHeader,
-    this.txsVi,
-    this.txs,
+    required this.blockHeader,
+    required this.txsVi,
+    required this.txs,
   });
 
   factory Block.fromHex(String str) {
-    return Block.fromHex(str);
+    return Block.fromBuffer(hex.decode(str));
   }
 
-  Block fromHex(String str) {
-    return this.fromBuffer(hex.decode(str));
-  }
+  // Block fromHex(String str) {
+  //   return this.fromBuffer(hex.decode(str));
+  // }
 
   factory Block.fromBuffer(List<int> buf) {
-    return Block().fromBuffer(buf);
+    return Block.fromBr(Br(buf: buf.asUint8List()));
   }
 
-  Block fromBuffer(List<int> buf) {
-    return this.fromBr(Br(buf: buf.asUint8List()));
+  // Block fromBuffer(List<int> buf) {
+  //   return this.fromBr(Br(buf: buf.asUint8List()));
+  // }
+
+  factory Block.fromBr(Br br) {
+    var blockHeader = new BlockHeader.fromBr(br);
+    var txsVi = new VarInt(buf: br.readVarIntBuf());
+    var txsNum = txsVi.toNumber()!;
+    List<Tx> txs = [];
+    for (var i = 0; i < txsNum; i++) {
+      txs.add(new Tx().fromBr(br));
+    }
+    // return this;
+    return Block(
+      blockHeader: blockHeader,
+      txsVi: txsVi,
+      txs: txs,
+    );
   }
 
-  String toHex() {
-    return this.toBuffer().toHex();
-  }
+  //  Block fromBr(Br br) {
+  //   this.blockHeader = new BlockHeader.fromBr(br);
+  //   this.txsVi = new VarInt(buf: br.readVarIntBuf());
+  //   var txsNum = this.txsVi.toNumber()!;
+  //   this.txs = [];
+  //   for (var i = 0; i < txsNum; i++) {
+  //     this.txs!.add(new Tx().fromBr(br));
+  //   }
+  //   return this;
+  // }
 
-  List<int> toBuffer() {
-    return this.toBw().toBuffer();
+  factory Block.fromJSON(Map json) {
+    List<Tx> txs = [];
+    json['txs'].forEach((tx) {
+      txs.add(new Tx().fromJSON(tx));
+    });
+
+    return Block(
+      blockHeader: new BlockHeader.fromJSON(json['blockHeader']),
+      txsVi: new VarInt().fromJSON(json['txsVi']),
+      txs: txs,
+    );
   }
 
   Block fromJSON(Map json) {
@@ -66,10 +100,18 @@ class Block {
     });
 
     return Block(
-      blockHeader: new BlockHeader().fromJSON(json['blockHeader']),
+      blockHeader: new BlockHeader.fromJSON(json['blockHeader']),
       txsVi: new VarInt().fromJSON(json['txsVi']),
       txs: txs,
     );
+  }
+
+  String toHex() {
+    return this.toBuffer().toHex();
+  }
+
+  List<int> toBuffer() {
+    return this.toBw().toBuffer();
   }
 
   Map<String, dynamic> toJSON() {
@@ -84,24 +126,13 @@ class Block {
     };
   }
 
-  Block fromBr(Br br) {
-    this.blockHeader = new BlockHeader().fromBr(br);
-    this.txsVi = new VarInt(buf: br.readVarIntBuf());
-    var txsNum = this.txsVi.toNumber();
-    this.txs = [];
-    for (var i = 0; i < txsNum; i++) {
-      this.txs.add(new Tx().fromBr(br));
-    }
-    return this;
-  }
-
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
     bw.write(this.blockHeader.toBuffer().asUint8List());
-    bw.write(this.txsVi.buf);
-    var txsNum = this.txsVi.toNumber();
+    bw.write(this.txsVi.buf as Uint8List?);
+    var txsNum = this.txsVi.toNumber()!;
     for (var i = 0; i < txsNum; i++) {
       this.txs[i].toBw(bw);
     }
@@ -128,7 +159,7 @@ class Block {
 
   int verifyMerkleRoot() {
     var txsbufs = this.txs.map((tx) => tx.toBuffer()).toList();
-    var merkleRootBuf = Merkle.fromBuffers(txsbufs).hash();
+    var merkleRootBuf = Merkle.fromBuffers(txsbufs).hash()!;
     return merkleRootBuf.compareTo(this.blockHeader.merkleRootBuf);
     // return Buffer.compare(merkleRootBuf, this.blockHeader.merkleRootBuf);
   }
@@ -144,7 +175,7 @@ class Block {
    */
   // static iterateTxs (blockBuf) {
   //   var br = new Br(blockBuf)
-  //   var blockHeader = new BlockHeader().fromBr(br)
+  //   var blockHeader = new BlockHeader.fromBr(br)
   //   var txsVi = new VarInt(br.readVarIntBuf())
   //   var txsNum = txsVi.toNumber()
   //   return {

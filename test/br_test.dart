@@ -54,7 +54,7 @@ void main() {
 
       test('should be able to read 0 bytes', () {
         var buf = hex.decode('0101');
-        expect(new Br(buf: buf).read(0).length, 0);
+        expect(new Br(buf: buf as Uint8List?).read(0).length, 0);
       });
     });
 
@@ -87,7 +87,7 @@ void main() {
         view.setUint8(0, 1);
         var br = new Br.fromByteData(view);
         expect(br.readUInt8(), 1);
-        expect(new Br(buf: hex.decode('ff')).readInt8(), -1);
+        expect(new Br(buf: hex.decode('ff') as Uint8List?).readInt8(), -1);
       });
     });
 
@@ -106,8 +106,8 @@ void main() {
         view.setInt16(0, 1, Endian.big);
         var br = new Br.fromByteData(view);
         expect(br.readUInt16BE(), 1);
-        Br(buf: hex.decode('ffff')).readInt16BE();
-        expect(new Br(buf: hex.decode('ffff')).readInt16BE(), -1);
+        Br(buf: hex.decode('ffff') as Uint8List?).readInt16BE();
+        expect(new Br(buf: hex.decode('ffff') as Uint8List?).readInt16BE(), -1);
       });
     });
 
@@ -126,7 +126,7 @@ void main() {
         view.setInt16(0, 1, Endian.little);
         var br = new Br.fromByteData(view);
         expect(br.readInt16LE(), 1);
-        expect(new Br(buf: hex.decode('ffff')).readInt16LE(), -1);
+        expect(new Br(buf: hex.decode('ffff') as Uint8List?).readInt16LE(), -1);
         // Uint8List.fromList(hex.decode('ffff')).buffer.asInt16List();
         // ByteData.view(Uint8List.fromList(hex.decode('ffff')).buffer)
         //     .getInt16(0, Endian.little);
@@ -150,7 +150,8 @@ void main() {
         view.setInt32(0, 1, Endian.big);
         var br = new Br.fromByteData(view);
         expect(br.readInt32BE(), 1);
-        expect(new Br(buf: hex.decode('ffffffff')).readInt32BE(), -1);
+        expect(new Br(buf: hex.decode('ffffffff') as Uint8List?).readInt32BE(),
+            -1);
       });
     });
 
@@ -169,7 +170,8 @@ void main() {
         view.setInt32(0, 1, Endian.little);
         var br = new Br.fromByteData(view);
         expect(br.readInt32LE(), 1);
-        expect(new Br(buf: hex.decode('ffffffff')).readInt32LE(), -1);
+        expect(new Br(buf: hex.decode('ffffffff') as Uint8List?).readInt32LE(),
+            -1);
       });
     });
 
@@ -207,7 +209,7 @@ void main() {
 
       test('should return 2^30', () {
         var view = ByteData.view(Uint8List(8).buffer);
-        view.setUint32(0, pow(2, 30), Endian.little);
+        view.setUint32(0, pow(2, 30) as int, Endian.little);
         var br = new Br.fromByteData(view);
 
         expect(

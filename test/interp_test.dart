@@ -50,7 +50,9 @@ void main() {
         var json = interp.toJSON();
         var interp2 = new Interp().fromJSON(json);
         expect(interp2.script != null, true);
+        // ignore: unnecessary_null_comparison
         expect(interp2.stack[0] != null, true);
+        // ignore: unnecessary_null_comparison
         expect(interp2.altStack[0] != null, true);
       });
     });
@@ -65,7 +67,9 @@ void main() {
         var json = interp.toBuffer();
         var interp2 = new Interp().fromBuffer(json);
         expect(interp2.script != null, true);
+        // ignore: unnecessary_null_comparison
         expect(interp2.stack[0] != null, true);
+        // ignore: unnecessary_null_comparison
         expect(interp2.altStack[0] != null, true);
       });
 
@@ -79,7 +83,9 @@ void main() {
         var buf = interp.toBuffer();
         var interp2 = new Interp().fromBuffer(buf);
         expect(interp2.script != null, true);
+        // ignore: unnecessary_null_comparison
         expect(interp2.stack[0] != null, true);
+        // ignore: unnecessary_null_comparison
         expect(interp2.altStack[0] != null, true);
       });
     });
@@ -150,7 +156,7 @@ void main() {
         var spendtx = new Tx();
 
         spendtx.addTxIn(
-          data: idbuf.data.toList(),
+          data: idbuf.data!.toList(),
           txOutNum: 0,
           script: new Script(),
           nSequence: 0xffffffff,
@@ -199,21 +205,20 @@ void main() {
         var spendtx = new Tx();
 
         spendtx.addTxIn(
-          data: idbuf.data.toList(),
+          data: idbuf.data!.toList(),
           txOutNum: 0,
           script: new Script(),
           nSequence: 0xffffffff,
         );
         spendtx.addTxOut(data: BigIntX.fromNum(0), script: new Script());
         var interp = new Interp();
-        var result = await interp.verify(
+        await interp.verify(
           scriptSig: scriptSig,
           scriptPubKey: scriptPubKey,
           tx: spendtx,
           nIn: 0,
           flags: flags,
         );
-        // print(result);
 
         var debugString = interp.getDebugString();
         expect(debugString,
@@ -304,7 +309,7 @@ void main() {
       test('should verify this new pay-to-pubKey script', () async {
         var keyPair = new KeyPair().fromRandom();
         var scriptPubKey = new Script()
-            .writeBuffer(keyPair.pubKey.toDer(true).asUint8List())
+            .writeBuffer(keyPair.pubKey!.toDer(true).asUint8List())
             .writeString('OP_CHECKSIG');
 
         var hashBuf = List.generate(32, (index) => 0);
@@ -320,7 +325,7 @@ void main() {
         var idbuf = credtx.hash();
         var spendtx = new Tx();
         spendtx.addTxIn(
-          data: idbuf.data.toList(),
+          data: idbuf.data!.toList(),
           txOutNum: 0,
           script: new Script(),
           nSequence: 0xffffffff,
@@ -335,7 +340,7 @@ void main() {
         );
         var scriptSig =
             new Script().writeBuffer(sig.toTxFormat().asUint8List());
-        spendtx.txIns[0].setScript(scriptSig);
+        spendtx.txIns![0].setScript(scriptSig);
 
         var interp = new Interp();
         var verified = await interp.verify(
@@ -367,7 +372,7 @@ void main() {
         var idbuf = credtx.hash();
         var spendtx = new Tx();
         spendtx.addTxIn(
-          data: idbuf.data.toList(),
+          data: idbuf.data!.toList(),
           txOutNum: 0,
           script: scriptSig,
           nSequence: 0xffffffff,
@@ -420,7 +425,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data.toList(),
+            data: idbuf.data!.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,
@@ -481,7 +486,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data.toList(),
+            data: idbuf.data!.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,
@@ -539,7 +544,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data.toList(),
+            data: idbuf.data!.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,
@@ -592,7 +597,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data.toList(),
+            data: idbuf.data!.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,

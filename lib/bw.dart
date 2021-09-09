@@ -14,10 +14,10 @@ import 'package:convert/convert.dart';
  */
 
 class Bw {
-  List<Uint8List> bufs;
+  late List<Uint8List?> bufs;
 
-  Bw({List<Uint8List> bufs}) {
-    this.bufs = bufs ?? List<Uint8List>(0);
+  Bw({List<Uint8List>? bufs}) {
+    this.bufs = bufs ?? List<Uint8List?>.filled(0, null, growable: false);
   }
 
   // factory Bw.fromByteData(ByteData data) {
@@ -27,22 +27,22 @@ class Bw {
   int getLength() {
     var len = 0;
     for (var item in bufs) {
-      var buf = item;
+      var buf = item!;
       len = len + buf.length;
     }
     return len;
   }
 
   List<int> toBuffer() {
-    return this.bufs.expand((element) => element).toList();
+    return this.bufs.expand((element) => element!).toList();
   }
 
   String toHex() {
     return hex.encode(this.toBuffer());
   }
 
-  Bw write(Uint8List buf) {
-    List<Uint8List> temp = []..addAll(this.bufs)..addAll([buf]);
+  Bw write(Uint8List? buf) {
+    List<Uint8List?> temp = []..addAll(this.bufs)..addAll([buf]);
     this.bufs = temp;
     return this;
   }
@@ -52,7 +52,7 @@ class Bw {
     for (var i = 0; i < buf2.length; i++) {
       buf2[i] = buf[buf.length - 1 - i];
     }
-    List<Uint8List> temp = []..addAll(this.bufs)..addAll([buf2]);
+    List<Uint8List?> temp = []..addAll(this.bufs)..addAll([buf2]);
     this.bufs = temp;
     return this;
   }

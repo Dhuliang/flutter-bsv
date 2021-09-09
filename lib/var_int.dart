@@ -17,9 +17,9 @@ import 'package:convert/convert.dart';
  */
 
 class VarInt {
-  List<int> buf;
+  List<int>? buf;
 
-  VarInt({List<int> buf}) {
+  VarInt({List<int>? buf}) {
     this.buf = buf;
   }
 
@@ -40,7 +40,7 @@ class VarInt {
   }
 
   String toJSON() {
-    return this.buf.toHex();
+    return this.buf!.toHex();
   }
 
   VarInt fromJSON(String str) {
@@ -68,15 +68,15 @@ class VarInt {
     return this;
   }
 
-  List<int> toBuffer() {
+  List<int>? toBuffer() {
     return this.buf;
   }
 
   BigIntX toBn() {
-    return new Br(buf: this.buf.asUint8List()).readVarIntBn();
+    return new Br(buf: this.buf!.asUint8List()).readVarIntBn();
   }
 
-  int toNumber() {
-    return new Br(buf: this.buf.asUint8List()).readVarIntNum();
+  int? toNumber() {
+    return new Br(buf: this.buf!.asUint8List()).readVarIntNum();
   }
 }

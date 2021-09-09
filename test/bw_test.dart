@@ -166,20 +166,20 @@ void main() {
 
       test('should write a 5 byte varInt', () {
         var bw = new Bw();
-        bw.writeVarIntNum(pow(2, 16 + 1));
+        bw.writeVarIntNum(pow(2, 16 + 1) as int);
         expect(bw.toBuffer().length, 5);
       });
 
       test('should write a 9 byte varInt', () {
         var bw = new Bw();
-        bw.writeVarIntNum(pow(2, 32 + 1));
+        bw.writeVarIntNum(pow(2, 32 + 1) as int);
         expect(bw.toBuffer().length, 9);
       });
 
       test('should read back the same value it wrote for a 9 byte varInt', () {
         var bw = new Bw();
         var n = pow(2, 63) - 1;
-        bw.writeVarIntNum(n);
+        bw.writeVarIntNum(n as int);
         var br = new Br(buf: Uint8List.fromList(bw.toBuffer()));
         expect(br.readVarIntBn().toNumber(), n);
       });

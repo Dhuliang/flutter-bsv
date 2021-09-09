@@ -5,8 +5,8 @@ import 'package:bsv/priv_key.dart';
 import 'package:convert/convert.dart';
 
 class PubKey {
-  PointWrapper point;
-  bool compressed;
+  PointWrapper? point;
+  bool? compressed;
 
   static const INVALID_BUF_LENGTH = "Length of x and y must be 32 bytes";
 
@@ -24,8 +24,8 @@ class PubKey {
   static const INVALID_POINT_ZERO = "point: Point cannot be equal to 0, 0";
 
   PubKey({
-    PointWrapper point,
-    bool compressed,
+    PointWrapper? point,
+    bool? compressed,
   }) {
     this.point = point;
     this.compressed = compressed;
@@ -35,7 +35,7 @@ class PubKey {
     return PubKey().fromPrivKey(privKey);
   }
 
-  factory PubKey.fromDer(List<int> buf, [bool strict]) {
+  factory PubKey.fromDer(List<int> buf, [bool strict = false]) {
     return PubKey().fromDer(buf, strict);
   }
 
@@ -77,7 +77,7 @@ class PubKey {
      * where he discovered these "hybrid pubKeys" on the mailing list:
      * http://sourceforge.net/p/bitcoin/mailman/message/29416133/
      */
-  PubKey fromDer(List<int> buf, [bool strict]) {
+  PubKey fromDer(List<int> buf, [bool? strict]) {
     if (strict == null) {
       strict = true;
     } else {
@@ -111,7 +111,7 @@ class PubKey {
     return this;
   }
 
-  PubKey fromX({bool isOdd, BigInt x}) {
+  PubKey fromX({bool? isOdd, BigInt? x}) {
     if (isOdd == null) {
       throw INVALID_ODD;
     }
@@ -120,7 +120,7 @@ class PubKey {
     return this;
   }
 
-  PubKey fromBuffer(List<int> buf, [bool strict]) {
+  PubKey fromBuffer(List<int> buf, [bool? strict]) {
     return this.fromDer(buf, strict);
   }
 
@@ -135,13 +135,14 @@ class PubKey {
   }
 
   List<int> toDer(bool compressed) {
-    compressed = compressed == null ? this.compressed : compressed;
+    // compressed = compressed == null ? this.compressed : compressed;
+    // ignore: unnecessary_null_comparison
     if (compressed == null) {
       throw INVALID_COMPRESSED;
     }
 
-    var x = this.point.getX();
-    var y = this.point.getY();
+    var x = this.point!.getX();
+    var y = this.point!.getY();
 
     var xbuf = x.toBuffer(size: 32);
     var ybuf = y.toBuffer(size: 32);
@@ -197,7 +198,7 @@ class PubKey {
 
   String toString() {
     var compressed = this.compressed == null ? true : this.compressed;
-    return hex.encode(this.toDer(compressed));
+    return hex.encode(this.toDer(compressed!));
   }
 
   static bool isCompressedOrUncompressed(List<int> buf) {
@@ -223,19 +224,19 @@ class PubKey {
   }
 
   PubKey validate() {
-    if (this.point.isInfinity) {
+    if (this.point!.isInfinity) {
       throw INVALID_POINT_INFINITY;
     }
     var other = PointWrapper(x: BigInt.zero, y: BigInt.zero);
     if (this.point == other) {
       throw INVALID_POINT_ZERO;
     }
-    this.point.validate();
+    this.point!.validate();
     return this;
   }
 
   PubKey fromPrivKey(PrivKey privKey) {
-    this.point = PointWrapper.getG().mul(privKey.bn);
+    this.point = PointWrapper.getG().mul(privKey.bn!);
     this.compressed = privKey.compressed;
     return this;
   }

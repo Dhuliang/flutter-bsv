@@ -15,9 +15,9 @@ import 'package:bsv/extentsions/list.dart';
  */
 
 class TxOutMap {
-  Map<dynamic, dynamic> map;
+  late Map<dynamic, dynamic> map;
 
-  TxOutMap({Map map}) {
+  TxOutMap({Map? map}) {
     this.map = map ?? Map();
   }
 
@@ -37,13 +37,13 @@ class TxOutMap {
     return this;
   }
 
-  TxOutMap set(List<int> txHashBuf, int txOutNum, TxOut txOut) {
+  TxOutMap set(List<int?> txHashBuf, int? txOutNum, TxOut txOut) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
     this.map[label] = txOut;
     return this;
   }
 
-  dynamic get(List<int> txHashBuf, int txOutNum) {
+  dynamic get(List<int> txHashBuf, int? txOutNum) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
     // print("label====================");
     // print(label);
@@ -52,9 +52,9 @@ class TxOutMap {
   }
 
   TxOutMap setTx(Tx tx) {
-    var txhashhex = tx.hash().data.toHex();
-    for (var i = 0; i < tx.txOuts.length; i++) {
-      var txOut = tx.txOuts[i];
+    var txhashhex = tx.hash().data!.toHex();
+    for (var i = 0; i < tx.txOuts!.length; i++) {
+      var txOut = tx.txOuts![i];
       var label = txhashhex + ':' + i.toString();
       this.map[label] = txOut;
     }

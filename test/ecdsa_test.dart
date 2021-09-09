@@ -27,13 +27,13 @@ void main() {
     // });
 
     var ecdsa = new Ecdsa();
-    ecdsa.hashBuf = Hash.sha256(utf8.encode('test data')).data.toList();
+    ecdsa.hashBuf = Hash.sha256(utf8.encode('test data') as Uint8List).data!.toList();
     ecdsa.keyPair = new KeyPair();
-    ecdsa.keyPair.privKey =
+    ecdsa.keyPair!.privKey =
         new PrivKey().fromBn(new BigIntX.fromBuffer(hex.decode(
       'fee0a1f7afebf9d2a5a80c0c98a31c709681cce195cbcd06342b517970c0be1e',
     )));
-    ecdsa.keyPair.pubKey = new PubKey(
+    ecdsa.keyPair!.pubKey = new PubKey(
       point: new PointWrapper(
         x: new BigIntX.fromBuffer(hex.decode(
           'ac242d242d23be966085a2b2b893d989f824e06c9ad0395a8a52f055ba39abb2',
@@ -89,11 +89,11 @@ void main() {
         ecdsa.randomK();
         ecdsa.sign();
         ecdsa.calcrecovery();
-        expect(ecdsa.sig.recovery != null, true);
+        expect(ecdsa.sig!.recovery != null, true);
       });
 
       test('should calculate this known pubKey recovery number', () {
-        var hashBuf = Hash.sha256(utf8.encode('some data'));
+        var hashBuf = Hash.sha256(utf8.encode('some data') as Uint8List);
         var r = new BigIntX.fromString(
           '71706645040721865894779025947914615666559616020894583599959600180037551395766',
         );
@@ -102,18 +102,18 @@ void main() {
         );
         var ecdsa = new Ecdsa();
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey().fromBn(
-            new BigIntX.fromBuffer(Hash.sha256(utf8.encode('test')).data)));
-        ecdsa.hashBuf = hashBuf.data.toList();
+            new BigIntX.fromBuffer(Hash.sha256(utf8.encode('test') as Uint8List).data!)));
+        ecdsa.hashBuf = hashBuf.data!.toList();
         ecdsa.sig = Sig(r: r, s: s);
 
         ecdsa.calcrecovery();
-        expect(ecdsa.sig.recovery, 1);
+        expect(ecdsa.sig!.recovery, 1);
       });
 
       test('should do a round trip with signature parsing', () {
         ecdsa.calcrecovery();
-        var pubKey = ecdsa.keyPair.pubKey;
-        var sig = ecdsa.sig;
+        var pubKey = ecdsa.keyPair!.pubKey!;
+        var sig = ecdsa.sig!;
         var hashBuf = ecdsa.hashBuf;
         expect(
           Ecdsa.staticSig2PubKey(sig: sig, hashBuf: hashBuf).toHex(),
@@ -180,19 +180,19 @@ void main() {
       test('should calculate pubKey recovery number same as #calcrecovery', () {
         ecdsa.randomK();
         ecdsa.sign();
-        var sig1 = ecdsa.calcrecovery().sig;
+        var sig1 = ecdsa.calcrecovery().sig!;
         var sig2 = Ecdsa.staticCalcrecovery(
           sig: ecdsa.sig,
-          pubKey: ecdsa.keyPair.pubKey,
+          pubKey: ecdsa.keyPair!.pubKey,
           hashBuf: ecdsa.hashBuf,
-        );
+        )!;
         expect(listEquals(sig1.toCompact(), sig2.toCompact()), true);
       });
 
       test(
           'should calulate this known pubKey recovery number same as #calcrecovery',
           () {
-        var hashBuf = Hash.sha256(utf8.encode('some data'));
+        var hashBuf = Hash.sha256(utf8.encode('some data') as Uint8List);
         var r = new BigIntX.fromString(
           '71706645040721865894779025947914615666559616020894583599959600180037551395766',
         );
@@ -201,16 +201,16 @@ void main() {
         );
         var ecdsa = new Ecdsa();
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey().fromBn(
-            new BigIntX.fromBuffer(Hash.sha256(utf8.encode('test')).data)));
+            new BigIntX.fromBuffer(Hash.sha256(utf8.encode('test') as Uint8List).data!)));
         ecdsa.hashBuf = hashBuf.data;
         ecdsa.sig = Sig(r: r, s: s);
 
-        var sig1 = ecdsa.calcrecovery().sig;
+        var sig1 = ecdsa.calcrecovery().sig!;
         var sig2 = Ecdsa.staticCalcrecovery(
           sig: ecdsa.sig,
-          pubKey: ecdsa.keyPair.pubKey,
+          pubKey: ecdsa.keyPair!.pubKey,
           hashBuf: ecdsa.hashBuf,
-        );
+        )!;
         expect(listEquals(sig1.toCompact(), sig2.toCompact()), true);
       });
     });
@@ -270,7 +270,7 @@ void main() {
     group('#randomK', () {
       test('should generate a new random k when called twice in a row', () {
         ecdsa.randomK();
-        var k1 = ecdsa.k;
+        var k1 = ecdsa.k!;
         ecdsa.randomK();
         var k2 = ecdsa.k;
         expect(k1.cmp(k2) == 0, false);
@@ -292,7 +292,7 @@ void main() {
       test('should generate the same deterministic k', () {
         ecdsa.deterministicK();
         expect(
-          ecdsa.k.toBuffer().toHex(),
+          ecdsa.k!.toBuffer().toHex(),
           'fcce1de7a9bcd6b2d3defade6afa1913fb9229e3b7ddf4749b55c4848b2a196e',
         );
       });
@@ -300,17 +300,17 @@ void main() {
       test('should generate the same deterministic k if badrs is set', () {
         ecdsa.deterministicK(0);
         expect(
-          ecdsa.k.toBuffer().toHex(),
+          ecdsa.k!.toBuffer().toHex(),
           ('fcce1de7a9bcd6b2d3defade6afa1913fb9229e3b7ddf4749b55c4848b2a196e'),
         );
         ecdsa.deterministicK(1);
         expect(
-          ecdsa.k.toBuffer().toHex() !=
+          ecdsa.k!.toBuffer().toHex() !=
               'fcce1de7a9bcd6b2d3defade6afa1913fb9229e3b7ddf4749b55c4848b2a196e',
           true,
         );
         expect(
-          ecdsa.k.toBuffer().toHex(),
+          ecdsa.k!.toBuffer().toHex(),
           ('727fbcb59eb48b1d7d46f95a04991fc512eb9dbf9105628e3aec87428df28fd8'),
         );
       });
@@ -327,16 +327,16 @@ void main() {
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey(bn: BigIntX.one));
         ecdsa.deterministicK();
         expect(
-          ecdsa.k.toBuffer().toHex(),
+          ecdsa.k!.toBuffer().toHex(),
           'ec633bd56a5774a0940cb97e27a9e4e51dc94af737596a0c5cbb3d30332d92a5',
         );
         ecdsa.sign();
         expect(
-          ecdsa.sig.r.toString(),
+          ecdsa.sig!.r.toString(),
           '23362334225185207751494092901091441011938859014081160902781146257181456271561',
         );
         expect(
-          ecdsa.sig.s.toString(),
+          ecdsa.sig!.s.toString(),
           '50433721247292933944369538617440297985091596895097604618403996029256432099938',
         );
       });
@@ -348,9 +348,9 @@ void main() {
           () {
         ecdsa.sig = new Sig().fromString(
             '3045022100ec3cfe0e335791ad278b4ec8eac93d0347a97877bb1d54d35d189e225c15f6650220278cf15b05ce47fb37d2233802899d94c774d5480bba9f0f2d996baa13370c43');
-        ecdsa.sig.recovery = 0;
+        ecdsa.sig!.recovery = 0;
         var pubKey = ecdsa.sig2PubKey();
-        expect(pubKey.point == ecdsa.keyPair.pubKey.point, true);
+        expect(pubKey.point == ecdsa.keyPair!.pubKey!.point, true);
       });
 
       test(
@@ -359,9 +359,9 @@ void main() {
         ecdsa.sign();
         ecdsa.sig = new Sig().fromString(
             '3046022100ec3cfe0e335791ad278b4ec8eac93d0347a97877bb1d54d35d189e225c15f665022100d8730ea4fa31b804c82ddcc7fd766269f33a079ea38e012c9238f2e2bcff34fe');
-        ecdsa.sig.recovery = 1;
+        ecdsa.sig!.recovery = 1;
         var pubKey = ecdsa.sig2PubKey();
-        expect(pubKey.point == ecdsa.keyPair.pubKey.point, true);
+        expect(pubKey.point == ecdsa.keyPair!.pubKey!.point, true);
       });
     });
 
@@ -392,7 +392,7 @@ void main() {
           '114860389168127852803919605627759231199925249596762615988727970217268189974335',
         );
         ecdsa.sign();
-        ecdsa.sig.recovery = 0;
+        ecdsa.sig!.recovery = 0;
         var pubKey1 = ecdsa.sig2PubKey();
         var pubKey2 =
             Ecdsa.staticSig2PubKey(sig: ecdsa.sig, hashBuf: ecdsa.hashBuf);
@@ -407,7 +407,7 @@ void main() {
         );
         ecdsa.sig = new Sig().fromString(
             '3045022100ec3cfe0e335791ad278b4ec8eac93d0347a97877bb1d54d35d189e225c15f6650220278cf15b05ce47fb37d2233802899d94c774d5480bba9f0f2d996baa13370c43');
-        ecdsa.sig.recovery = 0;
+        ecdsa.sig!.recovery = 0;
         var pubKey1 = ecdsa.sig2PubKey();
         var pubKey2 =
             Ecdsa.staticSig2PubKey(sig: ecdsa.sig, hashBuf: ecdsa.hashBuf);
@@ -423,7 +423,7 @@ void main() {
         ecdsa.sign();
         ecdsa.sig = new Sig().fromString(
             '3046022100ec3cfe0e335791ad278b4ec8eac93d0347a97877bb1d54d35d189e225c15f665022100d8730ea4fa31b804c82ddcc7fd766269f33a079ea38e012c9238f2e2bcff34fe');
-        ecdsa.sig.recovery = 1;
+        ecdsa.sig!.recovery = 1;
         var pubKey1 = ecdsa.sig2PubKey();
         var pubKey2 =
             Ecdsa.staticSig2PubKey(sig: ecdsa.sig, hashBuf: ecdsa.hashBuf);
@@ -482,31 +482,31 @@ void main() {
 
       test('should return an error if the pubKey is invalid', () {
         var ecdsa = new Ecdsa();
-        ecdsa.hashBuf = Hash.sha256(utf8.encode('test')).data;
+        ecdsa.hashBuf = Hash.sha256(utf8.encode('test') as Uint8List).data;
         expect(
             (ecdsa.verifyStr() as String).startsWith('Invalid pubKey'), true);
       });
 
       test('should return an error if r, s are invalid', () {
         var ecdsa = new Ecdsa();
-        ecdsa.hashBuf = Hash.sha256(utf8.encode('test')).data;
+        ecdsa.hashBuf = Hash.sha256(utf8.encode('test') as Uint8List).data;
         var pk = new PubKey();
         pk.fromDer(hex.decode(
           '041ff0fe0f7b15ffaa85ff9f4744d539139c252a49710fb053bb9f2b933173ff9a7baad41d04514751e6851f5304fd243751703bed21b914f6be218c0fa354a341',
         ));
         ecdsa.keyPair = new KeyPair();
-        ecdsa.keyPair.pubKey = pk;
+        ecdsa.keyPair!.pubKey = pk;
         ecdsa.sig = new Sig();
-        ecdsa.sig.r = BigIntX.zero;
-        ecdsa.sig.s = BigIntX.zero;
+        ecdsa.sig!.r = BigIntX.zero;
+        ecdsa.sig!.s = BigIntX.zero;
         expect(ecdsa.verifyStr(), ('r and s not in range'));
       });
 
       test('should return an error if the signature is incorrect', () {
         ecdsa.sig = new Sig();
-        ecdsa.sig.fromString(
+        ecdsa.sig!.fromString(
             '3046022100e9915e6236695f093a4128ac2a956c40ed971531de2f4f41ba05fac7e2bd019c02210094e6a4a769cc7f2a8ab3db696c7cd8d56bcdbfff860a8c81de4bc6a798b90827');
-        ecdsa.sig.r = ecdsa.sig.r.add(BigIntX.one);
+        ecdsa.sig!.r = ecdsa.sig!.r!.add(BigIntX.one);
         expect(ecdsa.verifyStr(false), 'Invalid signature');
       });
     });
@@ -520,7 +520,7 @@ void main() {
 
       test('should should throw an error if hashBuf is not 32 bytes', () {
         var ecdsa2 = new Ecdsa(
-            hashBuf: ecdsa.hashBuf.slice(0, 31), keyPair: ecdsa.keyPair);
+            hashBuf: ecdsa.hashBuf!.slice(0, 31), keyPair: ecdsa.keyPair);
         ecdsa2.randomK();
         expect(
           () => ecdsa2.sign(),
@@ -565,7 +565,7 @@ void main() {
 
       test('should verify this known good signature', () {
         ecdsa.sig = new Sig();
-        ecdsa.sig.fromString(
+        ecdsa.sig!.fromString(
             '3046022100e9915e6236695f093a4128ac2a956c40ed971531de2f4f41ba05fac7e2bd019c02210094e6a4a769cc7f2a8ab3db696c7cd8d56bcdbfff860a8c81de4bc6a798b90827');
         expect(ecdsa.verify(false).verified, true);
       });
@@ -602,22 +602,22 @@ void main() {
       test('should verify a valid signature, and unverify an invalid signature',
           () {
         var sig =
-            Ecdsa.staticSign(hashBuf: ecdsa.hashBuf, keyPair: ecdsa.keyPair);
+            Ecdsa.staticSign(hashBuf: ecdsa.hashBuf, keyPair: ecdsa.keyPair)!;
         expect(
           Ecdsa.staticVerify(
             hashBuf: ecdsa.hashBuf,
             sig: sig,
-            pubKey: ecdsa.keyPair.pubKey,
+            pubKey: ecdsa.keyPair!.pubKey,
           ),
           true,
         );
-        var fakesig = new Sig(r: sig.r.add(BigIntX.one), s: sig.s);
+        var fakesig = new Sig(r: sig.r!.add(BigIntX.one), s: sig.s);
 
         expect(
           Ecdsa.staticVerify(
             hashBuf: ecdsa.hashBuf,
             sig: fakesig,
-            pubKey: ecdsa.keyPair.pubKey,
+            pubKey: ecdsa.keyPair!.pubKey,
           ),
           false,
         );
@@ -630,7 +630,7 @@ void main() {
           Ecdsa.staticVerify(
               hashBuf: ecdsa.hashBuf,
               sig: sig,
-              pubKey: ecdsa.keyPair.pubKey,
+              pubKey: ecdsa.keyPair!.pubKey,
               endian: Endian.big),
           true,
         );
@@ -639,7 +639,7 @@ void main() {
           Ecdsa.staticVerify(
             hashBuf: ecdsa.hashBuf,
             sig: sig,
-            pubKey: ecdsa.keyPair.pubKey,
+            pubKey: ecdsa.keyPair!.pubKey,
             endian: Endian.little,
           ),
           false,
@@ -654,7 +654,7 @@ void main() {
           Ecdsa.staticVerify(
               hashBuf: ecdsa.hashBuf,
               sig: sig,
-              pubKey: ecdsa.keyPair.pubKey,
+              pubKey: ecdsa.keyPair!.pubKey,
               endian: Endian.big),
           false,
         );
@@ -663,7 +663,7 @@ void main() {
           Ecdsa.staticVerify(
             hashBuf: ecdsa.hashBuf,
             sig: sig,
-            pubKey: ecdsa.keyPair.pubKey,
+            pubKey: ecdsa.keyPair!.pubKey,
             endian: Endian.little,
           ),
           true,
@@ -700,7 +700,7 @@ void main() {
             keyPair: KeyPair().fromPrivKey(
                 PrivKey().fromBn(BigIntX.fromBuffer(hex.decode(obj['d'])))),
             k: BigIntX.fromBuffer(hex.decode(obj['k'])),
-            hashBuf: Hash.sha256(utf8.encode(obj['message'])).data,
+            hashBuf: Hash.sha256(utf8.encode(obj['message']) as Uint8List).data,
             sig: Sig(
               r: BigIntX.fromString(obj['signature']['r']),
               s: BigIntX.fromString(obj['signature']['s']),
@@ -712,7 +712,7 @@ void main() {
           ecdsa2.sign();
           ecdsa2.calcrecovery();
           expect(ecdsa2.sig.toString(), (ecdsa.sig.toString()));
-          expect(ecdsa2.sig.recovery, (ecdsa.sig.recovery));
+          expect(ecdsa2.sig!.recovery, (ecdsa.sig!.recovery));
           expect(ecdsa.verify().verified, (true));
         });
       }
@@ -737,7 +737,7 @@ void main() {
               r: BigIntX.fromString(obj['signature']['r']),
               s: BigIntX.fromString(obj['signature']['s']),
             ),
-            hashBuf: Hash.sha256(utf8.encode(obj['message'])).data,
+            hashBuf: Hash.sha256(utf8.encode(obj['message']) as Uint8List).data,
           );
           expect(ecdsa.verifyStr(), obj['exception']);
         });
@@ -749,7 +749,7 @@ void main() {
         var obj = deterministicK[i];
 
         test('should validate deterministicK vector $i', () {
-          var hashBuf = Hash.sha256(utf8.encode(obj['message']));
+          var hashBuf = Hash.sha256(utf8.encode(obj['message']) as Uint8List);
 
           var privKey = new PrivKey(
             bn: new BigIntX.fromBuffer(hex.decode(obj['privkey'])),
@@ -760,9 +760,9 @@ void main() {
             hashBuf: hashBuf.data,
           );
 
-          expect(ecdsa.deterministicK(0).k.toHex(), obj['k_bad00']);
-          expect(ecdsa.deterministicK(1).k.toHex(), obj['k_bad01']);
-          expect(ecdsa.deterministicK(15).k.toHex(), obj['k_bad15']);
+          expect(ecdsa.deterministicK(0).k!.toHex(), obj['k_bad00']);
+          expect(ecdsa.deterministicK(1).k!.toHex(), obj['k_bad01']);
+          expect(ecdsa.deterministicK(15).k!.toHex(), obj['k_bad15']);
         });
       }
     });

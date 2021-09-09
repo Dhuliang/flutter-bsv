@@ -15,10 +15,10 @@ import 'package:bsv/tx_out_map.dart';
 import 'package:bsv/extentsions/list.dart';
 
 class TxVerifier {
-  Tx tx;
-  TxOutMap txOutMap;
+  Tx? tx;
+  TxOutMap? txOutMap;
   String errStr;
-  Interp interp;
+  Interp? interp;
 
   TxVerifier({
     this.tx,
@@ -38,7 +38,7 @@ class TxVerifier {
      * valid, which is not performed by this test. That check is done with the
      * normal verify function.
      */
-  Future<bool> verify([int flags]) async {
+  Future<bool> verify([int? flags]) async {
     var result1 = this.checkStr();
     if (result1 is String) {
       return false;
@@ -68,7 +68,7 @@ class TxVerifier {
   /**
      * Convenience method to verify a transaction.
      */
-  static Future<bool> staticVerify({Tx tx, TxOutMap txOutMap, int flags}) {
+  static Future<bool> staticVerify({Tx? tx, TxOutMap? txOutMap, int? flags}) {
     return new TxVerifier(tx: tx, txOutMap: txOutMap).verify(flags);
   }
 
@@ -84,34 +84,34 @@ class TxVerifier {
      */
   dynamic checkStr() {
     // Basic checks that don't depend on any context
-    if (this.tx.txIns.length == 0 || this.tx.txInsVi.toNumber() == 0) {
+    if (this.tx!.txIns!.length == 0 || this.tx!.txInsVi!.toNumber() == 0) {
       this.errStr = 'transaction txIns empty';
       return this.errStr;
     }
-    if (this.tx.txOuts.length == 0 || this.tx.txOutsVi.toNumber() == 0) {
+    if (this.tx!.txOuts!.length == 0 || this.tx!.txOutsVi!.toNumber() == 0) {
       this.errStr = 'transaction txOuts empty';
       return this.errStr;
     }
 
     // Size limits
-    if (this.tx.toBuffer().length > Block.MAX_BLOCK_SIZE) {
+    if (this.tx!.toBuffer().length > Block.MAX_BLOCK_SIZE) {
       this.errStr = 'transaction over the maximum block size';
       return this.errStr;
     }
 
     // Check for negative or overflow output values
     var valueoutbn = BigIntX.zero;
-    for (var i = 0; i < this.tx.txOuts.length; i++) {
-      var txOut = this.tx.txOuts[i];
-      if (txOut.valueBn.lt(0)) {
+    for (var i = 0; i < this.tx!.txOuts!.length; i++) {
+      var txOut = this.tx!.txOuts![i];
+      if (txOut.valueBn!.lt(0)) {
         this.errStr = 'transaction txOut $i negative';
         return this.errStr;
       }
-      if (txOut.valueBn.gt(Tx.MAX_MONEY)) {
+      if (txOut.valueBn!.gt(Tx.MAX_MONEY)) {
         this.errStr = 'transaction txOut $i greater than MAX_MONEY';
         return this.errStr;
       }
-      valueoutbn = valueoutbn.add(txOut.valueBn);
+      valueoutbn = valueoutbn.add(txOut.valueBn!);
       if (valueoutbn.gt(Tx.MAX_MONEY)) {
         this.errStr =
             'transaction txOut $i total output greater than MAX_MONEY';
@@ -121,9 +121,9 @@ class TxVerifier {
 
     // Check for duplicate inputs
     var txInmap = {};
-    for (var i = 0; i < this.tx.txIns.length; i++) {
-      var txIn = this.tx.txIns[i];
-      var inputid = '${txIn.txHashBuf.toHex()}:${txIn.txOutNum}';
+    for (var i = 0; i < this.tx!.txIns!.length; i++) {
+      var txIn = this.tx!.txIns![i];
+      var inputid = '${txIn.txHashBuf!.toHex()}:${txIn.txOutNum}';
       if (txInmap[inputid] != null) {
         this.errStr = 'transaction input $i duplicate input';
         return this.errStr;
@@ -131,15 +131,15 @@ class TxVerifier {
       txInmap[inputid] = true;
     }
 
-    if (this.tx.isCoinbase()) {
-      var buf = this.tx.txIns[0].script.toBuffer();
+    if (this.tx!.isCoinbase()) {
+      var buf = this.tx!.txIns![0].script!.toBuffer();
       if (buf.length < 2 || buf.length > 100) {
         this.errStr = 'coinbase trasaction script size invalid';
         return this.errStr;
       }
     } else {
-      for (var i = 0; i < this.tx.txIns.length; i++) {
-        if (this.tx.txIns[i].hasNullInput()) {
+      for (var i = 0; i < this.tx!.txIns!.length; i++) {
+        if (this.tx!.txIns![i].hasNullInput()) {
           this.errStr = 'transaction input $i has null input';
           return this.errStr;
         }
@@ -154,7 +154,7 @@ class TxVerifier {
      * string of the script interpreter is invalid, otherwise returns false.
      */
   dynamic verifyStr(int flags) async {
-    for (var i = 0; i < this.tx.txIns.length; i++) {
+    for (var i = 0; i < this.tx!.txIns!.length; i++) {
       if (!await this.verifyNIn(i, flags)) {
         this.errStr = 'input $i failed script verify';
         return this.errStr;
@@ -180,9 +180,9 @@ class TxVerifier {
      * the input is valid, false otherwise.
      */
   Future<bool> verifyNIn(int nIn, int flags) async {
-    var txIn = this.tx.txIns[nIn];
+    var txIn = this.tx!.txIns![nIn];
     var scriptSig = txIn.script;
-    TxOut txOut = this.txOutMap.get(txIn.txHashBuf, txIn.txOutNum);
+    TxOut? txOut = this.txOutMap!.get(txIn.txHashBuf!, txIn.txOutNum);
     if (txOut == null) {
       print('output ${txIn.txOutNum} not found');
       return false;
@@ -190,7 +190,7 @@ class TxVerifier {
     var scriptPubKey = txOut.script;
     var valueBn = txOut.valueBn;
     this.interp = new Interp();
-    var verified = await this.interp.verify(
+    var verified = await this.interp!.verify(
           scriptSig: scriptSig,
           scriptPubKey: scriptPubKey,
           tx: this.tx,
@@ -224,7 +224,7 @@ class TxVerifier {
   Map<String, dynamic> getDebugObject() {
     return {
       "errStr": this.errStr,
-      "interpFailure": this.interp != null ? this.interp.getDebugObject() : null
+      "interpFailure": this.interp != null ? this.interp!.getDebugObject() : null
     };
   }
 

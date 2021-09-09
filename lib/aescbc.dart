@@ -31,7 +31,7 @@ class Aescbc {
 
     PaddedBlockCipherImpl cipherImpl = new PaddedBlockCipherImpl(
         new PKCS7Padding(), new CBCBlockCipher(new AESFastEngine()));
-    cipherImpl.init(true, params);
+    cipherImpl.init(true, params as PaddedBlockCipherParameters<CipherParameters?, CipherParameters?>);
     // return cipherImpl.process(utf8.encode(data));
     return cipherImpl.process((data));
   }
@@ -46,7 +46,7 @@ class Aescbc {
 
     PaddedBlockCipherImpl cipherImpl = new PaddedBlockCipherImpl(
         new PKCS7Padding(), new CBCBlockCipher(new AESFastEngine()));
-    cipherImpl.init(false, params);
+    cipherImpl.init(false, params as PaddedBlockCipherParameters<CipherParameters?, CipherParameters?>);
     // return cipherImpl.process(utf8.encode(data));
     return cipherImpl.process((data));
   }
@@ -70,7 +70,7 @@ class Aescbc {
   // }
 
   static Uint8List aesCbcEncrypt(
-      {Uint8List key, Uint8List iv, Uint8List paddedPlaintext}) {
+      {required Uint8List key, required Uint8List iv, required Uint8List paddedPlaintext}) {
     // Create a CBC block cipher with AES, and initialize with key and IV
 
     final cbc = CBCBlockCipher(AESFastEngine())

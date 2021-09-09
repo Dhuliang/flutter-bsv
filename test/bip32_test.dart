@@ -100,13 +100,13 @@ void main() {
 
     test('should initialize test vector 1 from the extended public key', () {
       var bip32 = new Bip32().fromString(vector1mPublic);
-      expect(bip32 != null, true);
+      // expect(bip32 != null, true);
       expect(bip32.pubKey != null, true);
     });
 
     test('should initialize test vector 1 from the extended private key', () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
-      expect(bip32 != null, true);
+      // expect(bip32 != null, true);
       expect(bip32.privKey != null, true);
     });
 
@@ -120,7 +120,7 @@ void main() {
     test("should get m/0' ext. private key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector1m0hPrivate);
     });
 
@@ -134,21 +134,21 @@ void main() {
     test("should get m/0' ext. public key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector1m0hPublic);
     });
 
     test("should get m/0'/1 ext. private key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector1m0h1Private);
     });
 
     test("should get m/0'/1 ext. public key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector1m0h1Public);
     });
 
@@ -159,7 +159,7 @@ void main() {
       var child = bip32.derive("m/0'");
       var childPub = new Bip32().fromString(child.toPublic().toString());
       var child2 = childPub.derive('m/1');
-      expect(child2 != null, true);
+      // expect(child2 != null, true);
       expect(child2.toPublic().toString(), vector1m0h1Public);
     });
 
@@ -178,21 +178,21 @@ void main() {
     test("should get m/0'/1/2h ext. private key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1/2'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector1m0h12hPrivate);
     });
 
     test("should get m/0'/1/2h ext. public key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1/2'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector1m0h12hPublic);
     });
 
     test("should get m/0'/1/2h/2 ext. private key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1/2'/2");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector1m0h12h2Private);
     });
 
@@ -203,14 +203,14 @@ void main() {
       var child = bip32.derive("m/0'/1/2'");
       var childPub = new Bip32().fromString(child.toPublic().toString());
       var child2 = childPub.derive('m/2');
-      expect(child2 != null, true);
+      // expect(child2 != null, true);
       expect(child2.toPublic().toString(), vector1m0h12h2Public);
     });
 
     test("should get m/0'/1/2h/2 ext. public key from test vector 1", () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1/2'/2");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector1m0h12h2Public);
     });
 
@@ -219,7 +219,7 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1/2'/2/1000000000");
-      expect(child != null, true);
+      // expect(child != null, true);
 
       expect(child.toString(), vector1m0h12h21000000000Private);
     });
@@ -228,7 +228,7 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector1mPrivate);
       var child = bip32.derive("m/0'/1/2'/2/1000000000");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector1m0h12h21000000000Public);
     });
 
@@ -239,19 +239,19 @@ void main() {
       var child = bip32.derive("m/0'/1/2'/2");
       var childPub = new Bip32().fromString(child.toPublic().toString());
       var child2 = childPub.derive('m/1000000000');
-      expect(child2 != null, true);
+      // expect(child2 != null, true);
       expect(child2.toPublic().toString(), vector1m0h12h21000000000Public);
     });
 
     test('should initialize test vector 2 from the extended public key', () {
       var bip32 = new Bip32().fromString(vector2mPublic);
-      expect(bip32 != null, true);
+      // expect(bip32 != null, true);
       expect(bip32.pubKey != null, true);
     });
 
     test('should initialize test vector 2 from the extended private key', () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
-      expect(bip32 != null, true);
+      // expect(bip32 != null, true);
       expect(bip32.privKey != null, true);
     });
 
@@ -265,14 +265,14 @@ void main() {
     test('should get m/0 ext. private key from test vector 2', () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive('m/0');
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector2m0Private);
     });
 
     test('should get m/0 ext. public key from test vector 2', () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive('m/0');
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector2m0Public);
     });
 
@@ -282,21 +282,21 @@ void main() {
       var child = bip32.derive('m');
       var childPub = new Bip32().fromString(child.toPublic().toString());
       var child2 = childPub.derive('m/0');
-      expect(child2 != null, true);
+      // expect(child2 != null, true);
       expect(child2.toPublic().toString(), vector2m0Public);
     });
 
     test('should get m/0/2147483647h ext. private key from test vector 2', () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector2m02147483647hPrivate);
     });
 
     test('should get m/0/2147483647h ext. public key from test vector 2', () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector2m02147483647hPublic);
     });
 
@@ -304,14 +304,14 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'/1");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector2m02147483647h1Private);
     });
 
     test('should get m/0/2147483647h/1 ext. public key from test vector 2', () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'/1");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toPublic().toString(), vector2m02147483647h1Public);
     });
 
@@ -322,7 +322,7 @@ void main() {
       var child = bip32.derive("m/0/2147483647'");
       var childPub = new Bip32().fromString(child.toPublic().toString());
       var child2 = childPub.derive('m/1');
-      expect(child2 != null, true);
+      // expect(child2 != null, true);
       expect(child2.toPublic().toString(), vector2m02147483647h1Public);
     });
 
@@ -331,7 +331,7 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'/1/2147483646'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector2m02147483647h12147483646hPrivate);
     });
 
@@ -340,7 +340,7 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'/1/2147483646'");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(
           child.toPublic().toString(), vector2m02147483647h12147483646hPublic);
     });
@@ -350,7 +350,7 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'/1/2147483646'/2");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(child.toString(), vector2m02147483647h12147483646h2Private);
     });
 
@@ -359,7 +359,7 @@ void main() {
         () {
       var bip32 = new Bip32().fromString(vector2mPrivate);
       var child = bip32.derive("m/0/2147483647'/1/2147483646'/2");
-      expect(child != null, true);
+      // expect(child != null, true);
       expect(
           child.toPublic().toString(), vector2m02147483647h12147483646h2Public);
     });
@@ -371,7 +371,7 @@ void main() {
       var child = bip32.derive("m/0/2147483647'/1/2147483646'");
       var childPub = new Bip32().fromString(child.toPublic().toString());
       var child2 = childPub.derive('m/2');
-      expect(child2 != null, true);
+      // expect(child2 != null, true);
       expect(child2.toPublic().toString(),
           vector2m02147483647h12147483646h2Public);
     });

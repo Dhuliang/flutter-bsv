@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/address.dart';
 import 'package:bsv/bn.dart';
 import 'package:bsv/br.dart';
@@ -93,7 +95,7 @@ void main() {
         expect(
           txIn2
               .setScript(Script().fromString('OP_RETURN OP_RETURN OP_RETURN'))
-              .scriptVi
+              .scriptVi!
               .toNumber(),
           3,
         );
@@ -107,6 +109,7 @@ void main() {
         expect(txIn2.txOutNum != null, true);
         expect(txIn2.scriptVi != null, true);
         expect(txIn2.script != null, true);
+        // ignore: unnecessary_null_comparison
         expect(txIn2.nSequence != null, true);
       });
     });
@@ -127,7 +130,7 @@ void main() {
         var hexStr =
             '00000000000000000000000000000000000000000000000000000000000000000000000001ae00000000';
         var txIn = new TxIn().fromHex(hexStr);
-        expect(txIn.scriptVi.toNumber(), 1);
+        expect(txIn.scriptVi!.toNumber(), 1);
         expect(txIn.script.toString(), 'OP_CHECKMULTISIG');
       });
     });
@@ -138,7 +141,7 @@ void main() {
             '00000000000000000000000000000000000000000000000000000000000000000000000001ae00000000';
         var buf = hexStr.toBuffer();
         var txIn = new TxIn().fromBuffer(buf);
-        expect(txIn.scriptVi.toNumber(), 1);
+        expect(txIn.scriptVi!.toNumber(), 1);
         expect(txIn.script.toString(), 'OP_CHECKMULTISIG');
       });
     });
@@ -148,9 +151,9 @@ void main() {
         var hexStr =
             '00000000000000000000000000000000000000000000000000000000000000000000000001ae00000000';
         var buf = hexStr.toBuffer();
-        var br = new Br(buf: buf);
+        var br = new Br(buf: buf as Uint8List);
         var txIn = new TxIn().fromBr(br);
-        expect(txIn.scriptVi.toNumber(), 1);
+        expect(txIn.scriptVi!.toNumber(), 1);
         expect(txIn.script.toString(), 'OP_CHECKMULTISIG');
       });
     });
@@ -185,10 +188,11 @@ void main() {
     group('#fromPubKeyHashTxOut', () {
       test('should convert from pubKeyHash out', () {
         var keyPair = new KeyPair().fromRandom();
-        var address = new Address().fromPubKey(keyPair.pubKey);
+        var address = new Address().fromPubKey(keyPair.pubKey!);
         var txOut = TxOut.fromProperties(
             valueBn: BigIntX.fromNum(1000),
-            script: new Script().fromPubKeyHash(address.hashBuf.asUint8List()));
+            script:
+                new Script().fromPubKeyHash(address.hashBuf!.asUint8List()));
         var txHashBuf = List.generate(32, (index) => 0);
         var txOutNum = 0;
         var txIn = new TxIn().fromPubKeyHashTxOut(
@@ -196,6 +200,7 @@ void main() {
             txOutNum: txOutNum,
             txOut: txOut,
             pubKey: keyPair.pubKey);
+        // ignore: unnecessary_null_comparison
         expect(txIn != null, true);
       });
     });

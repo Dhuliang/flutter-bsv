@@ -33,7 +33,7 @@ void main() {
 
     group('#fromJSON', () {
       test('should make a keyPair from this json', () {
-        var privKey = new PrivKey().fromRandom();
+        var privKey = new PrivKey.fromRandom();
         var pubKey = new PubKey().fromPrivKey(privKey);
         var keyPair = new KeyPair().fromJSON({
           "privKey": privKey.toJSON(),
@@ -123,7 +123,7 @@ void main() {
             '906977a061af29276e40bf377042ffbde414e496ae2260bbf1fa9d085637bfff';
         var pubhex =
             '02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc';
-        var privKey = new PrivKey().fromBn(BigIntX.fromHex(privhex));
+        var privKey = new PrivKey.fromBn(BigIntX.fromHex(privhex));
         var key = new KeyPair().fromPrivKey(privKey);
         expect(key.pubKey.toString(), pubhex);
       });
@@ -133,10 +133,10 @@ void main() {
           () {
         var privhex =
             '906977a061af29276e40bf377042ffbde414e496ae2260bbf1fa9d085637bfff';
-        var privKey = new PrivKey().fromBn(BigIntX.fromHex(privhex));
+        var privKey = new PrivKey.fromBn(BigIntX.fromHex(privhex));
         privKey.compressed = false;
         var key = new KeyPair().fromPrivKey(privKey);
-        expect(key.pubKey.compressed, false);
+        expect(key.pubKey!.compressed, false);
       });
     });
 
@@ -150,7 +150,7 @@ void main() {
             '906977a061af29276e40bf377042ffbde414e496ae2260bbf1fa9d085637bfff';
         var pubhex =
             '02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc';
-        var privKey = new PrivKey().fromBn(BigIntX.fromHex(privhex));
+        var privKey = new PrivKey.fromBn(BigIntX.fromHex(privhex));
         var key = KeyPair.fromPrivKey(privKey);
         expect(key.pubKey.toString(), pubhex);
       });
@@ -160,10 +160,10 @@ void main() {
           () {
         var privhex =
             '906977a061af29276e40bf377042ffbde414e496ae2260bbf1fa9d085637bfff';
-        var privKey = new PrivKey().fromBn(BigIntX.fromHex(privhex));
+        var privKey = new PrivKey.fromBn(BigIntX.fromHex(privhex));
         privKey.compressed = false;
         var key = KeyPair.fromPrivKey(privKey);
-        expect(key.pubKey.compressed, false);
+        expect(key.pubKey!.compressed, false);
       });
     });
 
@@ -191,12 +191,12 @@ void main() {
         key.fromRandom();
         expect(key.privKey != null, true);
         expect(key.pubKey != null, true);
-        expect(key.privKey.bn.gt(BigIntX.zero), (true));
-        expect(key.pubKey.point.getX().gt(BigIntX.zero), (true));
-        expect(key.pubKey.point.getY().gt(BigIntX.zero), (true));
+        expect(key.privKey!.bn!.gt(BigIntX.zero), (true));
+        expect(key.pubKey!.point!.getX().gt(BigIntX.zero), (true));
+        expect(key.pubKey!.point!.getY().gt(BigIntX.zero), (true));
 
-        expect(key.privKey.compressed, (true));
-        expect(key.pubKey.compressed, (true));
+        expect(key.privKey!.compressed, (true));
+        expect(key.pubKey!.compressed, (true));
       });
     });
 
@@ -205,12 +205,12 @@ void main() {
         var key = KeyPair.fromRandom();
         expect(key.privKey != null, true);
         expect(key.pubKey != null, true);
-        expect(key.privKey.bn.gt(BigIntX.zero), (true));
-        expect(key.pubKey.point.getX().gt(BigIntX.zero), (true));
-        expect(key.pubKey.point.getY().gt(BigIntX.zero), (true));
+        expect(key.privKey!.bn!.gt(BigIntX.zero), (true));
+        expect(key.pubKey!.point!.getX().gt(BigIntX.zero), (true));
+        expect(key.pubKey!.point!.getY().gt(BigIntX.zero), (true));
 
-        expect(key.privKey.compressed, (true));
-        expect(key.pubKey.compressed, (true));
+        expect(key.privKey!.compressed, (true));
+        expect(key.pubKey!.compressed, (true));
       });
     });
 

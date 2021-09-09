@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:bsv/address.dart';
 import 'package:bsv/cmp.dart';
@@ -25,11 +26,11 @@ import 'package:bsv/extentsions/list.dart';
 class Bsm {
   static var magicBytes = utf8.encode('Bitcoin Signed Message:\n');
 
-  List<int> messageBuf;
-  KeyPair keyPair;
-  Sig sig;
-  Address address;
-  bool verified;
+  List<int>? messageBuf;
+  KeyPair? keyPair;
+  Sig? sig;
+  Address? address;
+  bool? verified;
 
   Bsm({
     this.messageBuf,
@@ -39,15 +40,15 @@ class Bsm {
     this.verified,
   });
 
-  static Hash magicHash(List<int> messageBuf) {
+  static Hash magicHash(List<int>? messageBuf) {
     if (!(messageBuf is List<int>)) {
       throw ('messageBuf must be a buffer');
     }
     var bw = new Bw();
     bw.writeVarIntNum(Bsm.magicBytes.length);
-    bw.write(Bsm.magicBytes);
+    bw.write(Bsm.magicBytes as Uint8List?);
     bw.writeVarIntNum(messageBuf.length);
-    bw.write(messageBuf);
+    bw.write(messageBuf as Uint8List?);
     var buf = bw.toBuffer();
 
     var hashBuf = Hash.sha256Sha256(buf.asUint8List());
@@ -61,10 +62,10 @@ class Bsm {
   //   return workersResult.resbuf
   // }
 
-  static String staticSign({List<int> messageBuf, KeyPair keyPair}) {
+  static String staticSign({List<int>? messageBuf, KeyPair? keyPair}) {
     var m = new Bsm(messageBuf: messageBuf, keyPair: keyPair);
     m.sign();
-    var sigbuf = m.sig.toCompact();
+    var sigbuf = m.sig!.toCompact();
     // var sigstr = utf8.decode(sigbuf);
     var sigstr = base64Encode(sigbuf);
     return sigstr;
@@ -78,9 +79,9 @@ class Bsm {
   // }
 
   static staticVerify({
-    List<int> messageBuf,
-    String sigstr,
-    Address address,
+    List<int>? messageBuf,
+    required String sigstr,
+    Address? address,
   }) {
     var sigbuf = base64Decode(sigstr).toList();
     var message = new Bsm();
@@ -114,22 +115,22 @@ class Bsm {
     ecdsa.hashBuf = hashBuf.toBuffer();
     ecdsa.sig = this.sig;
     ecdsa.keyPair = new KeyPair();
-    ecdsa.keyPair.pubKey = ecdsa.sig2PubKey();
+    ecdsa.keyPair!.pubKey = ecdsa.sig2PubKey();
 
-    if (!ecdsa.verify().verified) {
+    if (!ecdsa.verify().verified!) {
       this.verified = false;
       return this;
     }
 
     var address = new Address().fromPubKey(
-      ecdsa.keyPair.pubKey,
+      ecdsa.keyPair!.pubKey!,
       // null,
       // this.sig.compressed,
     );
-    // TODO: what if livenet/testnet mismatch?
+    // TODOS: what if livenet/testnet mismatch?
     if (cmp(
-      address.hashBuf.asUint8List(),
-      this.address.hashBuf.asUint8List(),
+      address.hashBuf!.asUint8List(),
+      this.address!.hashBuf!.asUint8List(),
     )) {
       this.verified = true;
     } else {

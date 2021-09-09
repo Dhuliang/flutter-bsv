@@ -32,6 +32,7 @@ extension ListX<T> on List<T> {
     if (this is List<int>) {
       return Uint8List.fromList(this as List<int>);
     }
+
     throw 'not List<int>';
   }
 
@@ -59,21 +60,21 @@ extension ListX<T> on List<T> {
   //   return cloned;
   // }
 
-  List<T> slice([int start, int end]) {
+  List<T> slice([int? start, int? end]) {
     var len = this.length;
     List<T> range = [];
 
     start = idx(len, start);
     end = idx(len, end, len);
 
-    while (start < end) {
+    while (start! < end) {
       range.add(this[start++]);
     }
 
     return range;
   }
 
-  int idx(int len, int pos, [int end]) {
+  int idx(int len, int? pos, [int? end]) {
     if (pos == null) {
       pos = end ?? 0;
     } else if (pos < 0) {
@@ -85,7 +86,7 @@ extension ListX<T> on List<T> {
     return pos;
   }
 
-  List<T> splice(int start, [int toRemove = 0, T insert]) {
+  List<T> splice(int start, [int toRemove = 0, T? insert]) {
     // insert = insert ?? [] as T;
     // T insertEl = insert ?? [];
     var remove = this.slice(start, start + toRemove);

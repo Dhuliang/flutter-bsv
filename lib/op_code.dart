@@ -9,14 +9,14 @@
  * new OpCode(str).toNumber() or new OpCode(num).toString()
  */
 class OpCode {
-  int number;
+  late int number;
 
   static const INVALID_OP_CODE_REPRESENTATION =
       'OpCode does not have a string representation';
 
   static const INVALID_OP_CODE_STR = 'Invalid opCodeStr';
 
-  OpCode({int number}) {
+  OpCode({required int number}) {
     this.number = number;
   }
 
@@ -26,21 +26,27 @@ class OpCode {
   }
 
   factory OpCode.fromNumber(int number) {
-    return new OpCode().fromNumber(number);
+    // return new OpCode(number: number).fromNumber(number);
+    return new OpCode(number: number);
   }
 
   factory OpCode.fromString(String str) {
-    return new OpCode().fromString(str);
-  }
-
-  OpCode fromString(String str) {
     var number = map[str];
     if (number == null) {
       throw INVALID_OP_CODE_STR;
     }
-    this.number = number;
-    return this;
+    return OpCode(number: number);
+    // return new OpCode().fromString(str);
   }
+
+  // OpCode fromString(String str) {
+  //   var number = map[str];
+  //   if (number == null) {
+  //     throw INVALID_OP_CODE_STR;
+  //   }
+  //   this.number = number;
+  //   return this;
+  // }
 
   @override
   String toString() {

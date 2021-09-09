@@ -51,8 +51,8 @@ void main() {
         var G = PointWrapper.getG();
         var json = G.toJson();
 
-        expect(json['x'], G.point.x.toString());
-        expect(json['y'], G.point.y.toString());
+        expect(json['x'], G.point!.x.toString());
+        expect(json['y'], G.point!.y.toString());
       });
     });
 

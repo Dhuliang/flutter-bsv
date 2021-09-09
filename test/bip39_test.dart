@@ -29,10 +29,10 @@ void main() {
       // https://github.com/iancoleman/bip39/issues/58
       var seed = Bip39.fromString(
               'fruit wave dwarf banana earth journey tattoo true farm silk olive fence')
-          .toSeed('banana');
+          .toSeed('banana')!;
       var bip32 = Bip32.fromSeed(seed);
       bip32 = bip32.derive("m/44'/0'/0'/0/0");
-      var address = Address.fromPubKey(bip32.pubKey);
+      var address = Address.fromPubKey(bip32.pubKey!);
       expect(address.toString(), '17rxURoF96VhmkcEGCj5LNQkmN9HVhWb7F');
     });
 
@@ -79,7 +79,7 @@ void main() {
         var bip39b = new Bip39().fromBuffer(bip39a.toBuffer());
 
         expect(bip39a.mnemonic, bip39b.mnemonic);
-        expect(bip39b.seed.toHex(), bip39b.seed.toHex());
+        expect(bip39b.seed!.toHex(), bip39b.seed!.toHex());
       });
     });
 
@@ -150,7 +150,7 @@ void main() {
     group('#check', () {
       test('should work with or without optional wordlist', () {
         var buf = Uint8List.fromList(List.generate(128 ~/ 8, (index) => 0));
-        var mnemonic = new Bip39().entropy2Mnemonic(buf).mnemonic;
+        var mnemonic = new Bip39().entropy2Mnemonic(buf).mnemonic!;
         expect(new Bip39().fromString(mnemonic).check(), true);
         expect(new Bip39En().fromString(mnemonic).check(), true);
       });
@@ -169,11 +169,11 @@ void main() {
     group('#asyncToSeed', () {
       test('should result the same as toSeed', () {
         var bip39 = new Bip39().fromRandom();
-        var seed1a = bip39.toSeed();
-        var seed2a = bip39.toSeed();
+        var seed1a = bip39.toSeed()!;
+        var seed2a = bip39.toSeed()!;
         expect(seed1a.toHex(), seed2a.toHex());
-        var seed1b = bip39.toSeed('pass');
-        var seed2b = bip39.toSeed('pass');
+        var seed1b = bip39.toSeed('pass')!;
+        var seed2b = bip39.toSeed('pass')!;
         expect(seed1b.toHex(), seed2b.toHex());
       });
     });
@@ -195,28 +195,28 @@ void main() {
     });
 
     group('vectors', () {
-      for (var i = 0; i < bip39vectors['english'].length; i++) {
-        var vector = bip39vectors['english'][i];
+      for (var i = 0; i < bip39vectors['english']!.length; i++) {
+        var vector = bip39vectors['english']![i];
         test('should pass english test vector $i', () {
-          var entropy = hex.decode(vector['entropy']);
-          var bip39 = new Bip39En().fromEntropy(entropy);
+          var entropy = hex.decode(vector['entropy']!);
+          var bip39 = new Bip39En().fromEntropy(entropy as Uint8List);
           expect(bip39.toString(), vector['mnemonic']);
           expect(bip39.check(), true);
-          var seed = bip39.toSeed(vector['passphrase']);
+          var seed = bip39.toSeed(vector['passphrase'])!;
 
           expect(seed.toHex(), vector['seed']);
           expect(new Bip32().fromSeed(seed).toString(), vector['bip32_xprv']);
         });
       }
 
-      for (var i = 0; i < bip39vectors['japanese'].length; i++) {
-        var vector = bip39vectors['japanese'][i];
+      for (var i = 0; i < bip39vectors['japanese']!.length; i++) {
+        var vector = bip39vectors['japanese']![i];
         test('should pass japanese test vector $i', () {
-          var entropy = hex.decode(vector['entropy']);
-          var bip39 = new Bip39Jp().fromEntropy(entropy);
+          var entropy = hex.decode(vector['entropy']!);
+          var bip39 = new Bip39Jp().fromEntropy(entropy as Uint8List);
           expect(bip39.toString(), vector['mnemonic']);
           expect(bip39.check(), true);
-          var seed = bip39.toSeed(vector['passphrase']);
+          var seed = bip39.toSeed(vector['passphrase'])!;
           // print(bip39.toSeed().toHex());
           // print(hex.decode(vector['seed']));
 

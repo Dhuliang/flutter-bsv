@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/block.dart';
 import 'package:bsv/block_header.dart';
 import 'package:bsv/br.dart';
@@ -21,7 +23,7 @@ void main() {
     var bhhex =
         '0100000005050505050505050505050505050505050505050505050505050505050505050909090909090909090909090909090909090909090909090909090909090909020000000300000004000000';
     var bhbuf = hex.decode(bhhex);
-    var bh = new BlockHeader().fromBuffer(bhbuf);
+    var bh = new BlockHeader.fromBuffer(bhbuf);
     var txsVi = VarInt.fromNumber(1);
     var txs = [new Tx().fromBuffer(txbuf)];
     var block = new Block(
@@ -57,23 +59,29 @@ void main() {
             txs: txs);
         // should.exist(block.magicNum)
         // should.exist(block.blockSize)
+        // ignore: unnecessary_null_comparison
         expect(block.blockHeader != null, true);
+        // ignore: unnecessary_null_comparison
         expect(block.txsVi != null, true);
+        // ignore: unnecessary_null_comparison
         expect(block.txs != null, true);
       });
     });
 
     group('#fromJSON', () {
       test('should set these known values', () {
-        var block = new Block().fromJSON({
+        var block = new Block.fromJSON({
           "magicNum": magicNum,
           "blockSize": blockSize,
           "blockHeader": bh.toJSON(),
           "txsVi": txsVi.toJSON(),
           "txs": [txs[0].toJSON()]
         });
+        // ignore: unnecessary_null_comparison
         expect(block.blockHeader != null, true);
+        // ignore: unnecessary_null_comparison
         expect(block.txsVi != null, true);
+        // ignore: unnecessary_null_comparison
         expect(block.txs != null, true);
       });
     });
@@ -89,14 +97,14 @@ void main() {
 
     group('#fromHex', () {
       test('should make a block from this known hex', () {
-        var block = new Block().fromHex(blockHex);
+        var block = new Block.fromHex(blockHex);
         expect(block.toBuffer().toHex(), blockHex);
       });
     });
 
     group('#fromBuffer', () {
       test('should make a block from this known buffer', () {
-        var block = new Block().fromBuffer(blockBuf);
+        var block = new Block.fromBuffer(blockBuf);
         expect(block.txs.length, 1);
         expect(block.toBuffer().toHex(), blockHex);
       });
@@ -104,28 +112,28 @@ void main() {
 
     group('#fromBr', () {
       test('should make a block from this known buffer', () {
-        var block = new Block().fromBr(new Br(buf: blockBuf));
+        var block = new Block.fromBr(new Br(buf: blockBuf as Uint8List?));
         expect(block.toBuffer().toHex(), blockHex);
       });
     });
 
     group('#toHex', () {
       test('should recover a block from this known hex', () {
-        var block = new Block().fromHex(blockHex);
+        var block = new Block.fromHex(blockHex);
         expect(block.toBuffer().toHex(), blockHex);
       });
     });
 
     group('#toBuffer', () {
       test('should recover a block from this known buffer', () {
-        var block = new Block().fromBuffer(blockBuf);
+        var block = new Block.fromBuffer(blockBuf);
         expect(block.toBuffer().toHex(), blockHex);
       });
     });
 
     group('#toBw', () {
       test('should recover a block from this known buffer', () {
-        var block = new Block().fromBuffer(blockBuf);
+        var block = new Block.fromBuffer(blockBuf);
 
         expect(block.toBw().toBuffer().toHex(), blockHex);
 
@@ -138,20 +146,20 @@ void main() {
 
     group('#hash', () {
       test('should return the correct hash of the genesis block', () {
-        var block = new Block().fromBuffer(genesisbuf);
+        var block = new Block.fromBuffer(genesisbuf);
         // var blockhash = hex.decode(
         //   Array.apply([], hex.decode(genesisidhex)).reverse()
         // );
         // var blockhash = hex.decode(
         var blockhash = hex.decode(genesisidhex).reversed.toList();
 
-        expect(block.hash().data.toHex(), blockhash.toHex());
+        expect(block.hash().data!.toHex(), blockhash.toHex());
       });
     });
 
     group('#asyncHash', () {
       // test('should return the correct hash of the genesis block', async () {
-      //   var block = new Block().fromBuffer(genesisbuf)
+      //   var block = new Block.fromBuffer(genesisbuf)
       //   var hash = await block.asyncHash()
       //   var genesishashhex = new Br(hex.decode(genesisidhex, 'hex'))
       //     .readReverse()
@@ -162,12 +170,13 @@ void main() {
       test('should return the correct hash of block containing the largest tx',
           () {
         // this.timeout(10000)
-        var block = new Block().fromHex(largesttxblockvector['blockhex']);
+        var block = new Block.fromHex(largesttxblockvector['blockhex']!);
         var buf = block.toBuffer();
-        block = block.fromBuffer(buf);
+        block = Block.fromBuffer(buf);
         var hash = block.hash();
-        var blockidhex = largesttxblockvector['blockidhex'];
-        var blockhashBuf = new Br(buf: hex.decode(blockidhex)).readReverse();
+        var blockidhex = largesttxblockvector['blockidhex']!;
+        var blockhashBuf =
+            new Br(buf: hex.decode(blockidhex) as Uint8List).readReverse();
         var blockhashhex = blockhashBuf.toHex();
         expect(hash.toHex, blockhashhex);
       });
@@ -175,26 +184,26 @@ void main() {
 
     group('#id', () {
       test('should return the correct id of the genesis block', () {
-        var block = new Block().fromBuffer(genesisbuf);
+        var block = new Block.fromBuffer(genesisbuf);
         expect(block.id(), genesisidhex);
       });
 
       test('should return the correct id of block containing the largest tx',
           () {
-        var block = new Block().fromHex(largesttxblockvector['blockhex']);
+        var block = new Block.fromHex(largesttxblockvector['blockhex']!);
         expect(block.id(), largesttxblockvector['blockidhex']);
       });
     });
 
     // group('#asyncId', () {
     //   test('should return the correct id of the genesis block', async () {
-    //     var block = new Block().fromBuffer(genesisbuf)
+    //     var block = new Block.fromBuffer(genesisbuf)
     //     var id = await block.asyncId()
     //     id.should.equal(genesisidhex)
     //   })
 
     //   test('should return the correct id of block containing the largest tx', async () {
-    //     var block = new Block().fromHex(largesttxblockvector.blockhex)
+    //     var block = new Block.fromHex(largesttxblockvector.blockhex)
     //     var id = await block.asyncId()
     //     id.should.equal(largesttxblockvector.blockidhex)
     //   })
@@ -204,7 +213,7 @@ void main() {
       test(
           'should verify the merkle root of this known block with one tx (in addition to the coinbase tx)',
           () {
-        var block = new Block().fromHex(largesttxblockvector['blockhex']);
+        var block = new Block.fromHex(largesttxblockvector['blockhex']!);
         expect(block.verifyMerkleRoot(), 0);
       });
     });

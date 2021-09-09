@@ -20,14 +20,14 @@ void main() {
           merkle1: merkle1,
           merkle2: merkle2,
         );
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
         expect(
           hashBuf.toHex(),
           '352b71f195e85adbaefdcd6d7380d87067865d9a17c44d38982bb8a40bd0b393',
         );
         // and a second time ...
-        hashBuf = merkle.hash();
+        hashBuf = merkle.hash()!;
         expect(
           hashBuf.toHex(),
           '352b71f195e85adbaefdcd6d7380d87067865d9a17c44d38982bb8a40bd0b393',
@@ -36,7 +36,7 @@ void main() {
 
       test('should hash this buffer', () {
         var merkle = new Merkle(hashBuf: null, buf: []);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -48,9 +48,9 @@ void main() {
 
     group('#fromBuffers', () {
       test('should find this merkle root from three buffers', () {
-        var bufs = [List<int>(0), List<int>(0), List<int>(0)];
+        List<List<int>> bufs = [[], [], []];
         var merkle = new Merkle().fromBuffers(bufs);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -62,9 +62,9 @@ void main() {
       });
 
       test('should find this merkle root from four buffers', () {
-        var bufs = [List<int>(0), List<int>(0), List<int>(0), List<int>(0)];
+        List<List<int>> bufs = [[], [], [], []];
         var merkle = new Merkle().fromBuffers(bufs);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -76,12 +76,12 @@ void main() {
       });
 
       test('should find this merkle root from 9 buffers', () {
-        var bufs = List.generate(9, (index) => List<int>(0));
+        List<List<int>> bufs = List.generate(9, (index) => []);
         // for (var i = 0; i < 9; i++) {
         //   bufs[i] = Buffer.alloc(0)
         // }
         var merkle = new Merkle().fromBuffers(bufs);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -95,9 +95,9 @@ void main() {
 
     group('@fromBuffers', () {
       test('should find this merkle root from three buffers', () {
-        var bufs = [List<int>(0), List<int>(0), List<int>(0)];
+        List<List<int>> bufs = [[], [], []];
         var merkle = Merkle.fromBuffers(bufs);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -109,9 +109,9 @@ void main() {
       });
 
       test('should find this merkle root from four buffers', () {
-        var bufs = [List<int>(0), List<int>(0), List<int>(0), List<int>(0)];
+        List<List<int>> bufs = [[], [], [], []];
         var merkle = Merkle.fromBuffers(bufs);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -123,10 +123,10 @@ void main() {
       });
 
       test('should find this merkle root from 9 buffers', () {
-        var bufs = List.generate(9, (index) => List<int>(0));
+        List<List<int>> bufs = List.generate(9, (index) => []);
 
         var merkle = Merkle.fromBuffers(bufs);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
         expect(hashBuf.length, 32);
 
         expect(
@@ -140,19 +140,19 @@ void main() {
 
     group('#fromBufferArrays', () {
       test('should find this merkle root from two buffers', () {
-        var bufs1 = [List<int>(0)];
-        var bufs2 = [List<int>(0)];
+        List<List<int>> bufs1 = [[]];
+        List<List<int>> bufs2 = [[]];
         var merkle = new Merkle().fromBufferArrays(bufs1, bufs2);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
 
         expect(hashBuf.length, 32);
       });
 
       test('should find this merkle root from four buffers', () {
-        var bufs1 = [List<int>(0), List<int>(0)];
-        var bufs2 = [List<int>(0), List<int>(0)];
+        List<List<int>> bufs1 = [[], []];
+        List<List<int>> bufs2 = [[], []];
         var merkle = new Merkle().fromBufferArrays(bufs1, bufs2);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
 
         expect(hashBuf.length, 32);
       });
@@ -160,19 +160,19 @@ void main() {
 
     group('@fromBufferArrays', () {
       test('should find this merkle root from two buffers', () {
-        var bufs1 = [List<int>(0)];
-        var bufs2 = [List<int>(0)];
+        List<List<int>> bufs1 = [[]];
+        List<List<int>> bufs2 = [[]];
         var merkle = Merkle.fromBufferArrays(bufs1, bufs2);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
 
         expect(hashBuf.length, 32);
       });
 
       test('should find this merkle root from four buffers', () {
-        var bufs1 = [List<int>(0), List<int>(0)];
-        var bufs2 = [List<int>(0), List<int>(0)];
+        List<List<int>> bufs1 = [[], []];
+        List<List<int>> bufs2 = [[], []];
         var merkle = Merkle.fromBufferArrays(bufs1, bufs2);
-        var hashBuf = merkle.hash();
+        var hashBuf = merkle.hash()!;
 
         expect(hashBuf.length, 32);
       });

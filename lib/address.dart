@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/constants.dart';
 import 'package:bsv/hash.dart';
 import 'package:bsv/op_code.dart';
@@ -29,16 +31,16 @@ import 'package:bs58check/bs58check.dart' as Base58Check;
  */
 
 class Address {
-  int pubKeyHash;
-  int versionByteNum;
-  int payToScriptHash;
-  List<int> hashBuf;
+  int? pubKeyHash;
+  int? versionByteNum;
+  int? payToScriptHash;
+  List<int>? hashBuf;
 
   Address({
-    int pubKeyHash,
-    int versionByteNum,
-    int payToScriptHash,
-    List<int> hashBuf,
+    int? pubKeyHash,
+    int? versionByteNum,
+    int? payToScriptHash,
+    List<int>? hashBuf,
   }) {
     this.versionByteNum = versionByteNum;
     this.hashBuf = hashBuf;
@@ -108,7 +110,7 @@ class Address {
   }
 
   Address fromRandom() {
-    var randomPrivKey = new PrivKey().fromRandom();
+    var randomPrivKey = PrivKey.fromRandom();
     return this.fromPrivKey(randomPrivKey);
   }
 
@@ -149,7 +151,7 @@ class Address {
     var script = new Script();
     script.writeOpCode(OpCode.OP_DUP);
     script.writeOpCode(OpCode.OP_HASH160);
-    script.writeBuffer(this.hashBuf.asUint8List());
+    script.writeBuffer(this.hashBuf!.asUint8List());
     script.writeOpCode(OpCode.OP_EQUALVERIFY);
     script.writeOpCode(OpCode.OP_CHECKSIG);
 
@@ -158,7 +160,7 @@ class Address {
 
   Address fromTxInScript(Script script) {
     var pubKeyHashBuf = Hash.sha256Ripemd160(
-      script.chunks[1].buf ?? hex.decode('00' * 32),
+      script.chunks[1].buf ?? hex.decode('00' * 32) as Uint8List,
     );
     return this.fromPubKeyHashBuf(pubKeyHashBuf.toBuffer());
   }
@@ -168,7 +170,7 @@ class Address {
   }
 
   Address fromTxOutScript(Script script) {
-    return this.fromPubKeyHashBuf(script.chunks[2].buf);
+    return this.fromPubKeyHashBuf(script.chunks[2].buf!);
   }
 
   factory Address.fromTxOutScript(Script script) {
@@ -177,7 +179,7 @@ class Address {
 
   List<int> toBuffer() {
     var versionByteBuf = List<int>.from([this.versionByteNum]);
-    var buf = List<int>.from([...versionByteBuf, ...this.hashBuf]);
+    var buf = List<int>.from([...versionByteBuf, ...this.hashBuf!]);
     return buf;
   }
 
@@ -207,7 +209,7 @@ class Address {
   }
 
   Address validate() {
-    if (!(this.hashBuf is List<int>) || this.hashBuf.length != 20) {
+    if (!(this.hashBuf is List<int>) || this.hashBuf!.length != 20) {
       throw INVALID_ADDRESS_HASH_BUF;
     }
     if (this.versionByteNum != this.pubKeyHash) {
@@ -222,8 +224,8 @@ class Address {
 
   // ignore: non_constant_identifier_names
   factory Address.Testnet({
-    int versionByteNum,
-    List<int> hashBuf,
+    int? versionByteNum,
+    List<int>? hashBuf,
   }) {
     return Address(
       versionByteNum: versionByteNum,
@@ -235,8 +237,8 @@ class Address {
 
   // ignore: non_constant_identifier_names
   factory Address.Regtest({
-    int versionByteNum,
-    List<int> hashBuf,
+    int? versionByteNum,
+    List<int>? hashBuf,
   }) {
     return Address(
       versionByteNum: versionByteNum,
@@ -248,8 +250,8 @@ class Address {
 
   // ignore: non_constant_identifier_names
   factory Address.Mainnet({
-    int versionByteNum,
-    List<int> hashBuf,
+    int? versionByteNum,
+    List<int>? hashBuf,
   }) {
     return Address(
       versionByteNum: versionByteNum,

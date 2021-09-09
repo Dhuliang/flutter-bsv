@@ -7,9 +7,9 @@ import "package:pointycastle/pointycastle.dart";
 var ec = new ECDomainParameters("secp256k1");
 
 class PointWrapper {
-  ECPoint point;
+  ECPoint? point;
 
-  PointWrapper({BigInt x, BigInt y}) {
+  PointWrapper({BigInt? x, BigInt? y}) {
     super.toString();
     this.point = ec.curve.createPoint(x ?? BigInt.zero, y ?? BigInt.zero);
   }
@@ -39,7 +39,7 @@ class PointWrapper {
 //   return this.point(x, y);
 // };
 
-  factory PointWrapper.fromX({bool isOdd, BigInt x}) {
+  factory PointWrapper.fromX({required bool isOdd, BigInt? x}) {
     var prefixByte;
     if (isOdd) {
       prefixByte = 0x03;
@@ -49,18 +49,18 @@ class PointWrapper {
 
     var encoded = BigIntX(bn: x).toBuffer(size: 32);
 
-    var addressBytes = List<int>(1 + encoded.length);
+    var addressBytes = List<int>.filled(1 + encoded.length, 0, growable: false);
     addressBytes[0] = prefixByte;
     addressBytes.setRange(1, addressBytes.length, encoded);
 
-    var point = ec.curve.decodePoint(addressBytes);
+    var point = ec.curve.decodePoint(addressBytes)!;
 
     PointWrapper.checkIfOnCurve(point);
 
     return PointWrapper.fromECPoint(point);
   }
 
-  factory PointWrapper.fromECPoint(ECPoint point) {
+  factory PointWrapper.fromECPoint(ECPoint? point) {
     var wrapper = PointWrapper();
     wrapper.point = point;
     return wrapper;
@@ -74,26 +74,26 @@ class PointWrapper {
     return BigIntX(bn: ec.n);
   }
 
-  bool get isCompressed => this.point.isCompressed;
+  bool get isCompressed => this.point!.isCompressed;
 
-  bool get isInfinity => this.point.isInfinity;
+  bool get isInfinity => this.point!.isInfinity;
 
-  PointWrapper copyFrom(PointWrapper other) {
+  PointWrapper copyFrom(PointWrapper? other) {
     if (!(other is PointWrapper)) {
       throw INVALID_POINT_CONSTRUCTOR;
     }
-    this.point.x;
+    this.point!.x;
     this.point = other.point;
     return this;
   }
 
   PointWrapper add(PointWrapper other) {
-    var result = PointWrapper.fromECPoint(this.point + other.point);
+    var result = PointWrapper.fromECPoint(this.point! + other.point);
     return result;
   }
 
   PointWrapper mul(BigIntX other) {
-    var result = PointWrapper.fromECPoint(this.point * other.bn);
+    var result = PointWrapper.fromECPoint(this.point! * other.bn);
     return result;
   }
 
@@ -110,27 +110,27 @@ class PointWrapper {
   // }
 
   BigIntX getX() {
-    return BigIntX(bn: this.point.x.toBigInteger());
+    return BigIntX(bn: this.point!.x!.toBigInteger());
   }
 
   BigIntX getY() {
-    return BigIntX(bn: this.point.y.toBigInteger());
+    return BigIntX(bn: this.point!.y!.toBigInteger());
   }
 
-  PointWrapper fromX({bool isOdd, BigInt x}) {
+  PointWrapper fromX({required bool isOdd, BigInt? x}) {
     return PointWrapper(x: x);
   }
 
   Map<String, String> toJson() {
     return {
-      "x": this.point.x.toString(),
-      "y": this.point.y.toString(),
+      "x": this.point!.x.toString(),
+      "y": this.point!.y.toString(),
     };
   }
 
   PointWrapper fromJSON(Map<String, String> json) {
-    var x = BigInt.parse(json['x']);
-    var y = BigInt.parse(json['y']);
+    var x = BigInt.parse(json['x']!);
+    var y = BigInt.parse(json['y']!);
 
     var point = new PointWrapper(x: x, y: y);
     return point;
@@ -148,7 +148,7 @@ class PointWrapper {
 
   PointWrapper validate() {
     var p2 = PointWrapper.fromX(
-      isOdd: this.point.y.toBigInteger().isOdd,
+      isOdd: this.point!.y!.toBigInteger()!.isOdd,
       x: this.getX().bn,
     );
 
@@ -169,9 +169,9 @@ class PointWrapper {
 
   static bool checkIfOnCurve(ECPoint point) {
     //a bit of math copied from PointyCastle. ecc/ecc_fp.dart -> decompressPoint()
-    var x = ec.curve.fromBigInteger(point.x.toBigInteger());
-    var alpha = (x * ((x * x) + ec.curve.a)) + ec.curve.b;
-    ECFieldElement beta = alpha.sqrt();
+    var x = ec.curve.fromBigInteger(point.x!.toBigInteger()!);
+    var alpha = (x * ((x * x) + ec.curve.a!)) + ec.curve.b!;
+    ECFieldElement? beta = alpha.sqrt();
 
     if (beta == null) {
       throw ('This point is not on the curve');
@@ -179,14 +179,14 @@ class PointWrapper {
 
     //slight-of-hand. Create compressed point, reconstruct and check Y value.
     var compressedPoint = compressPoint(point);
-    var checkPoint = ec.curve.decodePoint(hex.decode(compressedPoint));
+    var checkPoint = ec.curve.decodePoint(hex.decode(compressedPoint))!;
 
-    if (checkPoint.y.toBigInteger() != point.y.toBigInteger()) {
+    if (checkPoint.y!.toBigInteger() != point.y!.toBigInteger()) {
       throw ('This point is not on the curve');
     }
 
-    var isOnCurve = (point.x.toBigInteger() == BigInt.zero) &&
-        (point.y.toBigInteger() == BigInt.zero);
+    var isOnCurve = (point.x!.toBigInteger() == BigInt.zero) &&
+        (point.y!.toBigInteger() == BigInt.zero);
 
     return isOnCurve;
   }

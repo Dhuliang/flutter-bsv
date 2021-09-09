@@ -32,9 +32,9 @@ import 'package:bsv/extentsions/list.dart';
  */
 
 class ScriptChunk {
-  Uint8List buf;
-  int len;
-  int opCodeNum;
+  Uint8List? buf;
+  int? len;
+  int? opCodeNum;
 
   ScriptChunk({
     this.buf,
@@ -44,7 +44,7 @@ class ScriptChunk {
 }
 
 class Script {
-  List<ScriptChunk> chunks;
+  late List<ScriptChunk> chunks;
 
   static const ERROR_INVALID_SCRIPT = 'Invalid script';
 
@@ -62,7 +62,7 @@ class Script {
 
   static const ERROR_HASHBUF_MUST_BE_20 = "hashBuf must be a 20 byte buffer";
 
-  Script({List<ScriptChunk> chunks}) {
+  Script({List<ScriptChunk>? chunks}) {
     this.chunks = chunks ?? [];
   }
 
@@ -90,7 +90,7 @@ class Script {
     return new Script().fromPubKeyHash(dataBuf);
   }
 
-  factory Script.fromPubKeys(int m, List<PubKey> pubKeys, [bool sort]) {
+  factory Script.fromPubKeys(int m, List<PubKey> pubKeys, [bool sort = false]) {
     return new Script().fromPubKeys(m, pubKeys, sort);
   }
 
@@ -130,7 +130,7 @@ class Script {
     return new Script().fromBuffer(buf);
   }
 
-  factory Script.fromJSON(String str) {
+  factory Script.fromJSON(String? str) {
     return new Script().fromJSON(str);
   }
 
@@ -147,7 +147,7 @@ class Script {
     return this;
   }
 
-  Script fromBuffer(Uint8List buf) {
+  Script fromBuffer(Uint8List? buf) {
     this.chunks = List<ScriptChunk>.from([]);
 
     var br = new Br(buf: buf);
@@ -217,19 +217,19 @@ class Script {
 
     for (var i = 0; i < this.chunks.length; i++) {
       var chunk = this.chunks[i];
-      var opCodeNum = chunk.opCodeNum;
+      var opCodeNum = chunk.opCodeNum!;
       bw.writeUInt8(opCodeNum);
       if (chunk.buf != null) {
         if (opCodeNum < OpCode.OP_PUSHDATA1) {
           bw.write(chunk.buf);
         } else if (opCodeNum == OpCode.OP_PUSHDATA1) {
-          bw.writeUInt8(chunk.len);
+          bw.writeUInt8(chunk.len!);
           bw.write(chunk.buf);
         } else if (opCodeNum == OpCode.OP_PUSHDATA2) {
-          bw.writeUInt16LE(chunk.len);
+          bw.writeUInt16LE(chunk.len!);
           bw.write(chunk.buf);
         } else if (opCodeNum == OpCode.OP_PUSHDATA4) {
-          bw.writeUInt32LE(chunk.len);
+          bw.writeUInt32LE(chunk.len!);
           bw.write(chunk.buf);
         }
       }
@@ -250,7 +250,7 @@ class Script {
     return this;
   }
 
-  Script fromString(String str) {
+  Script fromString(String? str) {
     this.chunks = List<ScriptChunk>.from([]);
     if (str == '' || str == null) {
       return this;
@@ -262,7 +262,7 @@ class Script {
       var token = tokens[i];
       var opCodeNum;
       try {
-        var opCode = new OpCode().fromString(token);
+        var opCode = new OpCode.fromString(token);
         opCodeNum = opCode.toNumber();
       } catch (err) {}
 
@@ -315,7 +315,7 @@ class Script {
       var chunk = this.chunks[i];
       var opCodeNum = chunk.opCodeNum;
       if (chunk.buf == null) {
-        if (OpCode.str[opCodeNum] != null) {
+        if (OpCode.str[opCodeNum!] != null) {
           str = str + ' ' + new OpCode(number: opCodeNum).toString();
         } else {
           str = str + ' ' + '0x' + opCodeNum.toRadixString(16);
@@ -324,10 +324,10 @@ class Script {
         if (opCodeNum == OpCode.OP_PUSHDATA1 ||
             opCodeNum == OpCode.OP_PUSHDATA2 ||
             opCodeNum == OpCode.OP_PUSHDATA4) {
-          str = str + ' ' + new OpCode(number: opCodeNum).toString();
+          str = str + ' ' + new OpCode(number: opCodeNum!).toString();
         }
         str = str + ' ' + "${chunk.len}";
-        str = str + ' ' + '0x' + hex.encode(chunk.buf);
+        str = str + ' ' + '0x' + hex.encode(chunk.buf!);
       }
     }
 
@@ -343,12 +343,12 @@ class Script {
     var tokens = str.split(' ');
     var i;
     for (i = 0; i < tokens.length; i++) {
-      String token = tokens[i];
+      String? token = tokens[i];
       if (token == '') {
         continue;
       }
 
-      if (token[0] == '0' && token.length >= 2 && token[1] == 'x') {
+      if (token![0] == '0' && token.length >= 2 && token[1] == 'x') {
         var hexStr = token.substring(2);
         bw.write(Uint8List.fromList(hex.decode(hexStr)));
       } else if (token[0] == "'") {
@@ -362,13 +362,13 @@ class Script {
       } else if (OpCode.map['OP_' + token] != null) {
         var opstr = 'OP_' + token;
         var opCodeNum = OpCode.map[opstr];
-        bw.writeUInt8(opCodeNum);
+        bw.writeUInt8(opCodeNum!);
       } else if (OpCode.map[token] is int) {
-        var opstr = token;
+        String opstr = token;
         var opCodeNum = OpCode.map[opstr];
-        bw.writeUInt8(opCodeNum);
+        bw.writeUInt8(opCodeNum!);
       } else if (int.tryParse(token, radix: 10) is int) {
-        var bn = new BigIntX.fromNum(int.tryParse(token));
+        var bn = new BigIntX.fromNum(int.tryParse(token)!);
         var script = new Script().writeBn(bn);
         var tbuf = Uint8List.fromList(script.toBuffer());
         bw.write(tbuf);
@@ -392,11 +392,11 @@ class Script {
         var buf = new Script(chunks: [chunk]).toBuffer();
         var hexStr = hex.encode(buf);
         str = str + ' ' + '0x' + hexStr;
-      } else if (OpCode.str[chunk.opCodeNum] != null) {
-        var ostr = new OpCode(number: chunk.opCodeNum).toString();
+      } else if (OpCode.str[chunk.opCodeNum!] != null) {
+        var ostr = new OpCode(number: chunk.opCodeNum!).toString();
         str = str + ' ' + ostr.substring(3); // remove OP_
       } else {
-        str = str + ' ' + '0x' + chunk.opCodeNum.toRadixString(16);
+        str = str + ' ' + '0x' + chunk.opCodeNum!.toRadixString(16);
       }
     }
     return str.isNotEmpty ? str.substring(1) : str;
@@ -451,7 +451,7 @@ class Script {
         }
 
         this.add(ScriptChunk(
-          buf: buf,
+          buf: buf as Uint8List?,
           len: buf.length,
           opCodeNum: opCodeNum,
         ));
@@ -482,7 +482,7 @@ class Script {
     var str = '';
     if (chunk.buf == null) {
       // no data chunk
-      if (OpCode.str[opCodeNum] != null) {
+      if (OpCode.str[opCodeNum!] != null) {
         // A few cases where the opcode name differs from reverseMap
         // aside from 1 to 16 data pushes.
         if (opCodeNum == 0) {
@@ -503,8 +503,8 @@ class Script {
       }
     } else {
       // data chunk
-      if (chunk.len != null && chunk.len > 0) {
-        str = str + ' ' + hex.encode(chunk.buf);
+      if (chunk.len != null && chunk.len! > 0) {
+        str = str + ' ' + hex.encode(chunk.buf!);
       }
     }
     return str;
@@ -533,7 +533,7 @@ class Script {
     return this;
   }
 
-  List<Uint8List> getData() {
+  List<Uint8List?> getData() {
     if (this.isSafeDataOut()) {
       var chunks = this.chunks.sublist(2);
       var buffers = chunks.map((chunk) => chunk.buf).toList();
@@ -595,7 +595,7 @@ class Script {
    * defaults to true. If sort is true, the pubKeys are sorted
    * lexicographically.
    */
-  Script fromPubKeys(int m, List<PubKey> pubKeys, [bool sort = true]) {
+  Script fromPubKeys(int m, List<PubKey> pubKeys, [bool? sort = true]) {
     if (sort == true) {
       pubKeys = Script.sortPubKeys(pubKeys);
     }
@@ -622,7 +622,7 @@ class Script {
   bool isPushOnly() {
     for (var i = 0; i < this.chunks.length; i++) {
       var chunk = this.chunks[i];
-      var opCodeNum = chunk.opCodeNum;
+      var opCodeNum = chunk.opCodeNum!;
       if (opCodeNum > OpCode.OP_16) {
         return false;
       }
@@ -654,17 +654,21 @@ class Script {
 
   bool isPubKeyHashOut() {
     if (this.chunks.length > 0 &&
+        // ignore: unnecessary_null_comparison
         this.chunks[0] != null &&
         this.chunks[0].opCodeNum == OpCode.OP_DUP &&
         this.chunks.length > 1 &&
+        // ignore: unnecessary_null_comparison
         this.chunks[1] != null &&
         this.chunks[1].opCodeNum == OpCode.OP_HASH160 &&
         this.chunks.length > 2 &&
         this.chunks[2].buf != null &&
         this.chunks.length > 3 &&
+        // ignore: unnecessary_null_comparison
         this.chunks[3] != null &&
         this.chunks[3].opCodeNum == OpCode.OP_EQUALVERIFY &&
         this.chunks.length > 4 &&
+        // ignore: unnecessary_null_comparison
         this.chunks[4] != null &&
         this.chunks[4].opCodeNum == OpCode.OP_CHECKSIG) {
       return true;
@@ -716,14 +720,14 @@ class Script {
   }
 
   bool isMultiSigOut() {
-    var m = this.chunks[0].opCodeNum - OpCode.OP_1 + 1;
+    var m = this.chunks[0].opCodeNum! - OpCode.OP_1 + 1;
     if (!(m >= 1 && m <= 16)) {
       return false;
     }
     var pubKeychunks = this.chunks.slice(1, this.chunks.length - 2);
     if (!pubKeychunks.every((chunk) {
       try {
-        var buf = chunk.buf;
+        var buf = chunk.buf!;
         var pubKey = new PubKey().fromDer(buf);
         pubKey.validate();
         return true;
@@ -733,7 +737,7 @@ class Script {
     })) {
       return false;
     }
-    var n = this.chunks[this.chunks.length - 2].opCodeNum - OpCode.OP_1 + 1;
+    var n = this.chunks[this.chunks.length - 2].opCodeNum! - OpCode.OP_1 + 1;
     if (!(n >= m && n <= 16)) {
       return false;
     }
@@ -752,7 +756,7 @@ class Script {
       return false;
     }
     return remaining
-        .every((chunk) => chunk.buf is Uint8List && Sig.IsTxDer(chunk.buf));
+        .every((chunk) => chunk.buf is Uint8List && Sig.IsTxDer(chunk.buf!));
   }
 
   // ignore: slash_for_doc_comments

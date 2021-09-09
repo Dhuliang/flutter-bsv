@@ -23,7 +23,7 @@ class SigOperations {
 
   Map map = Map();
 
-  SigOperations({Map map}) {
+  SigOperations({Map? map}) {
     this.map = map ?? Map();
   }
 
@@ -87,11 +87,11 @@ class SigOperations {
    * @param {Number} nHashType Usually = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID
    */
   SigOperations setOne({
-    List<int> txHashBuf,
-    int txOutNum,
-    int nScriptChunk,
+    required List<int> txHashBuf,
+    int? txOutNum,
+    int? nScriptChunk,
     String type = SigOperations.SigType,
-    String addressStr,
+    String? addressStr,
     int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
   }) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
@@ -115,9 +115,9 @@ class SigOperations {
    * @param {Array} arr Must take the form of [{nScriptChunk, type, addressStr, nHashType}, ...]
    */
   SigOperations setMany({
-    List<int> txHashBuf,
-    int txOutNum,
-    List arr,
+    required List<int> txHashBuf,
+    int? txOutNum,
+    required List arr,
   }) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
     arr = arr
@@ -133,14 +133,14 @@ class SigOperations {
   }
 
   SigOperations addOne({
-    List<int> txHashBuf,
-    int txOutNum,
-    int nScriptChunk,
-    String type = SigOperations.SigType,
-    String addressStr,
-    int nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
+    required List<int> txHashBuf,
+    int? txOutNum,
+    int? nScriptChunk,
+    String? type = SigOperations.SigType,
+    String? addressStr,
+    int? nHashType = Sig.SIGHASH_ALL | Sig.SIGHASH_FORKID,
   }) {
-    var arr = this.get(txHashBuf, txOutNum) ?? List();
+    var arr = this.get(txHashBuf, txOutNum) ?? [];
 
     arr.add({
       "nScriptChunk": nScriptChunk,
@@ -163,7 +163,7 @@ class SigOperations {
    * we are going to place the signature.
    * @returns {PubKey}
    */
-  dynamic get(List<int> txHashBuf, int txOutNum) {
+  dynamic get(List<int> txHashBuf, int? txOutNum) {
     var label = "${txHashBuf.toHex()}:$txOutNum";
     return this.map[label] ?? [];
   }

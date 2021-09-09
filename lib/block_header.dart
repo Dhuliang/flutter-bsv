@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:bsv/br.dart';
 import 'package:bsv/bw.dart';
 import 'package:bsv/extentsions/list.dart';
@@ -21,39 +23,49 @@ class BlockHeader {
   int nonce;
 
   BlockHeader({
-    this.versionBytesNum,
-    this.prevBlockHashBuf,
-    this.merkleRootBuf,
-    this.time,
-    this.bits,
-    this.nonce,
+    required this.versionBytesNum,
+    required this.prevBlockHashBuf,
+    required this.merkleRootBuf,
+    required this.time,
+    required this.bits,
+    required this.nonce,
   });
 
   factory BlockHeader.fromHex(String str) {
-    return BlockHeader.fromHex(str);
+    return BlockHeader.fromBuffer(hex.decode(str));
   }
 
-  BlockHeader fromHex(String str) {
-    return this.fromBuffer(hex.decode(str));
-  }
+  // BlockHeader fromHex(String str) {
+  //   return BlockHeader.fromHex(str);
+  // }
 
   factory BlockHeader.fromBuffer(List<int> buf) {
-    return BlockHeader().fromBuffer(buf);
+    return BlockHeader.fromBr(Br(buf: buf.asUint8List()));
   }
 
-  BlockHeader fromBuffer(List<int> buf) {
-    return this.fromBr(Br(buf: buf.asUint8List()));
+  // BlockHeader fromBuffer(List<int> buf) {
+  //   return BlockHeader.fromBr(Br(buf: buf.asUint8List()));
+  // }
+
+  factory BlockHeader.fromBr(Br br) {
+    // this.versionBytesNum = br.readUInt32LE();
+    // this.prevBlockHashBuf = br.read(32);
+    // this.merkleRootBuf = br.read(32);
+    // this.time = br.readUInt32LE();
+    // this.bits = br.readUInt32LE();
+    // this.nonce = br.readUInt32LE();
+    // return this;
+    return BlockHeader(
+      versionBytesNum: br.readUInt32LE(),
+      prevBlockHashBuf: br.read(32),
+      merkleRootBuf: br.read(32),
+      time: br.readUInt32LE(),
+      bits: br.readUInt32LE(),
+      nonce: br.readUInt32LE(),
+    );
   }
 
-  String toHex() {
-    return this.toBuffer().toHex();
-  }
-
-  List<int> toBuffer() {
-    return this.toBw().toBuffer();
-  }
-
-  BlockHeader fromJSON(Map json) {
+  factory BlockHeader.fromJSON(Map json) {
     return BlockHeader(
       versionBytesNum: json['versionBytesNum'],
       prevBlockHashBuf: hex.decode(json['prevBlockHashBuf']),
@@ -62,6 +74,14 @@ class BlockHeader {
       bits: json['bits'],
       nonce: json['nonce'],
     );
+  }
+
+  String toHex() {
+    return this.toBuffer().toHex();
+  }
+
+  List<int> toBuffer() {
+    return this.toBw().toBuffer();
   }
 
   Map<String, dynamic> toJSON() {
@@ -75,23 +95,13 @@ class BlockHeader {
     };
   }
 
-  BlockHeader fromBr(Br br) {
-    this.versionBytesNum = br.readUInt32LE();
-    this.prevBlockHashBuf = br.read(32);
-    this.merkleRootBuf = br.read(32);
-    this.time = br.readUInt32LE();
-    this.bits = br.readUInt32LE();
-    this.nonce = br.readUInt32LE();
-    return this;
-  }
-
-  Bw toBw([Bw bw]) {
+  Bw toBw([Bw? bw]) {
     if (bw == null) {
       bw = new Bw();
     }
     bw.writeUInt32LE(this.versionBytesNum);
-    bw.write(this.prevBlockHashBuf);
-    bw.write(this.merkleRootBuf);
+    bw.write(this.prevBlockHashBuf as Uint8List);
+    bw.write(this.merkleRootBuf as Uint8List);
     bw.writeUInt32LE(this.time);
     bw.writeUInt32LE(this.bits);
     bw.writeUInt32LE(this.nonce);

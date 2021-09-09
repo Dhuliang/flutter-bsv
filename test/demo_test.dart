@@ -10,7 +10,6 @@ import 'package:bsv/key_pair.dart';
 import 'package:bsv/script.dart';
 import 'package:bsv/tx.dart';
 import 'package:bsv/tx_builder.dart';
-import 'package:bsv/extentsions/list.dart';
 
 void main() {
   test('adds one to input values', () {
@@ -95,7 +94,7 @@ void main() {
 
     // TxBuilder(tx: tx).signTxIn
 
-    print(tx.txIns[0].txHashBuf.toHex());
+    // print(tx.txIns![0].txHashBuf!.toHex());
     // print(Sig.SIGHASH_FORKID | Sig.SIGHASH_ALL);
 
     var buf = Bip39.fromString(mnemonic).toSeed();
@@ -106,22 +105,22 @@ void main() {
     var realHdPriv = bip32.derive("m/44'/0'/0'");
     // print(realHdPriv);
 
-    signParams.forEach((param) {
+    signParams.forEach((Map<String, dynamic> param) {
       var tmpPriv_0 = realHdPriv.deriveChild(param['is_change'] ? 1 : 0);
-      print(tmpPriv_0.toString());
-      print(tmpPriv_0.toPublic().toString());
-      var signPriv = tmpPriv_0.deriveChild(param['address_index']);
-      print(signPriv.toString());
-      print(signPriv.toPublic().toString());
+      // print(tmpPriv_0.toString());
+      // print(tmpPriv_0.toPublic().toString());
+      var signPriv = tmpPriv_0.deriveChild(param['address_index'] as int);
+      // print(signPriv.toString());
+      // print(signPriv.toPublic().toString());
 
-      var keyPair = KeyPair.fromPrivKey(signPriv.privKey);
-      Address.Regtest().fromPrivKey(signPriv.privKey).toTxOutScript();
+      var keyPair = KeyPair.fromPrivKey(signPriv.privKey!);
+      Address.Regtest().fromPrivKey(signPriv.privKey!).toTxOutScript();
 
       // var subscript = Script.fromHex(
       //   (param['unlocking_script_hexs'] as List<String>).join(''),
       // );
 
-      var subscript = Script.fromHex(param['script_hex']);
+      var subscript = Script.fromHex(param['script_hex'] as String);
 
       // var scrip = Script.fromHex(param['script_hex']);
 
@@ -130,9 +129,9 @@ void main() {
 
       var sig1 = tx.sign(
         keyPair: keyPair,
-        nIn: param['index'],
+        nIn: param['index'] as int?,
         subScript: subscript,
-        valueBn: BigIntX.fromNum(param['amount']),
+        valueBn: BigIntX.fromNum(param['amount'] as num),
       );
 
       //  var sig1 = tx.sign(keyPair, param['index'], subscript, Bn(param['amount']));
@@ -279,26 +278,26 @@ void main() {
 
     var realHdPriv = bip32.derive("m/44'/0'/0'");
 
-    signParams.forEach((param) {
-      var tmpPriv_0 = realHdPriv.deriveChild(param['is_change'] ? 1 : 0);
+    signParams.forEach((Map<String, dynamic> param) {
+      var tmpPriv_0 = realHdPriv.deriveChild(param['is_change']! ? 1 : 0);
       print(tmpPriv_0.toString());
       print(tmpPriv_0.toPublic().toString());
-      var signPriv = tmpPriv_0.deriveChild(param['address_index']);
+      var signPriv = tmpPriv_0.deriveChild(param['address_index'] as int);
       print(signPriv.toString());
       print(signPriv.toPublic().toString());
 
-      var keyPair = KeyPair.fromPrivKey(signPriv.privKey);
-      Address.Regtest().fromPrivKey(signPriv.privKey).toTxOutScript();
+      var keyPair = KeyPair.fromPrivKey(signPriv.privKey!);
+      Address.Regtest().fromPrivKey(signPriv.privKey!).toTxOutScript();
 
-      var subscript = Script.fromHex(param['script_hex']);
-      print(Address.Regtest().fromPubKey(keyPair.pubKey).toString());
+      var subscript = Script.fromHex(param['script_hex'] as String);
+      print(Address.Regtest().fromPubKey(keyPair.pubKey!).toString());
       // print(Address.Regtest().fromPubKey(keyPair.pubKey).toHex());
       txBuilder.getSigWithUnlockingScriptHexs(
         keyPair: keyPair,
-        nIn: param['index'],
+        nIn: param['index'] as int,
         subScript: subscript,
-        unlockingScriptHexs: param['unlocking_script_hexs'],
-        valueBn: BigIntX.fromNum(param['amount']),
+        unlockingScriptHexs: param['unlocking_script_hexs'] as List<String>,
+        valueBn: BigIntX.fromNum(param['amount'] as num),
       );
     });
 
