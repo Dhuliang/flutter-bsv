@@ -2,6 +2,8 @@
 
 [![codecov](https://codecov.io/gh/Dhuliang/flutter-bsv/branch/master/graph/badge.svg?token=78D2HL935Z)](https://codecov.io/gh/Dhuliang/flutter-bsv)
 
+![example workflow](https://github.com/Dhuliang/flutter-bsv/actions/workflows/main.yml/badge.svg)
+
 A new Flutter package project.
 
 ## Getting Started
