@@ -1,3 +1,7 @@
+## [1.0.1]
+
+- Network type
+
 ## [1.0.0]
 
 - Null safety
