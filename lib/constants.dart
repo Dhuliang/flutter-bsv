@@ -106,3 +106,28 @@ class STNConstants extends NetworkConstants {
   int txBuilderDust = 546;
   double txBuilderFeePerKbNum = 0.00000500e8;
 }
+
+enum NetworkType { Mainnet, Testnet, Regtest, STN }
+
+class Globals {
+  static NetworkConstants network = MainnetConstants();
+
+  static void setNetworkType(NetworkType networkType) {
+    switch (networkType) {
+      case NetworkType.Mainnet:
+        Globals.network = MainnetConstants();
+        break;
+      case NetworkType.Testnet:
+        Globals.network = TestnetConstants();
+        break;
+      case NetworkType.Regtest:
+        Globals.network = RegtestConstants();
+        break;
+      case NetworkType.STN:
+        Globals.network = STNConstants();
+        break;
+      default:
+        Globals.network = MainnetConstants();
+    }
+  }
+}

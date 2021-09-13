@@ -44,9 +44,9 @@ class Address {
   }) {
     this.versionByteNum = versionByteNum;
     this.hashBuf = hashBuf;
-    this.pubKeyHash = pubKeyHash ?? Constants.Mainnet.addressPubKeyHash;
+    this.pubKeyHash = pubKeyHash ?? Globals.network.addressPubKeyHash;
     this.payToScriptHash =
-        payToScriptHash ?? Constants.Mainnet.addressPayToScriptHash;
+        payToScriptHash ?? Globals.network.addressPayToScriptHash;
   }
 
   static const INVALID_ADDRESS_LENGTH =
@@ -256,8 +256,8 @@ class Address {
     return Address(
       versionByteNum: versionByteNum,
       hashBuf: hashBuf,
-      pubKeyHash: Constants.Mainnet.addressPubKeyHash,
-      payToScriptHash: Constants.Mainnet.addressPayToScriptHash,
+      pubKeyHash: Globals.network.addressPubKeyHash,
+      payToScriptHash: Globals.network.addressPayToScriptHash,
     );
   }
 }

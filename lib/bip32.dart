@@ -43,8 +43,8 @@ class Bip32 {
     this.chainCode = chainCode;
     this.privKey = privKey;
     this.pubKey = pubKey;
-    this.bip32PrivKey = bip32PrivKey ?? Constants.Mainnet.bip32PrivKey;
-    this.bip32PubKey = bip32PubKey ?? Constants.Mainnet.bip32PubKey;
+    this.bip32PrivKey = bip32PrivKey ?? Globals.network.bip32PrivKey;
+    this.bip32PubKey = bip32PubKey ?? Globals.network.bip32PubKey;
   }
 
   // ignore: non_constant_identifier_names
@@ -111,13 +111,13 @@ class Bip32 {
       chainCode: chainCode,
       privKey: privKey,
       pubKey: pubKey,
-      bip32PrivKey: Constants.Mainnet.bip32PrivKey,
-      bip32PubKey: Constants.Mainnet.bip32PubKey,
+      bip32PrivKey: Globals.network.bip32PrivKey,
+      bip32PubKey: Globals.network.bip32PubKey,
     );
   }
 
   Bip32 fromRandom() {
-    this.versionBytesNum = this.bip32PrivKey ?? Constants.Mainnet.bip32PrivKey;
+    this.versionBytesNum = this.bip32PrivKey ?? Globals.network.bip32PrivKey;
     this.depth = 0x00;
     this.parentFingerPrint = Uint8List.fromList([0, 0, 0, 0]);
     this.childIndex = 0;

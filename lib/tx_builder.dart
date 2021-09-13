@@ -29,11 +29,11 @@ class TxBuilder {
   Script? changeScript;
   BigIntX? changeAmountBn;
   BigIntX? feeAmountBn;
-  num feePerKbNum = Constants.Mainnet.txBuilderFeePerKbNum;
+  num feePerKbNum = Globals.network.txBuilderFeePerKbNum;
   int nLockTime = 0;
   int versionBytesNum = 1;
   int sigsPerInput = 1;
-  int dust = Constants.Mainnet.txBuilderDust;
+  int dust = Globals.network.txBuilderDust;
   bool dustChangeToFees = false;
   HashCache hashCache = new HashCache();
 
@@ -62,11 +62,11 @@ class TxBuilder {
     this.changeScript = changeScript;
     this.changeAmountBn = changeAmountBn;
     this.feeAmountBn = feeAmountBn;
-    this.feePerKbNum = feePerKbNum ?? Constants.Mainnet.txBuilderFeePerKbNum;
+    this.feePerKbNum = feePerKbNum ?? Globals.network.txBuilderFeePerKbNum;
     this.nLockTime = nLockTime ?? 0;
     this.versionBytesNum = versionBytesNum ?? 1;
     this.sigsPerInput = sigsPerInput ?? 1;
-    this.dust = dust ?? Constants.Mainnet.txBuilderDust;
+    this.dust = dust ?? Globals.network.txBuilderDust;
     this.dustChangeToFees = dustChangeToFees ?? false;
     this.hashCache = hashCache ?? new HashCache();
   }
@@ -156,7 +156,7 @@ class TxBuilder {
      * sending dust amounts to fees, then set this value to true.
      */
   TxBuilder setDust([int? dust]) {
-    this.dust = dust ?? Constants.Mainnet.txBuilderDust;
+    this.dust = dust ?? Globals.network.txBuilderDust;
     return this;
   }
 

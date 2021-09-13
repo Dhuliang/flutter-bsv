@@ -20,7 +20,7 @@ class PrivKey {
     this.bn = bn;
     this.compressed = compressed;
     this.privKeyVersionByteNum =
-        privKeyVersionByteNum ?? Constants.Mainnet.privKeyVersionByteNum;
+        privKeyVersionByteNum ?? Globals.network.privKeyVersionByteNum;
   }
 
   static const INVALID_PRIV_KEY_LENGTH =
@@ -47,7 +47,7 @@ class PrivKey {
     return PrivKey(
       bn: bn,
       compressed: compressed,
-      privKeyVersionByteNum: Constants.Mainnet.privKeyVersionByteNum,
+      privKeyVersionByteNum: Globals.network.privKeyVersionByteNum,
     );
   }
 
