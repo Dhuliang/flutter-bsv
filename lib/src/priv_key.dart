@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/constants.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/random.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/constants.dart';
+import 'package:bsv/src/point.dart';
+import 'package:bsv/src/random.dart';
 import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:convert/convert.dart';
 

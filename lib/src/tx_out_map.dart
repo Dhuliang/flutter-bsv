@@ -1,6 +1,6 @@
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**

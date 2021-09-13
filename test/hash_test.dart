@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/hash.dart';
+import 'package:bsv/src/hash.dart';
 import 'package:convert/convert.dart';
 import './vectors/hash.dart';
 
@@ -209,7 +209,8 @@ void main() {
           final dataBuf = hex.decode(vector['data']);
           final keyBuf = hex.decode(vector['key']);
 
-          final sha256HmacHex = Hash.sha256Hmac(dataBuf as Uint8List, keyBuf as Uint8List).toHex;
+          final sha256HmacHex =
+              Hash.sha256Hmac(dataBuf as Uint8List, keyBuf as Uint8List).toHex;
           final sha512HmacHex = Hash.sha512Hmac(dataBuf, keyBuf).toHex;
 
           expect(sha256HmacHex.substring(0, vector['sha256hmac'].length),

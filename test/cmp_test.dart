@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/cmp.dart';
+import 'package:bsv/src/cmp.dart';
 
 void main() {
   group("cmp", () {

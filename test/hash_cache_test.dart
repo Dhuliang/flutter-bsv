@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:bsv/hash_cache.dart';
+import 'package:bsv/src/hash_cache.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group('HashCache', () {

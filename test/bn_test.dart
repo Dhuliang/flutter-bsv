@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/extentsions/list.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';

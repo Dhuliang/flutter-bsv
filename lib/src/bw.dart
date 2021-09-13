@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
+import 'package:bsv/src/bn.dart';
 import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments

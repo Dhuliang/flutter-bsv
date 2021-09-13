@@ -1,18 +1,18 @@
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/br.dart';
-import 'package:bsv/interp.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/sig.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_in.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/var_int.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/interp.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/sig.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_in.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/var_int.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 import 'vectors/bip69.dart';
 import 'vectors/bitcoin-abc/sighash.dart';

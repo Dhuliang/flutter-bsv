@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:bsv/address.dart';
-import 'package:bsv/bsm.dart';
-import 'package:bsv/key_pair.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/bsm.dart';
+import 'package:bsv/src/key_pair.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 

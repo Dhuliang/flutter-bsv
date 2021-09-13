@@ -1,19 +1,19 @@
 // ignore: slash_for_doc_comments
-import 'package:bsv/address.dart';
-import 'package:bsv/constants.dart';
-import 'package:bsv/bn.dart';
-import 'package:bsv/hash_cache.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/sig.dart';
-import 'package:bsv/sig_operation.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_in.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/tx_out_map.dart';
-import 'package:bsv/var_int.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/constants.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/hash_cache.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/sig.dart';
+import 'package:bsv/src/sig_operation.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_in.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/tx_out_map.dart';
+import 'package:bsv/src/var_int.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**

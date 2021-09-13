@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/br.dart';
-import 'package:bsv/interp.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/tx_out_map.dart';
-import 'package:bsv/tx_verifier.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/interp.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/tx_out_map.dart';
+import 'package:bsv/src/tx_verifier.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 

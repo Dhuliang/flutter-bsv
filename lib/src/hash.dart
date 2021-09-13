@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-// import 'package:bsv/common_util.dart';
+// import 'package:bsv/src/common_util.dart';
 import 'package:convert/convert.dart';
 import 'package:pointycastle/export.dart';
 

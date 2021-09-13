@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:bsv/aescbc.dart';
+import 'package:bsv/src/aescbc.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 

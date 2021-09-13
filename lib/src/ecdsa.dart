@@ -1,16 +1,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/br.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/random.dart';
-import 'package:bsv/sig.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/point.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/random.dart';
+import 'package:bsv/src/sig.dart';
 
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments

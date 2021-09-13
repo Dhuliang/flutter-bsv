@@ -1,11 +1,11 @@
-import 'package:bsv/bn.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/tx_out_map.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/tx_out_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group('TxOutMap', () {

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:bsv/bn.dart';
+import 'package:bsv/src/bn.dart';
 import 'package:convert/convert.dart';
 import "package:pointycastle/pointycastle.dart";
 

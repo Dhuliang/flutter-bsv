@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/br.dart';
-import 'package:bsv/bw.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/bw.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 

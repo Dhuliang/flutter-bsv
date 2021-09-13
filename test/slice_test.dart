@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/extentsions/list.dart';
-import 'package:bsv/extentsions/string.dart';
+import 'package:bsv/src/extentsions/list.dart';
+import 'package:bsv/src/extentsions/string.dart';
 
 void main() {
   test('list slice', () {

@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:bsv/address.dart';
-import 'package:bsv/cmp.dart';
-import 'package:bsv/ecdsa.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/sig.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/cmp.dart';
+import 'package:bsv/src/ecdsa.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/sig.dart';
+import 'package:bsv/src/bw.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**

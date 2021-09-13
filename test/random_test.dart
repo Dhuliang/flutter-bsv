@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/random.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/random.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group("RandomBytes", () {

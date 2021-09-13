@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/point.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/point.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

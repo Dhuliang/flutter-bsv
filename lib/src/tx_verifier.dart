@@ -6,13 +6,13 @@
 
 import 'dart:convert';
 
-import 'package:bsv/block.dart';
-import 'package:bsv/bn.dart';
-import 'package:bsv/interp.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/tx_out_map.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/block.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/interp.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/tx_out_map.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 class TxVerifier {
   Tx? tx;
@@ -224,7 +224,8 @@ class TxVerifier {
   Map<String, dynamic> getDebugObject() {
     return {
       "errStr": this.errStr,
-      "interpFailure": this.interp != null ? this.interp!.getDebugObject() : null
+      "interpFailure":
+          this.interp != null ? this.interp!.getDebugObject() : null
     };
   }
 

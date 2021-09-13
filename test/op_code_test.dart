@@ -1,4 +1,4 @@
-import 'package:bsv/op_code.dart';
+import 'package:bsv/src/op_code.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

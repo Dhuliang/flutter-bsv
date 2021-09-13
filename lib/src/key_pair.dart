@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:bsv/br.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/bw.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**

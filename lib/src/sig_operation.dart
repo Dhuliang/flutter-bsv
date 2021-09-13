@@ -1,5 +1,5 @@
-import 'package:bsv/extentsions/list.dart';
-import 'package:bsv/sig.dart';
+import 'package:bsv/src/extentsions/list.dart';
+import 'package:bsv/src/sig.dart';
 
 // ignore: slash_for_doc_comments
 /**

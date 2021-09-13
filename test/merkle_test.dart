@@ -1,6 +1,6 @@
-import 'package:bsv/merkle.dart';
+import 'package:bsv/src/merkle.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group('Merkle', () {

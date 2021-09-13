@@ -1,7 +1,7 @@
-import 'package:bsv/bn.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/point.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 

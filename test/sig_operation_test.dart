@@ -1,8 +1,8 @@
-import 'package:bsv/address.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/sig.dart';
-import 'package:bsv/sig_operation.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/sig.dart';
+import 'package:bsv/src/sig_operation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

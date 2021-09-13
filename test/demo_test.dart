@@ -1,15 +1,15 @@
-import 'package:bsv/bip32.dart';
-import 'package:bsv/bip39.dart';
-import 'package:bsv/tx_out_map.dart';
-import 'package:bsv/tx_verifier.dart';
+import 'package:bsv/src/bip32.dart';
+import 'package:bsv/src/bip39.dart';
+import 'package:bsv/src/tx_out_map.dart';
+import 'package:bsv/src/tx_verifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/address.dart';
-import 'package:bsv/bn.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_builder.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_builder.dart';
 
 void main() {
   test('adds one to input values', () {

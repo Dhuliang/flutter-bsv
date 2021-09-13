@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:bsv/extentsions/string.dart';
+import 'package:bsv/src/extentsions/string.dart';
 import 'package:convert/convert.dart';
 import "package:pointycastle/pointycastle.dart";
 

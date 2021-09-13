@@ -1,19 +1,19 @@
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/br.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/ecdsa.dart';
-import 'package:bsv/extentsions/list.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/hash_cache.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/sig.dart';
-import 'package:bsv/tx_in.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/var_int.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/bw.dart';
+import 'package:bsv/src/ecdsa.dart';
+import 'package:bsv/src/extentsions/list.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/hash_cache.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/sig.dart';
+import 'package:bsv/src/tx_in.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/var_int.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 

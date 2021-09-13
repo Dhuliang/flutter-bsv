@@ -1,13 +1,13 @@
-import 'package:bsv/address.dart';
-import 'package:bsv/constants.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/script.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/constants.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/script.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/extentsions/list.dart';
-// import 'package:bsv/extentsions/string.dart';
+import 'package:bsv/src/extentsions/list.dart';
+// import 'package:bsv/src/extentsions/string.dart';
 
 void main() {
   group('Address', () {

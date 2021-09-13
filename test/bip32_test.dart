@@ -1,8 +1,8 @@
-import 'package:bsv/bip32.dart';
+import 'package:bsv/src/bip32.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:convert/convert.dart';
 import 'package:bs58check/bs58check.dart' as Base58Check;
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group('Bip32', () {

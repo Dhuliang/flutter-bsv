@@ -2,15 +2,15 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/op_code.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/script.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/op_code.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/script.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 import 'vectors/bitcoind/script_invalid.dart';
 import 'vectors/bitcoind/script_valid.dart';

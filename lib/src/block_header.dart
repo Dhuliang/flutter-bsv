@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:bsv/br.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/bw.dart';
+import 'package:bsv/src/extentsions/list.dart';
 import 'package:convert/convert.dart';
 
 // ignore: slash_for_doc_comments

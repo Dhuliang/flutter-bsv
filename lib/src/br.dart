@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**

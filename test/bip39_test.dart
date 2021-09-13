@@ -1,15 +1,15 @@
-import 'package:bsv/address.dart';
-import 'package:bsv/bip32.dart';
-import 'package:bsv/bip39.dart';
-import 'package:bsv/bip39_cn_worldlist.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/bip32.dart';
+import 'package:bsv/src/bip39.dart';
+import 'package:bsv/src/bip39_cn_worldlist.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'dart:typed_data';
 
-import 'package:bsv/bip39_en_worldlist.dart';
-import 'package:bsv/random.dart';
+import 'package:bsv/src/bip39_en_worldlist.dart';
+import 'package:bsv/src/random.dart';
 import 'package:convert/convert.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 import 'vectors/bip39.dart';
 

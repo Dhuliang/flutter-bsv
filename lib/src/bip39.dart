@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:bsv/bip39_cn_worldlist.dart';
-import 'package:bsv/bip39_en_worldlist.dart';
-import 'package:bsv/bip39_jp_worldlist.dart';
-import 'package:bsv/br.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/random.dart';
-import 'package:bsv/extentsions/list.dart';
-import 'package:bsv/extentsions/string.dart';
+import 'package:bsv/src/bip39_cn_worldlist.dart';
+import 'package:bsv/src/bip39_en_worldlist.dart';
+import 'package:bsv/src/bip39_jp_worldlist.dart';
+import 'package:bsv/src/br.dart';
+import 'package:bsv/src/bw.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/random.dart';
+import 'package:bsv/src/extentsions/list.dart';
+import 'package:bsv/src/extentsions/string.dart';
 import 'package:pointycastle/export.dart';
 import "package:unorm_dart/unorm_dart.dart" as unorm;
 

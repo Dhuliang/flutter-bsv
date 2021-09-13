@@ -1,3 +1,7 @@
+## [1.0.2]
+
+- File Directory
+
 ## [1.0.1]
 
 - Network type

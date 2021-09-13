@@ -1,21 +1,21 @@
 import 'dart:convert';
 
-import 'package:bsv/address.dart';
-import 'package:bsv/bn.dart';
-import 'package:bsv/interp.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/script.dart';
-import 'package:bsv/sig.dart';
-import 'package:bsv/tx.dart';
-import 'package:bsv/tx_builder.dart';
-import 'package:bsv/tx_out.dart';
-import 'package:bsv/tx_out_map.dart';
-import 'package:bsv/tx_verifier.dart';
+import 'package:bsv/src/address.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/interp.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/script.dart';
+import 'package:bsv/src/sig.dart';
+import 'package:bsv/src/tx.dart';
+import 'package:bsv/src/tx_builder.dart';
+import 'package:bsv/src/tx_out.dart';
+import 'package:bsv/src/tx_out_map.dart';
+import 'package:bsv/src/tx_verifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group('TxBuilder', () {

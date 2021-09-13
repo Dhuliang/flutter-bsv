@@ -1,7 +1,7 @@
 import 'dart:math' as Math;
 
-import 'package:bsv/hash.dart';
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 // ignore: slash_for_doc_comments
 /**

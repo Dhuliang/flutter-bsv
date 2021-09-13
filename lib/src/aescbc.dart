@@ -3,7 +3,7 @@
 // import 'dart:convert';
 import 'dart:typed_data';
 
-// import 'package:bsv/random.dart';
+// import 'package:bsv/src/random.dart';
 
 import "package:pointycastle/export.dart";
 
@@ -31,7 +31,10 @@ class Aescbc {
 
     PaddedBlockCipherImpl cipherImpl = new PaddedBlockCipherImpl(
         new PKCS7Padding(), new CBCBlockCipher(new AESFastEngine()));
-    cipherImpl.init(true, params as PaddedBlockCipherParameters<CipherParameters?, CipherParameters?>);
+    cipherImpl.init(
+        true,
+        params as PaddedBlockCipherParameters<CipherParameters?,
+            CipherParameters?>);
     // return cipherImpl.process(utf8.encode(data));
     return cipherImpl.process((data));
   }
@@ -46,7 +49,10 @@ class Aescbc {
 
     PaddedBlockCipherImpl cipherImpl = new PaddedBlockCipherImpl(
         new PKCS7Padding(), new CBCBlockCipher(new AESFastEngine()));
-    cipherImpl.init(false, params as PaddedBlockCipherParameters<CipherParameters?, CipherParameters?>);
+    cipherImpl.init(
+        false,
+        params as PaddedBlockCipherParameters<CipherParameters?,
+            CipherParameters?>);
     // return cipherImpl.process(utf8.encode(data));
     return cipherImpl.process((data));
   }
@@ -70,7 +76,9 @@ class Aescbc {
   // }
 
   static Uint8List aesCbcEncrypt(
-      {required Uint8List key, required Uint8List iv, required Uint8List paddedPlaintext}) {
+      {required Uint8List key,
+      required Uint8List iv,
+      required Uint8List paddedPlaintext}) {
     // Create a CBC block cipher with AES, and initialize with key and IV
 
     final cbc = CBCBlockCipher(AESFastEngine())

@@ -1,17 +1,17 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/bw.dart';
-import 'package:bsv/constants.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/random.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/bw.dart';
+import 'package:bsv/src/constants.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/point.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/random.dart';
 import 'package:convert/convert.dart';
 import 'package:bs58check/bs58check.dart' as Base58Check;
-import 'package:bsv/extentsions/list.dart';
+import 'package:bsv/src/extentsions/list.dart';
 
 class Bip32 {
   int? versionBytesNum;

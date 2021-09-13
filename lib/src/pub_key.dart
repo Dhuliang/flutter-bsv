@@ -1,6 +1,6 @@
-import 'package:bsv/bn.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/priv_key.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/point.dart';
+import 'package:bsv/src/priv_key.dart';
 // import 'package:bs58check/bs58check.dart' as Base58Check;
 import 'package:convert/convert.dart';
 

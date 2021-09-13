@@ -2,20 +2,20 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:bsv/bn.dart';
-import 'package:bsv/ecdsa.dart';
-import 'package:bsv/hash.dart';
-import 'package:bsv/key_pair.dart';
-import 'package:bsv/point.dart';
-import 'package:bsv/priv_key.dart';
-import 'package:bsv/pub_key.dart';
-import 'package:bsv/sig.dart';
+import 'package:bsv/src/bn.dart';
+import 'package:bsv/src/ecdsa.dart';
+import 'package:bsv/src/hash.dart';
+import 'package:bsv/src/key_pair.dart';
+import 'package:bsv/src/point.dart';
+import 'package:bsv/src/priv_key.dart';
+import 'package:bsv/src/pub_key.dart';
+import 'package:bsv/src/sig.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:bsv/extentsions/list.dart';
-// import 'package:bsv/extentsions/string.dart';
+import 'package:bsv/src/extentsions/list.dart';
+// import 'package:bsv/src/extentsions/string.dart';
 
 import 'vectors/ecdsa.dart';
 
@@ -27,7 +27,8 @@ void main() {
     // });
 
     var ecdsa = new Ecdsa();
-    ecdsa.hashBuf = Hash.sha256(utf8.encode('test data') as Uint8List).data!.toList();
+    ecdsa.hashBuf =
+        Hash.sha256(utf8.encode('test data') as Uint8List).data!.toList();
     ecdsa.keyPair = new KeyPair();
     ecdsa.keyPair!.privKey =
         new PrivKey().fromBn(new BigIntX.fromBuffer(hex.decode(
@@ -102,7 +103,8 @@ void main() {
         );
         var ecdsa = new Ecdsa();
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey().fromBn(
-            new BigIntX.fromBuffer(Hash.sha256(utf8.encode('test') as Uint8List).data!)));
+            new BigIntX.fromBuffer(
+                Hash.sha256(utf8.encode('test') as Uint8List).data!)));
         ecdsa.hashBuf = hashBuf.data!.toList();
         ecdsa.sig = Sig(r: r, s: s);
 
@@ -201,7 +203,8 @@ void main() {
         );
         var ecdsa = new Ecdsa();
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey().fromBn(
-            new BigIntX.fromBuffer(Hash.sha256(utf8.encode('test') as Uint8List).data!)));
+            new BigIntX.fromBuffer(
+                Hash.sha256(utf8.encode('test') as Uint8List).data!)));
         ecdsa.hashBuf = hashBuf.data;
         ecdsa.sig = Sig(r: r, s: s);
 
