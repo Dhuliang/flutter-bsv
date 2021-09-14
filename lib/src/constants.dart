@@ -1,3 +1,5 @@
+import 'package:bsv/bsv.dart';
+
 class Constants {
   // ignore: non_constant_identifier_names
   static NetworkConstants Mainnet = MainnetConstants();
@@ -109,8 +111,14 @@ class STNConstants extends NetworkConstants {
 
 enum NetworkType { Mainnet, Testnet, Regtest, STN }
 
+enum Bip39WordListType { Japanese, Chinese, English }
+
 class Globals {
   static NetworkConstants network = MainnetConstants();
+
+  static Bip39WordListType bip39WordListType = Bip39WordListType.English;
+  static String bip39WorldSpace = bip39EnWorldSpace;
+  static List<String> bip39Worldlist = bip39EnWorldlist;
 
   static void setNetworkType(NetworkType networkType) {
     switch (networkType) {
@@ -128,6 +136,33 @@ class Globals {
         break;
       default:
         Globals.network = MainnetConstants();
+    }
+  }
+
+  static void setBip39WordListType(Bip39WordListType type) {
+    switch (type) {
+      case Bip39WordListType.Japanese:
+        Globals.bip39WordListType = Bip39WordListType.Japanese;
+        Globals.bip39WorldSpace = bip39JpWorldSpace;
+        Globals.bip39Worldlist = bip39JpWorldlist;
+        break;
+
+      case Bip39WordListType.Chinese:
+        Globals.bip39WordListType = Bip39WordListType.Chinese;
+        Globals.bip39WorldSpace = bip39CnWorldSpace;
+        Globals.bip39Worldlist = bip39CnWorldlist;
+        break;
+
+      case Bip39WordListType.English:
+        Globals.bip39WordListType = Bip39WordListType.English;
+        Globals.bip39WorldSpace = bip39EnWorldSpace;
+        Globals.bip39Worldlist = bip39EnWorldlist;
+        break;
+
+      default:
+        Globals.bip39WordListType = Bip39WordListType.English;
+        Globals.bip39WorldSpace = bip39EnWorldSpace;
+        Globals.bip39Worldlist = bip39EnWorldlist;
     }
   }
 }

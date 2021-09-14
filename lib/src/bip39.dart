@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:bsv/bsv.dart';
 import 'package:bsv/src/bip39_cn_worldlist.dart';
 import 'package:bsv/src/bip39_en_worldlist.dart';
 import 'package:bsv/src/bip39_jp_worldlist.dart';
@@ -10,8 +11,10 @@ import 'package:bsv/src/hash.dart';
 import 'package:bsv/src/random.dart';
 import 'package:bsv/src/extentsions/list.dart';
 import 'package:bsv/src/extentsions/string.dart';
+import 'package:convert/convert.dart';
 import 'package:pointycastle/export.dart';
 import "package:unorm_dart/unorm_dart.dart" as unorm;
+import 'package:crypto/crypto.dart' show sha256;
 
 class Bip39 {
   Uint8List? seed;
@@ -30,6 +33,10 @@ class Bip39 {
     this.worldList = worldList ?? bip39EnWorldlist;
     this.worldListSpace = worldListSpace ?? ' ';
   }
+
+  static const INVALID_MNEMONIC = 'Invalid mnemonic';
+  static const INVALID_ENTROPY = 'Invalid entropy';
+  static const INVALID_CHECKSUM = 'Invalid mnemonic checksum';
 
   Bw toBw([Bw? bw]) {
     if (bw == null) {
@@ -279,6 +286,76 @@ class Bip39 {
   //   return this.versionBytesNum == this.bip32PrivKey;
   // }
 
+  // String toEntropy([String? passphrase]) {
+  //   return this.toSeed(passphrase)!.toHex();
+  // }
+
+//Uint8List _createUint8ListFromString( String s ) {
+//  var ret = new Uint8List(s.length);
+//  for( var i=0 ; i<s.length ; i++ ) {
+//    ret[i] = s.codeUnitAt(i);
+//  }
+//  return ret;
+//}
+
+  String bytesToBinary(Uint8List bytes) {
+    return bytes.map((byte) => byte.toRadixString(2).padLeft(8, '0')).join('');
+  }
+
+  int binaryToByte(String binary) {
+    return int.parse(binary, radix: 2);
+  }
+
+  String deriveChecksumBits(Uint8List entropy) {
+    final ent = entropy.length * 8;
+    final cs = ent ~/ 32;
+    final hash = sha256.convert(entropy);
+    return bytesToBinary(Uint8List.fromList(hash.bytes)).slice(0, cs);
+  }
+
+  String mnemonicToEntropy([String? mnemonic]) {
+    mnemonic = mnemonic ?? this.mnemonic;
+    var words = mnemonic!.split(Globals.bip39WorldSpace);
+
+    if (words.length % 3 != 0) {
+      throw new ArgumentError(INVALID_MNEMONIC);
+    }
+    final wordlist = Globals.bip39Worldlist;
+    // convert word indices to 11 bit binary strings
+    final bits = words.map((word) {
+      final index = wordlist.indexOf(word);
+      if (index == -1) {
+        throw new ArgumentError(INVALID_MNEMONIC);
+      }
+      return index.toRadixString(2).padLeft(11, '0');
+    }).join('');
+    // split the binary string into ENT/CS
+    final dividerIndex = (bits.length / 33).floor() * 32;
+    final entropyBits = bits.substring(0, dividerIndex);
+    final checksumBits = bits.substring(dividerIndex);
+
+    // calculate the checksum and compare
+    final entropyBytes = Uint8List.fromList(RegExp(r".{1,8}")
+        .allMatches(entropyBits)
+        .map((match) => binaryToByte(match.group(0)!))
+        .toList(growable: false));
+
+    if (entropyBytes.length < 16) {
+      throw StateError(INVALID_ENTROPY);
+    }
+    if (entropyBytes.length > 32) {
+      throw StateError(INVALID_ENTROPY);
+    }
+    if (entropyBytes.length % 4 != 0) {
+      throw StateError(INVALID_ENTROPY);
+    }
+    final newChecksum = deriveChecksumBits(entropyBytes);
+    if (newChecksum != checksumBits) {
+      throw StateError(INVALID_CHECKSUM);
+    }
+
+    return hex.encode(entropyBytes);
+  }
 }
 
 class Bip39En extends Bip39 {

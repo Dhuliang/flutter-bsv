@@ -1,3 +1,4 @@
+import 'package:bsv/bsv.dart';
 import 'package:bsv/src/address.dart';
 import 'package:bsv/src/bip32.dart';
 import 'package:bsv/src/bip39.dart';
@@ -198,8 +199,11 @@ void main() {
       for (var i = 0; i < bip39vectors['english']!.length; i++) {
         var vector = bip39vectors['english']![i];
         test('should pass english test vector $i', () {
+          Globals.setBip39WordListType(Bip39WordListType.English);
           var entropy = hex.decode(vector['entropy']!);
           var bip39 = new Bip39En().fromEntropy(entropy as Uint8List);
+
+          expect(bip39.mnemonicToEntropy(), vector['entropy']);
           expect(bip39.toString(), vector['mnemonic']);
           expect(bip39.check(), true);
           var seed = bip39.toSeed(vector['passphrase'])!;
@@ -212,8 +216,11 @@ void main() {
       for (var i = 0; i < bip39vectors['japanese']!.length; i++) {
         var vector = bip39vectors['japanese']![i];
         test('should pass japanese test vector $i', () {
+          Globals.setBip39WordListType(Bip39WordListType.Japanese);
           var entropy = hex.decode(vector['entropy']!);
           var bip39 = new Bip39Jp().fromEntropy(entropy as Uint8List);
+
+          expect(bip39.mnemonicToEntropy(), vector['entropy']);
           expect(bip39.toString(), vector['mnemonic']);
           expect(bip39.check(), true);
           var seed = bip39.toSeed(vector['passphrase'])!;
