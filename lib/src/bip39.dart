@@ -313,6 +313,33 @@ class Bip39 {
     return bytesToBinary(Uint8List.fromList(hash.bytes)).slice(0, cs);
   }
 
+  String entropyToMnemonic(String entropyString) {
+    final List<int> entropy = hex.decode(entropyString);
+    if (entropy.length < 16) {
+      throw ArgumentError(INVALID_ENTROPY);
+    }
+    if (entropy.length > 32) {
+      throw ArgumentError(INVALID_ENTROPY);
+    }
+    if (entropy.length % 4 != 0) {
+      throw ArgumentError(INVALID_ENTROPY);
+    }
+    final entropyBits = bytesToBinary(Uint8List.fromList(entropy));
+    final checksumBits = deriveChecksumBits(Uint8List.fromList(entropy));
+    final bits = entropyBits + checksumBits;
+    final regex =
+        new RegExp(r".{1,11}", caseSensitive: false, multiLine: false);
+    final chunks = regex
+        .allMatches(bits)
+        .map((match) => match.group(0))
+        .toList(growable: false);
+    List<String> wordlist = Globals.bip39Worldlist;
+    String words = chunks
+        .map((binary) => wordlist[binaryToByte(binary!)])
+        .join(Globals.bip39WorldSpace);
+    return words;
+  }
+
   String mnemonicToEntropy([String? mnemonic]) {
     mnemonic = mnemonic ?? this.mnemonic;
     var words = mnemonic!.split(Globals.bip39WorldSpace);
