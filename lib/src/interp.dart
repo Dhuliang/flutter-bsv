@@ -1382,15 +1382,15 @@ class Interp {
             // valtype vchnew Hash((opCode == OpCode.OP_RIPEMD160 || opCode == OpCode.OP_SHA1 || opCode == OpCode.OP_HASH160) ? 20 : 32)
             var bufHash;
             if (opCodeNum == OpCode.OP_RIPEMD160) {
-              bufHash = Hash.ripemd160(buf.asUint8List()).data!.toList();
+              bufHash = Hash.ripemd160(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_SHA1) {
-              bufHash = Hash.sha1(buf.asUint8List()).data!.toList();
+              bufHash = Hash.sha1(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_SHA256) {
-              bufHash = Hash.sha256(buf.asUint8List()).data!.toList();
+              bufHash = Hash.sha256(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_HASH160) {
-              bufHash = Hash.sha256Ripemd160(buf.asUint8List()).data!.toList();
+              bufHash = Hash.sha256Ripemd160(buf.asUint8List()).data.toList();
             } else if (opCodeNum == OpCode.OP_HASH256) {
-              bufHash = Hash.sha256Sha256(buf.asUint8List()).data!.toList();
+              bufHash = Hash.sha256Sha256(buf.asUint8List()).data.toList();
             }
             this.stack.removeLast();
             this.stack.add(bufHash);

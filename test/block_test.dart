@@ -153,7 +153,7 @@ void main() {
         // var blockhash = hex.decode(
         var blockhash = hex.decode(genesisidhex).reversed.toList();
 
-        expect(block.hash().data!.toHex(), blockhash.toHex());
+        expect(block.hash().data.toHex(), blockhash.toHex());
       });
     });
 

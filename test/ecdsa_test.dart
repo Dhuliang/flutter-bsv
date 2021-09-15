@@ -28,7 +28,7 @@ void main() {
 
     var ecdsa = new Ecdsa();
     ecdsa.hashBuf =
-        Hash.sha256(utf8.encode('test data') as Uint8List).data!.toList();
+        Hash.sha256(utf8.encode('test data') as Uint8List).data.toList();
     ecdsa.keyPair = new KeyPair();
     ecdsa.keyPair!.privKey =
         new PrivKey().fromBn(new BigIntX.fromBuffer(hex.decode(
@@ -104,8 +104,8 @@ void main() {
         var ecdsa = new Ecdsa();
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey().fromBn(
             new BigIntX.fromBuffer(
-                Hash.sha256(utf8.encode('test') as Uint8List).data!)));
-        ecdsa.hashBuf = hashBuf.data!.toList();
+                Hash.sha256(utf8.encode('test') as Uint8List).data)));
+        ecdsa.hashBuf = hashBuf.data.toList();
         ecdsa.sig = Sig(r: r, s: s);
 
         ecdsa.calcrecovery();
@@ -204,7 +204,7 @@ void main() {
         var ecdsa = new Ecdsa();
         ecdsa.keyPair = new KeyPair().fromPrivKey(new PrivKey().fromBn(
             new BigIntX.fromBuffer(
-                Hash.sha256(utf8.encode('test') as Uint8List).data!)));
+                Hash.sha256(utf8.encode('test') as Uint8List).data)));
         ecdsa.hashBuf = hashBuf.data;
         ecdsa.sig = Sig(r: r, s: s);
 

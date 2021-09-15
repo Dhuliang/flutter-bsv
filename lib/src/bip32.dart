@@ -147,7 +147,7 @@ class Bip32 {
     }
     var hash = Hash.sha512Hmac(
             bytes as Uint8List, Uint8List.fromList(utf8.encode('Bitcoin seed')))
-        .data!;
+        .data;
 
     this.depth = 0x00;
     this.parentFingerPrint = Uint8List.fromList([0, 0, 0, 0]);
@@ -278,7 +278,7 @@ class Bip32 {
       }
 
       var hash =
-          Hash.sha512Hmac(Uint8List.fromList(data), this.chainCode!).data!;
+          Hash.sha512Hmac(Uint8List.fromList(data), this.chainCode!).data;
       // var il = BigIntX.fromBuffer(hash.slice(0, 32), { size: 32 })
       var il = BigIntX.fromBuffer(hash.slice(0, 32));
       var ir = hash.slice(32, 64).asUint8List();
@@ -293,7 +293,7 @@ class Bip32 {
       ret.pubKey = new PubKey().fromPrivKey(ret.privKey!);
     } else {
       var data = Uint8List.fromList([...this.pubKey!.toBuffer(), ...ib]);
-      var hash = Hash.sha512Hmac(data, this.chainCode!).data!;
+      var hash = Hash.sha512Hmac(data, this.chainCode!).data;
       var il = BigIntX.fromBuffer(hash.slice(0, 32));
       var ir = hash.slice(32, 64).asUint8List();
 
@@ -314,7 +314,7 @@ class Bip32 {
 
     ret.childIndex = i;
     var pubKeyhash =
-        Hash.sha256Ripemd160(this.pubKey!.toBuffer().asUint8List()).data!;
+        Hash.sha256Ripemd160(this.pubKey!.toBuffer().asUint8List()).data;
     ret.parentFingerPrint = pubKeyhash.slice(0, 4).asUint8List();
     ret.versionBytesNum = this.versionBytesNum;
     ret.depth = this.depth! + 1;

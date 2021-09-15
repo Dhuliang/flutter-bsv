@@ -14,7 +14,6 @@ import 'package:bsv/src/extentsions/string.dart';
 import 'package:convert/convert.dart';
 import 'package:pointycastle/export.dart';
 import "package:unorm_dart/unorm_dart.dart" as unorm;
-import 'package:crypto/crypto.dart' show sha256;
 
 class Bip39 {
   Uint8List? seed;
@@ -132,7 +131,7 @@ class Bip39 {
       throw ('Entropy is less than 128 bits. It must be 128 bits or more.');
     }
 
-    var hash = Hash.sha256(buf).data!;
+    var hash = Hash.sha256(buf).data;
     var bin = '';
     var bits = buf.length * 8;
     for (var i = 0; i < buf.length; i++) {
@@ -192,7 +191,7 @@ class Bip39 {
           .setUint8(i, int.tryParse(bin.slice(i * 8, (i + 1) * 8), radix: 2)!);
       // buf.writeUInt8( int.tryParse (bin.slice(i * 8, (i + 1) * 8), radix:2), i);
     }
-    var hash = Hash.sha256(buf).data!;
+    var hash = Hash.sha256(buf).data;
     var expectedHashBits = hash[0].toRadixString(2);
     expectedHashBits = ('00000000' + expectedHashBits).slice(-8).slice(0, cs);
 
@@ -309,8 +308,8 @@ class Bip39 {
   static String deriveChecksumBits(Uint8List entropy) {
     final ent = entropy.length * 8;
     final cs = ent ~/ 32;
-    final hash = sha256.convert(entropy);
-    return bytesToBinary(Uint8List.fromList(hash.bytes)).slice(0, cs);
+    final hash = Hash.sha256(entropy);
+    return bytesToBinary(Uint8List.fromList(hash.data)).slice(0, cs);
   }
 
   static String entropyToMnemonic(String entropyString) {

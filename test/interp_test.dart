@@ -156,7 +156,7 @@ void main() {
         var spendtx = new Tx();
 
         spendtx.addTxIn(
-          data: idbuf.data!.toList(),
+          data: idbuf.data.toList(),
           txOutNum: 0,
           script: new Script(),
           nSequence: 0xffffffff,
@@ -205,7 +205,7 @@ void main() {
         var spendtx = new Tx();
 
         spendtx.addTxIn(
-          data: idbuf.data!.toList(),
+          data: idbuf.data.toList(),
           txOutNum: 0,
           script: new Script(),
           nSequence: 0xffffffff,
@@ -325,7 +325,7 @@ void main() {
         var idbuf = credtx.hash();
         var spendtx = new Tx();
         spendtx.addTxIn(
-          data: idbuf.data!.toList(),
+          data: idbuf.data.toList(),
           txOutNum: 0,
           script: new Script(),
           nSequence: 0xffffffff,
@@ -372,7 +372,7 @@ void main() {
         var idbuf = credtx.hash();
         var spendtx = new Tx();
         spendtx.addTxIn(
-          data: idbuf.data!.toList(),
+          data: idbuf.data.toList(),
           txOutNum: 0,
           script: scriptSig,
           nSequence: 0xffffffff,
@@ -425,7 +425,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data!.toList(),
+            data: idbuf.data.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,
@@ -486,7 +486,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data!.toList(),
+            data: idbuf.data.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,
@@ -544,7 +544,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data!.toList(),
+            data: idbuf.data.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,
@@ -597,7 +597,7 @@ void main() {
           var idbuf = credtx.hash();
           var spendtx = new Tx();
           spendtx.addTxIn(
-            data: idbuf.data!.toList(),
+            data: idbuf.data.toList(),
             txOutNum: 0,
             script: scriptSig,
             nSequence: 0xffffffff,

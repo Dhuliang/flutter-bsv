@@ -181,9 +181,9 @@ class Ecdsa {
         ...this.hashBuf as Iterable<int>
       ]),
       k,
-    ).data!;
+    ).data;
 
-    v = Hash.sha256Hmac(v, k).data!;
+    v = Hash.sha256Hmac(v, k).data;
     k = Hash.sha256Hmac(
       Uint8List.fromList([
         ...v,
@@ -192,9 +192,9 @@ class Ecdsa {
         ...this.hashBuf as Iterable<int>
       ]),
       k,
-    ).data!;
-    v = Hash.sha256Hmac(v, k).data!;
-    v = Hash.sha256Hmac(v, k).data!;
+    ).data;
+    v = Hash.sha256Hmac(v, k).data;
+    v = Hash.sha256Hmac(v, k).data;
     var T = new BigIntX.fromBuffer(v);
     var N = PointWrapper.getN();
 
@@ -213,9 +213,9 @@ class Ecdsa {
           ...([0x00])
         ]),
         k,
-      ).data!;
-      v = Hash.sha256Hmac(v, k).data!;
-      v = Hash.sha256Hmac(v, k).data!;
+      ).data;
+      v = Hash.sha256Hmac(v, k).data;
+      v = Hash.sha256Hmac(v, k).data;
       T = new BigIntX.fromBuffer(v);
     }
 

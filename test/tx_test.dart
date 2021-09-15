@@ -327,7 +327,7 @@ void main() {
           hex.decode(tx2idhex).reversed.toList(),
         );
 
-        expect(tx.hash().data!.toList().toHex(), txHashBuf.toHex());
+        expect(tx.hash().data.toList().toHex(), txHashBuf.toHex());
       });
     });
 

@@ -94,7 +94,7 @@ void main() {
         var txHashBuf = tx.hash();
         var txOut = tx.txOuts![0];
 
-        expect(txOutMap.get(txHashBuf.data!, 0).toHex(), txOut.toHex());
+        expect(txOutMap.get(txHashBuf.data, 0).toHex(), txOut.toHex());
       });
     });
   });

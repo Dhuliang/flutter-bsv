@@ -52,7 +52,7 @@ class TxOutMap {
   }
 
   TxOutMap setTx(Tx tx) {
-    var txhashhex = tx.hash().data!.toHex();
+    var txhashhex = tx.hash().data.toHex();
     for (var i = 0; i < tx.txOuts!.length; i++) {
       var txOut = tx.txOuts![i];
       var label = txhashhex + ':' + i.toString();

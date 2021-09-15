@@ -30,12 +30,12 @@ class Merkle {
       return this.hashBuf;
     }
     if (this.buf != null) {
-      return Hash.sha256Sha256(this.buf!.asUint8List()).data!.toList();
+      return Hash.sha256Sha256(this.buf!.asUint8List()).data.toList();
     }
     var hashBuf1 = this.merkle1!.hash()!;
     var hashBuf2 = this.merkle2!.hash()!;
     this.buf = List<int>.from([...hashBuf1, ...hashBuf2]);
-    return Hash.sha256Sha256(this.buf!.asUint8List()).data!.toList();
+    return Hash.sha256Sha256(this.buf!.asUint8List()).data.toList();
   }
 
   double logBase(num x, num base) => Math.log(x) / Math.log(base);

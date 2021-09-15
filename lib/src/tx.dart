@@ -224,7 +224,7 @@ class Tx {
       if (!(nHashType & Sig.SIGHASH_ANYONECANPAY != 0)) {
         hashPrevouts = hashCache.prevoutsHashBuf != null
             ? hashCache.prevoutsHashBuf
-            : hashCache.prevoutsHashBuf = this.hashPrevouts().data!.toList();
+            : hashCache.prevoutsHashBuf = this.hashPrevouts().data.toList();
       }
 
       if (!(nHashType & Sig.SIGHASH_ANYONECANPAY != 0) &&
@@ -232,14 +232,14 @@ class Tx {
           (nHashType & 0x1f) != Sig.SIGHASH_NONE) {
         hashSequence = hashCache.sequenceHashBuf != null
             ? hashCache.sequenceHashBuf
-            : hashCache.sequenceHashBuf = this.hashSequence().data!.toList();
+            : hashCache.sequenceHashBuf = this.hashSequence().data.toList();
       }
 
       if ((nHashType & 0x1f) != Sig.SIGHASH_SINGLE &&
           (nHashType & 0x1f) != Sig.SIGHASH_NONE) {
         hashOutputs = hashCache.outputsHashBuf != null
             ? hashCache.outputsHashBuf
-            : hashCache.outputsHashBuf = this.hashOutputs().data!.toList();
+            : hashCache.outputsHashBuf = this.hashOutputs().data.toList();
       } else if ((nHashType & 0x1f) == Sig.SIGHASH_SINGLE &&
           nIn! < this.txOuts!.length) {
         hashOutputs =
