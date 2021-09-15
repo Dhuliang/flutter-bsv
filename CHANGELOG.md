@@ -1,3 +1,7 @@
+## [1.0.3]
+
+- Add entropyToMnemonic, mnemonicToEntropy
+
 ## [1.0.2]
 
 - File Directory

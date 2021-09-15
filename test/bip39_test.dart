@@ -201,9 +201,13 @@ void main() {
         test('should pass english test vector $i', () {
           Globals.setBip39WordListType(Bip39WordListType.English);
           var entropy = hex.decode(vector['entropy']!);
+          expect(
+              Bip39.entropyToMnemonic(vector['entropy']!), vector['mnemonic']);
+          expect(
+              Bip39.mnemonicToEntropy(vector['mnemonic']!), vector['entropy']);
+
           var bip39 = new Bip39En().fromEntropy(entropy as Uint8List);
 
-          expect(bip39.mnemonicToEntropy(), vector['entropy']);
           expect(bip39.toString(), vector['mnemonic']);
           expect(bip39.check(), true);
           var seed = bip39.toSeed(vector['passphrase'])!;
@@ -218,9 +222,13 @@ void main() {
         test('should pass japanese test vector $i', () {
           Globals.setBip39WordListType(Bip39WordListType.Japanese);
           var entropy = hex.decode(vector['entropy']!);
+          expect(
+              Bip39.entropyToMnemonic(vector['entropy']!), vector['mnemonic']);
+          expect(
+              Bip39.mnemonicToEntropy(vector['mnemonic']!), vector['entropy']);
+
           var bip39 = new Bip39Jp().fromEntropy(entropy as Uint8List);
 
-          expect(bip39.mnemonicToEntropy(), vector['entropy']);
           expect(bip39.toString(), vector['mnemonic']);
           expect(bip39.check(), true);
           var seed = bip39.toSeed(vector['passphrase'])!;

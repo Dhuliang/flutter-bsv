@@ -298,22 +298,22 @@ class Bip39 {
 //  return ret;
 //}
 
-  String bytesToBinary(Uint8List bytes) {
+  static String bytesToBinary(Uint8List bytes) {
     return bytes.map((byte) => byte.toRadixString(2).padLeft(8, '0')).join('');
   }
 
-  int binaryToByte(String binary) {
+  static int binaryToByte(String binary) {
     return int.parse(binary, radix: 2);
   }
 
-  String deriveChecksumBits(Uint8List entropy) {
+  static String deriveChecksumBits(Uint8List entropy) {
     final ent = entropy.length * 8;
     final cs = ent ~/ 32;
     final hash = sha256.convert(entropy);
     return bytesToBinary(Uint8List.fromList(hash.bytes)).slice(0, cs);
   }
 
-  String entropyToMnemonic(String entropyString) {
+  static String entropyToMnemonic(String entropyString) {
     final List<int> entropy = hex.decode(entropyString);
     if (entropy.length < 16) {
       throw ArgumentError(INVALID_ENTROPY);
@@ -340,9 +340,8 @@ class Bip39 {
     return words;
   }
 
-  String mnemonicToEntropy([String? mnemonic]) {
-    mnemonic = mnemonic ?? this.mnemonic;
-    var words = mnemonic!.split(Globals.bip39WorldSpace);
+  static String mnemonicToEntropy(String mnemonic) {
+    var words = mnemonic.split(Globals.bip39WorldSpace);
 
     if (words.length % 3 != 0) {
       throw new ArgumentError(INVALID_MNEMONIC);
@@ -381,7 +380,8 @@ class Bip39 {
       throw StateError(INVALID_CHECKSUM);
     }
 
-    return hex.encode(entropyBytes);
+    final entropy = hex.encode(entropyBytes);
+    return entropy;
   }
 }
 
