@@ -98,7 +98,7 @@ void main() {
     // print(Sig.SIGHASH_FORKID | Sig.SIGHASH_ALL);
 
     var buf = Bip39.fromString(mnemonic).toSeed();
-    var bip32 = Bip32.Regtest().fromSeed(buf);
+    var bip32 = Bip32.Regtest().fromSeed(buf!);
     // var bip32 = Bip32.Mainnet().fromSeed(buf);
     // print(bip32.toString());
 
@@ -274,7 +274,7 @@ void main() {
     // print(tx.txIns[0].txHashBuf.toHex());
 
     var buf = Bip39.fromString(mnemonic).toSeed();
-    var bip32 = Bip32.Regtest().fromSeed(buf);
+    var bip32 = Bip32.Regtest().fromSeed(buf!);
 
     var realHdPriv = bip32.derive("m/44'/0'/0'");
 

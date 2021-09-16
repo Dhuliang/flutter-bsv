@@ -1,3 +1,7 @@
+## [1.0.4]
+
+- Covert List<int> to Uint8List
+
 ## [1.0.3]
 
 - Add entropyToMnemonic, mnemonicToEntropy

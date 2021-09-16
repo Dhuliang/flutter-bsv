@@ -135,7 +135,7 @@ class Bip32 {
     return this.fromBuffer(Base58Check.decode(str));
   }
 
-  Bip32 fromSeed(List<int>? bytes) {
+  Bip32 fromSeed(List<int> bytes) {
     if (!(bytes is List<int>)) {
       throw ('bytes must be a buffer');
     }
@@ -146,8 +146,10 @@ class Bip32 {
       throw ('More than 512 bits of entropy is nonstandard');
     }
     var hash = Hash.sha512Hmac(
-            bytes as Uint8List, Uint8List.fromList(utf8.encode('Bitcoin seed')))
-        .data;
+        Uint8List.fromList(bytes),
+        Uint8List.fromList(
+          utf8.encode('Bitcoin seed'),
+        )).data;
 
     this.depth = 0x00;
     this.parentFingerPrint = Uint8List.fromList([0, 0, 0, 0]);
