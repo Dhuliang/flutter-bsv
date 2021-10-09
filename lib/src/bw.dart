@@ -42,7 +42,9 @@ class Bw {
   }
 
   Bw write(Uint8List? buf) {
-    List<Uint8List?> temp = []..addAll(this.bufs)..addAll([buf]);
+    List<Uint8List?> temp = []
+      ..addAll(this.bufs)
+      ..addAll([buf]);
     this.bufs = temp;
     return this;
   }
@@ -52,7 +54,9 @@ class Bw {
     for (var i = 0; i < buf2.length; i++) {
       buf2[i] = buf[buf.length - 1 - i];
     }
-    List<Uint8List?> temp = []..addAll(this.bufs)..addAll([buf2]);
+    List<Uint8List?> temp = []
+      ..addAll(this.bufs)
+      ..addAll([buf2]);
     this.bufs = temp;
     return this;
   }

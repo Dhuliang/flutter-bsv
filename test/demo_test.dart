@@ -312,4 +312,12 @@ void main() {
     );
     print(r);
   });
+
+  test('example bip32.dart', () {
+    var mnemonic =
+        "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
+    var bip39 = Bip39.fromString(mnemonic);
+    print(bip39.mnemonic);
+    print(Bip39.fromRandom(32 * 8));
+  });
 }
