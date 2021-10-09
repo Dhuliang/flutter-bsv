@@ -12,3 +12,7 @@ Dart library for Bitcoin SV
 dependencies:
   bsv: ^1.0.4
 ```
+
+### Full example
+
+See test file.
