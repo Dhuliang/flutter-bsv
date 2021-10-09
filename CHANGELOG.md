@@ -1,6 +1,10 @@
+## [1.0.6]
+
+- Update LICENSE
+
 ## [1.0.5]
 
-- Update doc.
+- Update doc
 
 ## [1.0.4]
 

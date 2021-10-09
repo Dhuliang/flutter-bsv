@@ -13,6 +13,6 @@ dependencies:
   bsv: ^1.0.5
 ```
 
-### Full example
+## Examples
 
 See test file.
