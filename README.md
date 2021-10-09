@@ -10,7 +10,7 @@ Dart library for Bitcoin SV
 
 ```yaml
 dependencies:
-  bsv: ^1.0.4
+  bsv: ^1.0.5
 ```
 
 ### Full example

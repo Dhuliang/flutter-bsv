@@ -1,3 +1,7 @@
+## [1.0.5]
+
+- Update doc.
+
 ## [1.0.4]
 
 - Covert List<int> to Uint8List
