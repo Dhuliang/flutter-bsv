@@ -1,3 +1,4 @@
+import 'package:bsv/bsv.dart';
 import 'package:bsv/src/bip32.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:convert/convert.dart';
@@ -6,6 +7,42 @@ import 'package:bsv/src/extentsions/list.dart';
 
 void main() {
   group('Bip32', () {
+    test('should satisfy network type', () {
+      Globals.setNetworkType(NetworkType.Regtest);
+      expect(
+        Bip32.fromRandom().toString().substring(0, 4),
+        'tprv',
+      );
+      expect(
+        Bip32.fromRandom().toPublic().toString().substring(0, 4),
+        'tpub',
+      );
+      expect(
+        Bip32().fromRandom().toString().substring(0, 4),
+        'tprv',
+      );
+      expect(
+        Bip32().fromRandom().toPublic().toString().substring(0, 4),
+        'tpub',
+      );
+      Globals.setNetworkType(NetworkType.Mainnet);
+      expect(
+        Bip32.fromRandom().toString().substring(0, 4),
+        'xprv',
+      );
+      expect(
+        Bip32.fromRandom().toPublic().toString().substring(0, 4),
+        'xpub',
+      );
+      expect(
+        Bip32().fromRandom().toString().substring(0, 4),
+        'xprv',
+      );
+      expect(
+        Bip32().fromRandom().toPublic().toString().substring(0, 4),
+        'xpub',
+      );
+    });
     test('should satisfy these basic API features', () {
       expect(
         Bip32.fromRandom().toString().substring(0, 4),
@@ -23,13 +60,6 @@ void main() {
         Bip32.Testnet().fromRandom().toPublic().toString().substring(0, 4),
         'tpub',
       );
-
-      // List.generate(100, (index) {
-      //   print(Bip32.fromRandom().toString());
-      //   print(Bip32.fromRandom().toPublic().toString());
-      //   print(Bip32.Testnet().fromRandom().toString());
-      //   print(Bip32.Testnet().fromRandom().toPublic().toString());
-      // });
     });
 
     // test vectors: https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
