@@ -13,7 +13,7 @@ class Hash {
   Uint8List data;
   Hash({required this.data});
 
-  String get toHex => hex.encode(this.data);
+  String toHex() => hex.encode(this.data);
 
   List<int> toBuffer() => this.data.toList();
 

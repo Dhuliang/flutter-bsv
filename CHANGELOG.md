@@ -1,3 +1,7 @@
+## [1.0.7]
+
+- Add MerkleProof, MerkleNode, change to hash toHex()
+
 ## [1.0.6]
 
 - Update LICENSE

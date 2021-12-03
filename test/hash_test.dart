@@ -33,11 +33,11 @@ void main() {
         var hash = Hash.sha1(buf);
         // print(hex.encode(hash));
         // print(hash);
-        expect(hash.toHex, 'de69b8a4a5604d0486e6420db81e39eb464a17b2');
+        expect(hash.toHex(), 'de69b8a4a5604d0486e6420db81e39eb464a17b2');
         hash = Hash.sha1(Uint8List(0));
         // print(hex.encode(hash));
         // print(hash);
-        expect(hash.toHex, 'da39a3ee5e6b4b0d3255bfef95601890afd80709');
+        expect(hash.toHex(), 'da39a3ee5e6b4b0d3255bfef95601890afd80709');
       });
     });
 
@@ -52,14 +52,14 @@ void main() {
         var key = hex.decode('0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b');
         final hash = Hash.sha1Hmac(data as Uint8List, key as Uint8List);
 
-        expect(hash.toHex, _hex);
+        expect(hash.toHex(), _hex);
       });
     });
 
     group("@sha256", () {
       test('should calculate the hash of this buffer correctly', () {
         var hash = Hash.sha256(buf);
-        expect(hash.toHex,
+        expect(hash.toHex(),
             '6f2c7b22fd1626998287b3636089087961091de80311b9279c4033ec678a83e8');
       });
 
@@ -70,7 +70,7 @@ void main() {
         final hash1 = Hash.sha256(data);
         final hash2 = Hash.sha256(data);
 
-        expect(hash1.toHex, hash2.toHex);
+        expect(hash1.toHex(), hash2.toHex());
       }, timeout: Timeout(Duration(milliseconds: 10000)));
     });
 
@@ -80,7 +80,7 @@ void main() {
         final data = utf8.encode('');
 
         var hash = Hash.sha256Hmac(data as Uint8List, key as Uint8List);
-        expect(hash.toHex,
+        expect(hash.toHex(),
             'b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad');
       });
 
@@ -89,7 +89,7 @@ void main() {
         final data = utf8.encode('The quick brown fox jumps over the lazy dog');
         var hash = Hash.sha256Hmac(data as Uint8List, key as Uint8List);
 
-        expect(hash.toHex,
+        expect(hash.toHex(),
             'f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8');
       });
     });
@@ -98,7 +98,7 @@ void main() {
       test('should calculate the hash of this buffer correctly', () {
         final hash = Hash.sha256Sha256(buf);
 
-        expect(hash.toHex,
+        expect(hash.toHex(),
             'be586c8b20dee549bdd66018c7a79e2b67bb88b7c7d428fa4c970976d2bec5ba');
       });
     });
@@ -106,14 +106,14 @@ void main() {
     group('@sha256Ripemd160', () {
       test('should calculate the hash of this buffer correctly', () {
         final hash = Hash.sha256Ripemd160(buf);
-        expect(hash.toHex, '7322e2bd8535e476c092934e16a6169ca9b707ec');
+        expect(hash.toHex(), '7322e2bd8535e476c092934e16a6169ca9b707ec');
       });
     });
 
     group('@ripemd160', () {
       test('should calculate the hash of this buffer correctly', () {
         final hash = Hash.ripemd160(buf);
-        expect(hash.toHex, 'fa0f4565ff776fee0034c713cbf48b5ec06b7f5c');
+        expect(hash.toHex(), 'fa0f4565ff776fee0034c713cbf48b5ec06b7f5c');
       });
     });
 
@@ -121,7 +121,7 @@ void main() {
       test('should calculate the hash of this buffer correctly', () {
         final hash = Hash.sha512(buf);
 
-        expect(hash.toHex,
+        expect(hash.toHex(),
             'c0530aa32048f4904ae162bc14b9eb535eab6c465e960130005feddb71613e7d62aea75f7d3333ba06e805fc8e45681454524e3f8050969fe5a5f7f2392e31d0');
       });
     });
@@ -139,7 +139,7 @@ void main() {
 
         final hash = Hash.sha512Hmac(data, key);
 
-        expect(hash.toHex, _hex);
+        expect(hash.toHex(), _hex);
       });
 
       test('should calculate this known empty test vector correctly', () {
@@ -148,7 +148,7 @@ void main() {
 
         final hash = Hash.sha512Hmac(Uint8List(0), Uint8List(0));
 
-        expect(hash.toHex, _hex);
+        expect(hash.toHex(), _hex);
       });
 
       test('should calculate this known non-empty test vector correctly', () {
@@ -160,7 +160,7 @@ void main() {
 
         final hash = Hash.sha512Hmac(data as Uint8List, key as Uint8List);
 
-        expect(hash.toHex, _hex);
+        expect(hash.toHex(), _hex);
       });
     });
 
@@ -173,7 +173,7 @@ void main() {
           final data = utf8.encode(vector[0]);
           final hash = Hash.sha1(data as Uint8List);
 
-          expect(hash.toHex, vector[1]);
+          expect(hash.toHex(), vector[1]);
         });
       }
 
@@ -185,7 +185,7 @@ void main() {
           final data = utf8.encode(vector[0]);
           final hash = Hash.sha256(data as Uint8List);
 
-          expect(hash.toHex, vector[1]);
+          expect(hash.toHex(), vector[1]);
         });
       }
 
@@ -197,7 +197,7 @@ void main() {
           final data = utf8.encode(vector[0]);
           final hash = Hash.sha512(data as Uint8List);
 
-          expect(hash.toHex, vector[1]);
+          expect(hash.toHex(), vector[1]);
         });
       }
 
@@ -210,8 +210,8 @@ void main() {
           final keyBuf = hex.decode(vector['key']);
 
           final sha256HmacHex =
-              Hash.sha256Hmac(dataBuf as Uint8List, keyBuf as Uint8List).toHex;
-          final sha512HmacHex = Hash.sha512Hmac(dataBuf, keyBuf).toHex;
+              Hash.sha256Hmac(dataBuf as Uint8List, keyBuf as Uint8List).toHex();
+          final sha512HmacHex = Hash.sha512Hmac(dataBuf, keyBuf).toHex();
 
           expect(sha256HmacHex.substring(0, vector['sha256hmac'].length),
               vector['sha256hmac']);

@@ -178,7 +178,7 @@ void main() {
         var blockhashBuf =
             new Br(buf: hex.decode(blockidhex) as Uint8List).readReverse();
         var blockhashhex = blockhashBuf.toHex();
-        expect(hash.toHex, blockhashhex);
+        expect(hash.toHex(), blockhashhex);
       });
     });
 
