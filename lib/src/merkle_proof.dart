@@ -411,6 +411,94 @@ class MerkleProof {
     return (c.data.compareTo(merkleRootBuf));
   }
 
+  String calculateMerkleRoot(Hash h) {
+    if (this.getFlagsComposite()) {
+      // composite proof type not supported
+      throw 'only single proof supported in this version';
+    }
+
+    if (this.getFlagsProofType() != 'branch') {
+      // merkle tree proof type not supported
+      throw 'only merkle branch supported in this version';
+    }
+
+    try {
+      // there is no reason to use this method, so we disable it. always deliver
+      // the merkle root.
+      if (this.getFlagsTargetType() == 'hash') {
+        throw 'target type hash not supported in this version';
+      }
+    } catch (err) {
+      throw 'invalid target type : ${err.toString()}';
+    }
+
+    Hash c = Hash(data: h.data);
+    var index = this.indexNum;
+
+    if (this.getFlagsHasTx()) {
+      var tx2 = Tx.fromBuffer(this.txOrIdBuf!);
+
+      var txCorrect = !(tx2.hash().data.compareTo(c.data) != 0);
+      if (!txCorrect) {
+        // the tx in the merkle proof does not match
+        throw 'the tx in the merkle proof does not match';
+      }
+    } else {
+      var txCorrect = !(this.txOrIdBuf!.asUint8List().compareTo(c.data) != 0);
+      if (!txCorrect) {
+        // the tx hash in the merkle proof does not match
+        throw "the tx hash in the merkle proof does not match";
+      }
+    }
+    // var isLastInTree = true
+
+    for (var i = 0; i < this.nodes.length; i++) {
+      var typeNum = this.nodes[i]['typeNum'];
+      var p = this.nodes[i]['nodeBuf'];
+
+      // Check if the node is the left or the right child
+      var cIsLeft = index! % 2 == 0;
+
+      // Check for duplicate hash - this happens if the node (p) is
+      // the last element of an uneven merkle tree layer
+      if (typeNum == 1) {
+        // If no pair is provided, we assume that c[0] is the Merkle root and compare it to the root provided in the block header.
+        if (!cIsLeft) {
+          // this shouldn't happen...
+          throw ('invalid duplicate on left hand side according to index value');
+        }
+        p = c.data;
+      }
+
+      // This check fails at least once if it's not the last element
+      // if (cIsLeft && c != p) {
+      //   isLastInTree = false
+      // }
+
+      var merklec = new MerkleNode(hashBuf: c.data);
+      var merklep = new MerkleNode(hashBuf: p);
+
+      // Calculate the parent node
+      if (cIsLeft) {
+        // Concatenate left leaf (c) with right leaf (p)
+        // c = MerkleNode.fromObject({merkle1: merklec, merkle2: merklep}).hash();
+        c = MerkleNode(merkle1: merklec, merkle2: merklep).hash();
+      } else {
+        // Concatenate left leaf (p) with right leaf (c)
+        // c = MerkleNode.fromObject({merkle1: merklep, merkle2: merklec}).hash();
+        c = MerkleNode(merkle1: merklep, merkle2: merklec).hash();
+      }
+
+      // We need integer division here with remainder dropped.
+      // Javascript does floating point math by default so we
+      // need to use Math.floor to drop the fraction.
+      index = (index / 2).floor();
+    }
+
+    // c is now the calculated merkle root
+    return c.data.reversed.toList().toHex();
+  }
+
   bool verify(BlockHeader blockHeader, Tx tx) {
     dynamic result = this.verificationError(blockHeader, tx);
     return !Util.checkToBool(result);

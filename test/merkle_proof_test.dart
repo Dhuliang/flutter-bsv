@@ -521,6 +521,72 @@ void main() {
 
         expect(!Util.checkToBool(result), true);
       });
+
+      test('should calculate merkle root0', () {
+        // there is no reason to use this method, so we disable it. always deliver
+        // the merkle root.
+        var txId =
+            '75edb0a69eb195cdd81e310553aa4d25e18450e08f168532a2c2e9cf447bf169';
+        var merkleRootId =
+            '6c9d85bf51ebb0c474616fad91a115590e9a8316f21cab836dc949cfa267b0a7';
+
+        var hash = Hash(
+            data: Br(buf: hex.decode(txId).asUint8List())
+                .readReverse()
+                .asUint8List());
+
+        var merkleProof = MerkleProof.fromJSON({
+          "index": 2,
+          "targetType": 'merkleRoot',
+          "txOrId": txId,
+          "target": merkleRootId,
+          "nodes": [
+            '*',
+            '0afecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe',
+            '1afecafecafecafecafecafecafecafecafecafecafecafecafecafecafecafe'
+          ]
+        });
+
+        String merkleRoot = merkleProof.calculateMerkleRoot(hash);
+
+        expect(merkleRoot, merkleRootId);
+      });
+
+      test('should calculate merkle root1', () {
+        // there is no reason to use this method, so we disable it. always deliver
+        // the merkle root.
+        var txId =
+            '8fbdc210a30749296e77b72dbff2065582ed13e10c92cac3dca3ec71457066c0';
+        var merkleRootId =
+            'e89889a3d17431126a2ed0532ce98815778a6f1e23caf0ee6a4513e44555952c';
+
+        var hash = Hash(
+            data: Br(buf: hex.decode(txId).asUint8List())
+                .readReverse()
+                .asUint8List());
+
+        var merkleProof = MerkleProof.fromJSON({
+          "index": 632,
+          "targetType": 'merkleRoot',
+          "txOrId": txId,
+          "target": merkleRootId,
+          "nodes": [
+            "e57c0f7dde88c0185e62544c73246e03560ab2ac8625c996a608c9da71a4d130",
+            "16c99343b8baac3dacf561fe633231cfb0c09983687cd4a00eaa9ce54b1984d7",
+            "6ac61d8b94df3e2551ef3b64963b237421e4b567db15d17ed26a449ab4f669df",
+            "150d674ba440e9da7879773623eef1d1968c42f1b44356c72834f2049ed2ba4b",
+            "4869fee350abaad55c4b9b27e243274c451235e251aebbb8646a359760cb7ddb",
+            "9c093eee173d65a9f793e5aa41ea593da0194f8f653d2b030579adaaa257244c",
+            "5ade12c612f32b581160720478f63c42a21aa9faba49ff0bd266ecb2cc55bdbd",
+            "d762835582cdb83ce854eb599e738011f76ff201665617885fd323c13229fda5",
+            "4d5998e89b2b46238d63aa73dd02ec8239a1310be9fbaf8b29cc060520a07314",
+            "10a00c3d94a581056d163fe3554e8339d5141a97b8dd59084174fde5ede4c1ba",
+          ]
+        });
+
+        String merkleRoot = merkleProof.calculateMerkleRoot(hash);
+        expect(merkleRoot, merkleRootId);
+      });
     });
   });
 }

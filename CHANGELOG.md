@@ -1,3 +1,7 @@
+## [1.0.9]
+
+- Add Calculate merkler root
+
 ## [1.0.8]
 
 - Add MerkleProof, MerkleNode export
