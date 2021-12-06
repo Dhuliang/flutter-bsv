@@ -40,3 +40,5 @@ export 'src/tx_out.dart';
 export 'src/tx_out_map.dart';
 export 'src/tx_verifier.dart';
 export 'src/var_int.dart';
+export 'src/merkle_node.dart';
+export 'src/merkle_proof.dart';

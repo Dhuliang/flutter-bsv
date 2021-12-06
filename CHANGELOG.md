@@ -1,3 +1,7 @@
+## [1.0.8]
+
+- Add MerkleProof, MerkleNode export
+
 ## [1.0.7]
 
 - Add MerkleProof, MerkleNode, change to hash toHex()
