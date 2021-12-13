@@ -1,6 +1,6 @@
 name: bsv
 description: Bitcoin SV (BSV) library for Dart, which supports sign transaction, bip32, bip39 etc.
-version: 1.0.9
+version: 1.0.10
 homepage: "https://github.com/Dhuliang/flutter-bsv"
 
 environment:

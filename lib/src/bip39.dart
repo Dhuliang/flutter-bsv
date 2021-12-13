@@ -29,8 +29,8 @@ class Bip39 {
   }) {
     this.seed = seed;
     this.mnemonic = mnemonic;
-    this.worldList = worldList ?? bip39EnWorldlist;
-    this.worldListSpace = worldListSpace ?? ' ';
+    this.worldList = worldList ?? Globals.bip39Worldlist;
+    this.worldListSpace = worldListSpace ?? Globals.bip39WorldSpace;
   }
 
   static const INVALID_MNEMONIC = 'Invalid mnemonic';
