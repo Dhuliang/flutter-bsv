@@ -1,3 +1,4 @@
+import 'package:bsv/bsv.dart';
 import 'package:bsv/src/bip32.dart';
 import 'package:bsv/src/bip39.dart';
 import 'package:bsv/src/tx_out_map.dart';
@@ -319,5 +320,19 @@ void main() {
     var bip39 = Bip39.fromString(mnemonic);
     print(bip39.mnemonic);
     print(Bip39.fromRandom(32 * 8));
+  });
+
+  test('example test cn', () {
+    Globals.setBip39WordListType(Bip39WordListType.Chinese);
+
+    var mnemonic = "怀 盟 拆 租 有 氮 职 惠 三 式 烘 诸";
+
+    var bip39 = Bip39(mnemonic: mnemonic);
+    expect(bip39.mnemonic, mnemonic);
+    print(bip39.mnemonic);
+
+    var seed = bip39.toSeed();
+
+    Bip32.fromSeed(List<int>.from(seed!)).derive("m/44'/0'/0'");
   });
 }
