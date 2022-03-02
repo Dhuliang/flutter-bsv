@@ -1,3 +1,7 @@
+## [1.0.11]
+
+- Fix OP_PUSHDATA1 OP_PUSHDATA2 OP_PUSHDATA4, `Script` fromHex/toHex bug.
+
 ## [1.0.10]
 
 - Fix Bip39

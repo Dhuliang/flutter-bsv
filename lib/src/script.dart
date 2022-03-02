@@ -151,6 +151,7 @@ class Script {
     this.chunks = List<ScriptChunk>.from([]);
 
     var br = new Br(buf: buf);
+    var invalid = false;
     while (!br.eof()) {
       var opCodeNum = br.readUInt8();
 
@@ -170,6 +171,8 @@ class Script {
           buf = br.read(len);
         } catch (err) {
           br.read();
+          invalid = true;
+          break;
         }
         this.add(ScriptChunk(
           buf: buf,
@@ -182,6 +185,8 @@ class Script {
           buf = br.read(len);
         } catch (err) {
           br.read();
+          invalid = true;
+          break;
         }
         this.add(ScriptChunk(
           buf: buf,
@@ -189,12 +194,13 @@ class Script {
           opCodeNum: opCodeNum,
         ));
       } else if (opCodeNum == OpCode.OP_PUSHDATA4) {
-        // print('OP_PUSHDATA4');
         try {
           len = br.readUInt32LE();
           buf = br.read(len);
         } catch (err) {
           br.read();
+          invalid = true;
+          break;
         }
         this.add(ScriptChunk(
           buf: buf,
@@ -202,17 +208,24 @@ class Script {
           opCodeNum: opCodeNum,
         ));
       } else {
-        // print('add 0');
         this.add(ScriptChunk(
           opCodeNum: opCodeNum,
         ));
       }
     }
 
+    if (invalid) {
+      this.chunks = [ScriptChunk(buf: buf)];
+    }
+
     return this;
   }
 
   List<int> toBuffer() {
+    if (this.chunks.length == 1 && this.chunks[0].opCodeNum == null) {
+      return this.chunks[0].buf?.toList() ?? [];
+    }
+
     var bw = new Bw();
 
     for (var i = 0; i < this.chunks.length; i++) {
